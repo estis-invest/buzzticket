@@ -1,1 +1,9 @@
+#!/bin/bash
+# Run lint-staged for non-Java files
 npx lint-staged
+
+# Run Spotless for Java files
+mvn spotless:apply
+
+# Re-stage any files that Spotless just fixed
+git add .

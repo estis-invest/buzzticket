@@ -1,5 +1,8 @@
 package com.efpcode.domain.model;
 
 public enum TicketStatus {
-    PENDING, CLOSED, OPEN, ARCHIVED
+  PENDING,
+  CLOSED,
+  OPEN,
+  ARCHIVED
 }
