@@ -1,4 +1,4 @@
-package com.efpcode.domain.model;
+package com.efpcode.domain.user.model;
 
 import java.util.UUID;
 

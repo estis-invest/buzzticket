@@ -1,4 +1,4 @@
-package com.efpcode.domain.model;
+package com.efpcode.domain.ticket.model;
 
 import java.util.UUID;
 

@@ -1,5 +1,6 @@
-package com.efpcode.domain.model;
+package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.user.model.UserId;
 import java.util.Objects;
 
 public record Ticket(
@@ -8,6 +9,7 @@ public record Ticket(
     TicketTitle title,
     TicketDescription description,
     TicketStatus status,
+    TicketPriority newPriority,
     TicketCreatAt time,
     TicketAssignees workers,
     UserId reportedBy) {
@@ -18,6 +20,7 @@ public record Ticket(
     Objects.requireNonNull(title, "TicketTitle cannot be null");
     Objects.requireNonNull(description, "TicketDescription cannot be null");
     Objects.requireNonNull(status, "TicketStatus cannot be null");
+    Objects.requireNonNull(newPriority, "TicketStatus cannot be null");
     Objects.requireNonNull(time, "TicketCreatAt cannot be null");
     Objects.requireNonNull(workers, "TicketAssignees cannot be null");
     Objects.requireNonNull(reportedBy, "UserId cannot be null");
@@ -34,6 +37,7 @@ public record Ticket(
         this.title,
         this.description,
         TicketStatus.OPEN,
+        TicketPriority.LOW,
         this.time,
         this.workers,
         this.reportedBy);
@@ -50,6 +54,7 @@ public record Ticket(
         this.title,
         this.description,
         TicketStatus.CLOSED,
+        TicketPriority.LOW,
         this.time,
         this.workers,
         this.reportedBy);
@@ -66,6 +71,7 @@ public record Ticket(
         this.title,
         this.description,
         TicketStatus.ARCHIVED,
+        TicketPriority.LOW,
         this.time,
         this.workers,
         this.reportedBy);
@@ -85,8 +91,14 @@ public record Ticket(
         title,
         description,
         TicketStatus.PENDING,
+        TicketPriority.LOW,
         time,
         TicketAssignees.empty(),
         reportedBy);
+  }
+
+  public Ticket changeTicketPriority(TicketPriority ticketPriority) {
+    return new Ticket(
+        id, slug, title, description, status, ticketPriority, time, workers, reportedBy);
   }
 }
