@@ -9,7 +9,8 @@ public record TicketDescription(String description) {
     }
 
     if (description.length() > MAX_CHARACTER_LENGTH) {
-      throw new IllegalArgumentException("Description has surpass max length");
+      throw new IllegalArgumentException(
+          "Description exceeds max length of " + MAX_CHARACTER_LENGTH + " characters");
     }
   }
 }

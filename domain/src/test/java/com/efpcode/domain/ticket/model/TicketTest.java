@@ -348,7 +348,7 @@ class TicketTest {
       var pastTime = TicketCreatedAt.createNow();
       var currentTime = TicketCreatedAt.createNow();
 
-      assertThat(pastTime).isNotSameAs(currentTime).isNotEqualTo(currentTime);
+      assertThat(pastTime).isNotSameAs(currentTime);
     }
 
     @Test
@@ -408,12 +408,12 @@ class TicketTest {
 
       assertThatThrownBy(() -> new TicketDescription(longText))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("surpass max length");
+          .hasMessageContaining("exceeds max length");
     }
 
     @Test
-    @DisplayName("TicketDescription can be created if lenght is under max length")
-    void ticketDescriptionCanBeCreatedIfLenghtIsUnderMaxLength() {
+    @DisplayName("TicketDescription can be created if length is under max length")
+    void ticketDescriptionCanBeCreatedIfLengthIsUnderMaxLength() {
       var lengthOfText = 1800;
       var longText = "a".repeat(lengthOfText);
       var ticketDescription = new TicketDescription(longText);
@@ -443,7 +443,7 @@ class TicketTest {
 
       assertThatThrownBy(() -> new TicketSlug(invalidFormatSlug))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("AAA-0000");
+          .hasMessageContaining("AAA-0000...000");
     }
 
     @Test

@@ -16,7 +16,7 @@ public record TicketSlug(String slug) {
     }
 
     if (!FORMAT.matcher(slug).matches()) {
-      throw new IllegalArgumentException("Slug must follow format `AAA-0000`");
+      throw new IllegalArgumentException("Slug must follow format `AAA-0000...000`");
     }
   }
 }
