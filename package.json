@@ -17,9 +17,6 @@
     "husky": "^9.1.7"
   },
   "lint-staged": {
-    "*.java": [
-      "mvn spotless:apply"
-    ],
     "frontend/**/*.{ts,tsx,js,jsx,json,css}": [
       "prettier --write"
     ]
