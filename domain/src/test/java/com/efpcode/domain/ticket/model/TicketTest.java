@@ -222,7 +222,7 @@ class TicketTest {
 
       assertThatThrownBy(() -> ticketWorkers.add(worker4))
           .isInstanceOf(IllegalArgumentException.class)
-          .hasMessageContaining("then 3");
+          .hasMessageContaining("than 3");
     }
 
     @Test
@@ -289,6 +289,30 @@ class TicketTest {
       assertThat(result.workers()).hasSize(1);
       assertThat(result.workers()).isEqualTo(ticketWorkers.workers());
       assertThat(result).isSameAs(ticketWorkers);
+    }
+
+    @Test
+    @DisplayName("TicketAssignees add method cannot pass null throws error")
+    void ticketAssigneesAddMethodCannotPassNullThrowsError() {
+
+      var worker1 = UserId.createRandom();
+
+      var ticketWorkers = new TicketAssignees(Set.of(worker1));
+      assertThatThrownBy(() -> ticketWorkers.add(null))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("be null");
+    }
+
+    @Test
+    @DisplayName("TicketAssignees remove method cannot pass null throws error")
+    void ticketAssigneesRemoveMethodCannotPassNullThrowsError() {
+
+      var worker1 = UserId.createRandom();
+
+      var ticketWorkers = new TicketAssignees(Set.of(worker1));
+      assertThatThrownBy(() -> ticketWorkers.remove(null))
+          .isInstanceOf(IllegalArgumentException.class)
+          .hasMessageContaining("be null");
     }
 
     @Test

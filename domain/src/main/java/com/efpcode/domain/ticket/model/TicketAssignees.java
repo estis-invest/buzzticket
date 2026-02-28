@@ -16,11 +16,12 @@ public record TicketAssignees(Set<UserId> workers) {
     workers = Set.copyOf(workers);
 
     if (workers.size() > LIMIT) {
-      throw new IllegalArgumentException("A ticket cannot have more then " + LIMIT + " workers");
+      throw new IllegalArgumentException("A ticket cannot have more than " + LIMIT + " workers");
     }
   }
 
   public TicketAssignees add(UserId userId) {
+    if (userId == null) throw new IllegalArgumentException("UserId cannot be null");
     if (workers.contains(userId)) return this; // Already assigned, no change needed
 
     var newWorkers = new HashSet<>(workers);
@@ -29,6 +30,8 @@ public record TicketAssignees(Set<UserId> workers) {
   }
 
   public TicketAssignees remove(UserId userId) {
+    if (userId == null) throw new IllegalArgumentException("UserId cannot be null");
+
     if (!workers.contains(userId)) return this; // Not assigned, no change needed
 
     var newWorkers = new HashSet<>(workers);
