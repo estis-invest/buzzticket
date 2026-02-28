@@ -15,14 +15,14 @@ class TicketTest {
   @Nested
   class TicketTestObject {
 
-    private final TicketId anyId = new TicketId(UUID.randomUUID());
+    private final TicketId anyId = TicketId.generate();
     private final TicketSlug anySlug = new TicketSlug("BZT-00001");
     private final TicketTitle anyTitle = new TicketTitle("Fix broken build");
     private final TicketDescription anyDescription = new TicketDescription("This ticket is broken");
-    private final TicketCreatAt anyTime = new TicketCreatAt(Instant.now());
+    private final TicketCreatedAt anyTime = TicketCreatedAt.createNow();
     private final TicketAssignees anyWorker =
-        new TicketAssignees(Set.of(new UserId(UUID.randomUUID(), "Random", "test@test.com")));
-    private final UserId anyCustomer = new UserId(UUID.randomUUID(), "Random2", "test2@test2.com");
+        new TicketAssignees(Set.of(new UserId(UUID.randomUUID())));
+    private final UserId anyCustomer = UserId.createRandom();
 
     @Test
     @DisplayName("Opening a ticket that is not PENDING return the same instance")
@@ -124,7 +124,8 @@ class TicketTest {
     void newTicketHasStatusPendingAndNoWorkers() {
 
       var ticket =
-          Ticket.createPending(anyId, anySlug, anyTitle, anyDescription, anyTime, anyCustomer);
+          Ticket.createPending(
+              anyId, anySlug, anyTitle, anyDescription, TicketPriority.LOW, anyTime, anyCustomer);
       assertThat(ticket.status()).isEqualTo(TicketStatus.PENDING);
       assertThat(ticket.workers().workers()).isEmpty();
     }
@@ -191,11 +192,11 @@ class TicketTest {
               anyWorker,
               anyCustomer);
 
-      var result = pendingTicket.changeTicketPriority(TicketPriority.HIGH);
+      var result = pendingTicket.withPriority(TicketPriority.HIGH);
       assertThat(pendingTicket).isNotEqualTo(result);
-      assertThat(result.newPriority()).isNotEqualTo(pendingTicket.newPriority());
+      assertThat(result.priority()).isNotEqualTo(pendingTicket.priority());
       assertThat(result.id()).isEqualTo(pendingTicket.id());
-      assertThat(result.newPriority()).isEqualTo(TicketPriority.HIGH);
+      assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
     }
   }
 
@@ -205,10 +206,10 @@ class TicketTest {
     @Test
     @DisplayName("TicketAssignees throws error if more size is greater than three")
     void ticketAssigneesThrowsErrorIfMoreSizeIsGreaterThanThree() {
-      var worker1 = new UserId(UUID.randomUUID(), "W1", "w1@test.com");
-      var worker2 = new UserId(UUID.randomUUID(), "W2", "w2@test.com");
-      var worker3 = new UserId(UUID.randomUUID(), "W3", "w3@test.com");
-      var worker4 = new UserId(UUID.randomUUID(), "W4", "w4@test.com");
+      var worker1 = UserId.createRandom();
+      var worker2 = UserId.createRandom();
+      var worker3 = UserId.createRandom();
+      var worker4 = UserId.createRandom();
 
       Set<UserId> overLimit = Set.of(worker1, worker2, worker3, worker4);
       Set<UserId> underLimit = Set.of(worker1, worker2, worker3);
@@ -235,9 +236,8 @@ class TicketTest {
     @Test
     @DisplayName("TicketAssignees has add method that returns a new object")
     void ticketAssigneesHasAddMethodThatReturnsANewObject() {
-      var ticketWorkers =
-          new TicketAssignees(Set.of(new UserId(UUID.randomUUID(), "Test", "test@test.com")));
-      var newWorker = new UserId(UUID.randomUUID(), "Test2", "test2@test2.com");
+      var ticketWorkers = new TicketAssignees(Set.of(UserId.createRandom()));
+      var newWorker = UserId.createRandom();
 
       var result = ticketWorkers.add(newWorker);
       assertThat(result).isNotNull();
@@ -250,7 +250,7 @@ class TicketTest {
     @DisplayName("TicketAssignees cannot assignee the same user with add")
     void ticketAssigneesCannotAssigneeTheSameUserWithAdd() {
 
-      var newWorker = new UserId(UUID.randomUUID(), "Test2", "test2@test2.com");
+      var newWorker = UserId.createRandom();
       var ticketWorker = new TicketAssignees(Set.of(newWorker));
 
       var tempWorker = ticketWorker.add(newWorker);
@@ -264,8 +264,8 @@ class TicketTest {
     @Test
     @DisplayName("TicketAssignees has remove method that returns new object")
     void ticketAssigneesHasRemoveMethodThatReturnsNewObject() {
-      var worker1 = new UserId(UUID.randomUUID(), "W1", "w1@test.com");
-      var worker2 = new UserId(UUID.randomUUID(), "W2", "w2@test.com");
+      var worker1 = UserId.createRandom();
+      var worker2 = UserId.createRandom();
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1, worker2));
 
@@ -280,8 +280,8 @@ class TicketTest {
     @DisplayName("TicketAssignees cannot remove user that is not present returns valid object")
     void ticketAssigneesCannotRemoveUserThatIsNotPresentReturnsValidObject() {
 
-      var worker1 = new UserId(UUID.randomUUID(), "W1", "w1@test.com");
-      var worker2 = new UserId(UUID.randomUUID(), "W2", "w2@test.com");
+      var worker1 = UserId.createRandom();
+      var worker2 = UserId.createRandom();
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1));
       var result = ticketWorkers.remove(worker2);
@@ -295,13 +295,13 @@ class TicketTest {
     @DisplayName("TicketCreateAt cannot pass null value or zero time")
     void ticketCreateAtCannotPassNullValueOrZeroTime() {
 
-      assertThatThrownBy(() -> new TicketCreatAt(null))
+      assertThatThrownBy(() -> new TicketCreatedAt(null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("Time is required");
 
       var emptyTime = Instant.ofEpochMilli(0);
 
-      assertThatThrownBy(() -> new TicketCreatAt(emptyTime))
+      assertThatThrownBy(() -> new TicketCreatedAt(emptyTime))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("Time is required");
     }
@@ -312,7 +312,7 @@ class TicketTest {
 
       var futureTime = Instant.now().plusSeconds(90);
 
-      assertThatThrownBy(() -> new TicketCreatAt(futureTime))
+      assertThatThrownBy(() -> new TicketCreatedAt(futureTime))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("the future");
     }
@@ -321,17 +321,17 @@ class TicketTest {
     @DisplayName("Time has createNow method that returns new objects")
     void timeHasCreateNowMethodThatReturnsNewObjects() {
 
-      var pastTime = TicketCreatAt.createNow();
-      var currentTime = TicketCreatAt.createNow();
-      assertThat(pastTime).isNotSameAs(currentTime);
-      assertThat(pastTime).isNotEqualTo(currentTime);
+      var pastTime = TicketCreatedAt.createNow();
+      var currentTime = TicketCreatedAt.createNow();
+
+      assertThat(pastTime).isNotSameAs(currentTime).isNotEqualTo(currentTime);
     }
 
     @Test
     @DisplayName("Time has createNow method and returns valid objects")
     void timeHasCreateNowMethodAndReturnsValidObjects() {
 
-      var now = TicketCreatAt.createNow();
+      var now = TicketCreatedAt.createNow();
       assertThat(now.time()).isNotNull();
       assertThat(now.time()).isBeforeOrEqualTo(Instant.now());
     }
@@ -343,6 +343,25 @@ class TicketTest {
       assertThatThrownBy(() -> new TicketId(null))
           .isInstanceOf(IllegalArgumentException.class)
           .hasMessageContaining("UUID is required");
+    }
+
+    @Test
+    @DisplayName("TicketId generate method returns valid UUID object")
+    void ticketIdGenerateMethodReturnsValidUuidObject() {
+      var result = TicketId.generate();
+      assertThat(result).isNotNull().isInstanceOf(TicketId.class);
+    }
+
+    @Test
+    @DisplayName("TicketId fromString method returns a valid TicketID object")
+    void ticketIdFromStringMethodReturnsAValidTicketIdObject() {
+
+      var stringUUID = UUID.randomUUID().toString();
+
+      TicketId result = TicketId.fromString(stringUUID);
+
+      assertThat(result).isNotNull().isInstanceOf(TicketId.class);
+      assertThat(result.value().toString()).hasToString(stringUUID);
     }
 
     @Test
@@ -377,7 +396,7 @@ class TicketTest {
 
       assertThat(ticketDescription.description()).isEqualTo(longText);
       assertThat(ticketDescription.description()).isNotBlank().isNotNull();
-      assertThat(ticketDescription.description().length()).isEqualTo(lengthOfText);
+      assertThat(ticketDescription.description()).hasSameSizeAs(longText);
     }
 
     @Test
@@ -425,7 +444,7 @@ class TicketTest {
       var newSlug = new TicketSlug(longSlug);
 
       assertThat(newSlug.slug()).isEqualTo(longSlug);
-      assertThat(newSlug.slug().length()).isEqualTo(longSlug.length());
+      assertThat(newSlug.slug()).hasSameSizeAs(longSlug);
     }
 
     @Test

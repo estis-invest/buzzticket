@@ -9,8 +9,8 @@ public record Ticket(
     TicketTitle title,
     TicketDescription description,
     TicketStatus status,
-    TicketPriority newPriority,
-    TicketCreatAt time,
+    TicketPriority priority,
+    TicketCreatedAt time,
     TicketAssignees workers,
     UserId reportedBy) {
 
@@ -20,8 +20,8 @@ public record Ticket(
     Objects.requireNonNull(title, "TicketTitle cannot be null");
     Objects.requireNonNull(description, "TicketDescription cannot be null");
     Objects.requireNonNull(status, "TicketStatus cannot be null");
-    Objects.requireNonNull(newPriority, "TicketStatus cannot be null");
-    Objects.requireNonNull(time, "TicketCreatAt cannot be null");
+    Objects.requireNonNull(priority, "TicketPriority cannot be null");
+    Objects.requireNonNull(time, "TicketCreatedAt cannot be null");
     Objects.requireNonNull(workers, "TicketAssignees cannot be null");
     Objects.requireNonNull(reportedBy, "UserId cannot be null");
   }
@@ -31,16 +31,7 @@ public record Ticket(
       return this;
     }
 
-    return new Ticket(
-        this.id,
-        this.slug,
-        this.title,
-        this.description,
-        TicketStatus.OPEN,
-        TicketPriority.LOW,
-        this.time,
-        this.workers,
-        this.reportedBy);
+    return withStatus(TicketStatus.OPEN);
   }
 
   public Ticket close() {
@@ -48,16 +39,7 @@ public record Ticket(
     if (this.status != TicketStatus.OPEN) {
       return this;
     }
-    return new Ticket(
-        this.id,
-        this.slug,
-        this.title,
-        this.description,
-        TicketStatus.CLOSED,
-        TicketPriority.LOW,
-        this.time,
-        this.workers,
-        this.reportedBy);
+    return withStatus(TicketStatus.CLOSED);
   }
 
   public Ticket archive() {
@@ -65,16 +47,7 @@ public record Ticket(
     if (this.status != TicketStatus.CLOSED) {
       return this;
     }
-    return new Ticket(
-        this.id,
-        this.slug,
-        this.title,
-        this.description,
-        TicketStatus.ARCHIVED,
-        TicketPriority.LOW,
-        this.time,
-        this.workers,
-        this.reportedBy);
+    return withStatus(TicketStatus.ARCHIVED);
   }
 
   public static Ticket createPending(
@@ -82,7 +55,8 @@ public record Ticket(
       TicketSlug slug,
       TicketTitle title,
       TicketDescription description,
-      TicketCreatAt time,
+      TicketPriority priority,
+      TicketCreatedAt time,
       UserId reportedBy) {
 
     return new Ticket(
@@ -91,14 +65,18 @@ public record Ticket(
         title,
         description,
         TicketStatus.PENDING,
-        TicketPriority.LOW,
+        priority,
         time,
         TicketAssignees.empty(),
         reportedBy);
   }
 
-  public Ticket changeTicketPriority(TicketPriority ticketPriority) {
+  public Ticket withPriority(TicketPriority ticketPriority) {
     return new Ticket(
         id, slug, title, description, status, ticketPriority, time, workers, reportedBy);
+  }
+
+  private Ticket withStatus(TicketStatus newStatus) {
+    return new Ticket(id, slug, title, description, newStatus, priority, time, workers, reportedBy);
   }
 }
