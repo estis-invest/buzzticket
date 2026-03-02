@@ -3,6 +3,7 @@ package com.efpcode.domain.user.model;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.domain.user.exceptions.InvalidUserNameException;
+import com.efpcode.domain.user.exceptions.UserNameLengthException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -30,5 +31,27 @@ class UserNameTest {
 
     assertThat(results.name()).hasToString(testName);
     assertThat(results).isNotNull().isInstanceOf(UserName.class);
+  }
+
+  @Test
+  @DisplayName("Username cannot exceed limit throws error")
+  void usernameCannotExceedLimitThrowsError() {
+
+    var testName = "a".repeat(51);
+
+    assertThatThrownBy(() -> new UserName(testName))
+        .isInstanceOf(UserNameLengthException.class)
+        .hasMessageContaining("Username cannot exceed 50 limit");
+  }
+
+  @Test
+  @DisplayName("Username below limit can return valid object")
+  void usernameBelowLimitCanReturnValidObject() {
+
+    var testName = "a".repeat(50);
+    var result = new UserName(testName);
+
+    assertThat(result.name()).hasToString(testName);
+    assertThat(result.name().length()).isEqualTo(testName.length());
   }
 }

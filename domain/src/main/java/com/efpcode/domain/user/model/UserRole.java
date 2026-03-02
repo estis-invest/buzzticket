@@ -3,5 +3,9 @@ package com.efpcode.domain.user.model;
 public enum UserRole {
   CUSTOMER,
   SUPPORT,
-  ADMIN
+  ADMIN;
+
+  public boolean requiresPartner() {
+    return this == SUPPORT || this == ADMIN;
+  }
 }

@@ -11,7 +11,7 @@ public record UserId(UUID id) {
     }
   }
 
-  public static UserId createRandom() {
+  public static UserId generate() {
 
     return new UserId(UUID.randomUUID());
   }

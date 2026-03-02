@@ -23,7 +23,7 @@ class TicketTest {
     private final TicketCreatedAt anyTime = TicketCreatedAt.createNow();
     private final TicketAssignees anyWorker =
         new TicketAssignees(Set.of(new UserId(UUID.randomUUID())));
-    private final UserId anyCustomer = UserId.createRandom();
+    private final UserId anyCustomer = UserId.generate();
 
     @Test
     @DisplayName("Opening a ticket that is not PENDING return the same instance")
@@ -207,10 +207,10 @@ class TicketTest {
     @Test
     @DisplayName("TicketAssignees throws error if more size is greater than three")
     void ticketAssigneesThrowsErrorIfMoreSizeIsGreaterThanThree() {
-      var worker1 = UserId.createRandom();
-      var worker2 = UserId.createRandom();
-      var worker3 = UserId.createRandom();
-      var worker4 = UserId.createRandom();
+      var worker1 = UserId.generate();
+      var worker2 = UserId.generate();
+      var worker3 = UserId.generate();
+      var worker4 = UserId.generate();
 
       Set<UserId> overLimit = Set.of(worker1, worker2, worker3, worker4);
       Set<UserId> underLimit = Set.of(worker1, worker2, worker3);
@@ -237,8 +237,8 @@ class TicketTest {
     @Test
     @DisplayName("TicketAssignees has add method that returns a new object")
     void ticketAssigneesHasAddMethodThatReturnsANewObject() {
-      var ticketWorkers = new TicketAssignees(Set.of(UserId.createRandom()));
-      var newWorker = UserId.createRandom();
+      var ticketWorkers = new TicketAssignees(Set.of(UserId.generate()));
+      var newWorker = UserId.generate();
 
       var result = ticketWorkers.add(newWorker);
       assertThat(result).isNotNull();
@@ -251,7 +251,7 @@ class TicketTest {
     @DisplayName("TicketAssignees cannot assignee the same user with add")
     void ticketAssigneesCannotAssigneeTheSameUserWithAdd() {
 
-      var newWorker = UserId.createRandom();
+      var newWorker = UserId.generate();
       var ticketWorker = new TicketAssignees(Set.of(newWorker));
 
       var tempWorker = ticketWorker.add(newWorker);
@@ -265,8 +265,8 @@ class TicketTest {
     @Test
     @DisplayName("TicketAssignees has remove method that returns new object")
     void ticketAssigneesHasRemoveMethodThatReturnsNewObject() {
-      var worker1 = UserId.createRandom();
-      var worker2 = UserId.createRandom();
+      var worker1 = UserId.generate();
+      var worker2 = UserId.generate();
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1, worker2));
 
@@ -281,8 +281,8 @@ class TicketTest {
     @DisplayName("TicketAssignees cannot remove user that is not present returns valid object")
     void ticketAssigneesCannotRemoveUserThatIsNotPresentReturnsValidObject() {
 
-      var worker1 = UserId.createRandom();
-      var worker2 = UserId.createRandom();
+      var worker1 = UserId.generate();
+      var worker2 = UserId.generate();
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1));
       var result = ticketWorkers.remove(worker2);
@@ -296,7 +296,7 @@ class TicketTest {
     @DisplayName("TicketAssignees add method cannot pass null throws error")
     void ticketAssigneesAddMethodCannotPassNullThrowsError() {
 
-      var worker1 = UserId.createRandom();
+      var worker1 = UserId.generate();
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1));
       assertThatThrownBy(() -> ticketWorkers.add(null))
@@ -308,7 +308,7 @@ class TicketTest {
     @DisplayName("TicketAssignees remove method cannot pass null throws error")
     void ticketAssigneesRemoveMethodCannotPassNullThrowsError() {
 
-      var worker1 = UserId.createRandom();
+      var worker1 = UserId.generate();
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1));
       assertThatThrownBy(() -> ticketWorkers.remove(null))
