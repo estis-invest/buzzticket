@@ -1,5 +1,7 @@
 package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.ticket.exceptions.InvalidCreatedAtException;
+import com.efpcode.domain.ticket.exceptions.InvalidTicketDateException;
 import java.time.Instant;
 
 public record TicketCreatedAt(Instant time) {
@@ -7,10 +9,10 @@ public record TicketCreatedAt(Instant time) {
 
   public TicketCreatedAt {
     if (time == null || time.equals(Instant.ofEpochMilli(0)))
-      throw new IllegalArgumentException("Time is required");
+      throw new InvalidCreatedAtException("Time is required");
 
     if (time.isAfter(Instant.now().plusSeconds(GRACE_PERIOD)))
-      throw new IllegalArgumentException("Time cannot be created in the future");
+      throw new InvalidTicketDateException("Time cannot be created in the future");
   }
 
   public static TicketCreatedAt createNow() {

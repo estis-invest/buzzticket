@@ -1,12 +1,13 @@
 package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.ticket.exceptions.InvalidTicketIdException;
 import java.util.UUID;
 
 public record TicketId(UUID value) {
 
   public TicketId {
     if (value == null) {
-      throw new IllegalArgumentException("UUID is required and cannot be null");
+      throw new InvalidTicketIdException("UUID is required and cannot be null");
     }
   }
 

@@ -2,6 +2,7 @@ package com.efpcode.domain.user.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.user.exceptions.InvalidUserIdException;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,7 +14,7 @@ class UserIdTest {
   void userIdCannotPassNullThrowsError() {
 
     assertThatThrownBy(() -> new UserId(null))
-        .isInstanceOf(IllegalArgumentException.class)
+        .isInstanceOf(InvalidUserIdException.class)
         .hasMessageContaining("cannot pass null");
   }
 

@@ -2,6 +2,7 @@ package com.efpcode.domain.ticket.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.ticket.exceptions.*;
 import com.efpcode.domain.user.model.UserId;
 import java.time.Instant;
 import java.util.Set;
@@ -217,11 +218,11 @@ class TicketTest {
       var ticketWorkers = new TicketAssignees(underLimit);
 
       assertThatThrownBy(() -> new TicketAssignees(overLimit))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(TicketAssigmentLimitException.class)
           .hasMessageContaining("3 workers");
 
       assertThatThrownBy(() -> ticketWorkers.add(worker4))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(TicketAssigmentLimitException.class)
           .hasMessageContaining("than 3");
     }
 
@@ -299,7 +300,7 @@ class TicketTest {
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1));
       assertThatThrownBy(() -> ticketWorkers.add(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(MissingUserAssignmentException.class)
           .hasMessageContaining("be null");
     }
 
@@ -311,7 +312,7 @@ class TicketTest {
 
       var ticketWorkers = new TicketAssignees(Set.of(worker1));
       assertThatThrownBy(() -> ticketWorkers.remove(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(MissingUserAssignmentException.class)
           .hasMessageContaining("be null");
     }
 
@@ -320,13 +321,13 @@ class TicketTest {
     void ticketCreateAtCannotPassNullValueOrZeroTime() {
 
       assertThatThrownBy(() -> new TicketCreatedAt(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidCreatedAtException.class)
           .hasMessageContaining("Time is required");
 
       var emptyTime = Instant.ofEpochMilli(0);
 
       assertThatThrownBy(() -> new TicketCreatedAt(emptyTime))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidCreatedAtException.class)
           .hasMessageContaining("Time is required");
     }
 
@@ -337,7 +338,7 @@ class TicketTest {
       var futureTime = Instant.now().plusSeconds(90);
 
       assertThatThrownBy(() -> new TicketCreatedAt(futureTime))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketDateException.class)
           .hasMessageContaining("the future");
     }
 
@@ -365,7 +366,7 @@ class TicketTest {
     void ticketIdCannotPassNullValue() {
 
       assertThatThrownBy(() -> new TicketId(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketIdException.class)
           .hasMessageContaining("UUID is required");
     }
 
@@ -392,11 +393,11 @@ class TicketTest {
     @DisplayName("TicketDescription cannot pass null or blank")
     void ticketDescriptionCannotPassNullOrBlank() {
       assertThatThrownBy(() -> new TicketDescription("    "))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketDescriptionException.class)
           .hasMessageContaining("be empty");
 
       assertThatThrownBy(() -> new TicketDescription(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketDescriptionException.class)
           .hasMessageContaining("be empty");
     }
 
@@ -407,7 +408,7 @@ class TicketTest {
       var longText = "a".repeat(1801);
 
       assertThatThrownBy(() -> new TicketDescription(longText))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(TicketDescriptionLengthException.class)
           .hasMessageContaining("exceeds max length");
     }
 
@@ -428,11 +429,11 @@ class TicketTest {
     void ticketSlugCannotPassNullOrBlankThrowsError() {
 
       assertThatThrownBy(() -> new TicketSlug(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketSlugException.class)
           .hasMessageContaining("be null");
 
       assertThatThrownBy(() -> new TicketSlug("   "))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketSlugException.class)
           .hasMessageContaining("or blank");
     }
 
@@ -442,7 +443,7 @@ class TicketTest {
       var invalidFormatSlug = "AAAA-0000";
 
       assertThatThrownBy(() -> new TicketSlug(invalidFormatSlug))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(TicketSlugFormatException.class)
           .hasMessageContaining("AAA-0000...000");
     }
 
@@ -453,7 +454,7 @@ class TicketTest {
       var longSlug = "1".repeat(64);
 
       assertThatThrownBy(() -> new TicketSlug(prefix + "-" + longSlug))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(TicketSlugLengthException.class)
           .hasMessageContaining("max range");
     }
 
@@ -475,11 +476,11 @@ class TicketTest {
     @DisplayName("TicketTitle cannot pass null or blank")
     void ticketTitleCannotPassNullOrBlank() {
       assertThatThrownBy(() -> new TicketTitle("  "))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketTitleException.class)
           .hasMessageContaining("be blank");
 
       assertThatThrownBy(() -> new TicketTitle(null))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(InvalidTicketTitleException.class)
           .hasMessageContaining("or null");
     }
 
@@ -490,7 +491,7 @@ class TicketTest {
       var longTitle = "a".repeat(51);
 
       assertThatThrownBy(() -> new TicketTitle(longTitle))
-          .isInstanceOf(IllegalArgumentException.class)
+          .isInstanceOf(TicketTitleLengthException.class)
           .hasMessageContaining("Max length");
     }
   }
