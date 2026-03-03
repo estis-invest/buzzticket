@@ -68,6 +68,25 @@ class UserTest {
   }
 
   @Test
+  @DisplayName("User with Customer role can be created without a partner")
+  void userWithCustomerRoleCanBeCreatedWithoutAPartner() {
+    Optional<PartnerId> noPartner = Optional.empty();
+
+    var customer =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            noPartner);
+    assertThat(customer.role()).isEqualTo(UserRole.CUSTOMER);
+    assertThat(customer.partnerId()).isEmpty();
+  }
+
+  @Test
   @DisplayName("User with Support role requires partner throws error if partner is missing")
   void userWithSupportRoleRequiresPartnerThrowsErrorIfPartnerIsMissing() {
     Optional<PartnerId> partnerId = Optional.empty();
@@ -229,7 +248,7 @@ class UserTest {
 
     assertThatThrownBy(user::promoteToAdmin)
         .isInstanceOf(IllegalRoleTransitionException.class)
-        .hasMessageContaining("is already: " + user.role());
+        .hasMessageContaining("User is already " + user.role());
   }
 
   @Test
@@ -308,7 +327,7 @@ class UserTest {
 
     assertThatThrownBy(user::demoteToSupport)
         .isInstanceOf(IllegalRoleTransitionException.class)
-        .hasMessageContaining("User is already: " + user.role());
+        .hasMessageContaining("User is already " + user.role());
   }
 
   @Test

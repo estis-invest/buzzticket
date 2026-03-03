@@ -1,7 +1,6 @@
 package com.efpcode.domain.user.model;
 
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
 import com.efpcode.domain.user.exceptions.UserStatusChangeException;
 import java.util.Objects;
@@ -47,32 +46,14 @@ public record User(
   }
 
   public User promoteToAdmin() {
-    if (!isActive()) {
-      throw new UserStatusChangeException(
-          String.format("User must have activated status current: %s", this.status()));
-    }
-
-    if (this.role == UserRole.ADMIN)
-      throw new IllegalRoleTransitionException(
-          String.format("User is already: %s . Cannot be promoted", this.role));
-
-    var newStatus = this.role.canChangeRoleTo();
-
-    return withRole(newStatus);
+    ensureActiveUser();
+    return withRole(this.role.promote());
   }
 
   public User demoteToSupport() {
-    if (!isActive()) {
-      throw new UserStatusChangeException(
-          String.format("User must have activated status current: %s", this.status()));
-    }
-    if (this.role == UserRole.SUPPORT)
-      throw new IllegalRoleTransitionException(
-          String.format("User is already: %s . Cannot be promoted", this.role));
+    ensureActiveUser();
 
-    var newStatus = this.role.canChangeRoleTo();
-
-    return withRole(newStatus);
+    return withRole(this.role.demote());
   }
 
   public boolean canAssignTickets() {
@@ -85,5 +66,12 @@ public record User(
 
   private User withRole(UserRole newRole) {
     return new User(id, name, email, password, newRole, status, time, partnerId);
+  }
+
+  private void ensureActiveUser() {
+    if (!isActive()) {
+      throw new UserStatusChangeException(
+          String.format("User must have activated status current: %s", this.status()));
+    }
   }
 }

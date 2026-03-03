@@ -8,34 +8,65 @@ import org.junit.jupiter.api.Test;
 
 class UserRoleTest {
   @Test
-  @DisplayName("UserRole method canChangeRoleTo transition admin to support")
-  void userRoleMethodCanChangeRoleToTransitionAdminToSupport() {
+  @DisplayName("UserRole method demote transition admin to support")
+  void userRoleMethodDemoteTransitionAdminToSupport() {
 
     var adminRole = UserRole.ADMIN;
-    var newRole = adminRole.canChangeRoleTo();
+    var newRole = adminRole.demote();
 
     assertThat(newRole).isNotEqualTo(adminRole).isEqualTo(UserRole.SUPPORT);
   }
 
   @Test
-  @DisplayName("UserRole method canChangeRoleTo transition support to admin")
-  void userRoleMethodCanChangeRoleToTransitionSupportToAdmin() {
+  @DisplayName("UserRole method promote transition support to admin")
+  void userRoleMethodPromoteTransitionSupportToAdmin() {
 
     var supportRole = UserRole.SUPPORT;
-    var newRole = supportRole.canChangeRoleTo();
+    var newRole = supportRole.promote();
 
     assertThat(newRole).isNotEqualTo(supportRole).isEqualTo(UserRole.ADMIN);
   }
 
   @Test
-  @DisplayName("UserRole method canChangeRole to throws error if base role is Customer")
-  void userRoleMethodCanChangeRoleToThrowsErrorIfBaseRoleIsCustomer() {
+  @DisplayName("UserRole method promote to throws error if base role is Customer")
+  void userRoleMethodPromoteThrowsErrorIfBaseRoleIsCustomer() {
 
     var customerRole = UserRole.CUSTOMER;
 
-    assertThatThrownBy(customerRole::canChangeRoleTo)
+    assertThatThrownBy(customerRole::promote)
         .isInstanceOf(IllegalRoleTransitionException.class)
-        .hasMessageContaining("User role " + customerRole + " cannot be changed");
+        .hasMessageContaining("User role " + customerRole + " cannot be promoted");
+  }
+
+  @Test
+  @DisplayName("UserRole method demote to throws error if base role is Customer")
+  void userRoleMethodDemoteThrowsErrorIfBaseRoleIsCustomer() {
+
+    var customerRole = UserRole.CUSTOMER;
+
+    assertThatThrownBy(customerRole::demote)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("User role " + customerRole + " cannot be demoted");
+  }
+
+  @Test
+  @DisplayName("UserRole method promote cannot Promote Admin throws error")
+  void userRoleMethodPromoteCannotPromoteAdminThrowsError() {
+    var adminRole = UserRole.ADMIN;
+
+    assertThatThrownBy(adminRole::promote)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("User is already " + adminRole);
+  }
+
+  @Test
+  @DisplayName("UserRole method demote cannot Promote Admin throws error")
+  void userRoleMethodDemoteCannotPromoteAdminThrowsError() {
+    var supportRole = UserRole.SUPPORT;
+
+    assertThatThrownBy(supportRole::demote)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("User is already " + supportRole);
   }
 
   @Test

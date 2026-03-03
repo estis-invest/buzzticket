@@ -15,14 +15,27 @@ public enum UserRole {
     return this == SUPPORT || this == ADMIN;
   }
 
-  public UserRole canChangeRoleTo() {
-
+  public UserRole promote() {
     return switch (this) {
-      case ADMIN -> SUPPORT;
       case SUPPORT -> ADMIN;
+      case ADMIN ->
+          throw new IllegalRoleTransitionException(
+              String.format("User is already %s. Cannot be promoted", this));
       case CUSTOMER ->
           throw new IllegalRoleTransitionException(
-              String.format("User role %s cannot be changed", this));
+              String.format("User role %s cannot be promoted", this));
+    };
+  }
+
+  public UserRole demote() {
+    return switch (this) {
+      case ADMIN -> SUPPORT;
+      case SUPPORT ->
+          throw new IllegalRoleTransitionException(
+              String.format("User is already %s. Cannot be demoted", this));
+      case CUSTOMER ->
+          throw new IllegalRoleTransitionException(
+              String.format("User role %s cannot be demoted", this));
     };
   }
 }
