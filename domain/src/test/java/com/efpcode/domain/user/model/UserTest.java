@@ -1,8 +1,10 @@
 package com.efpcode.domain.user.model;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
 import com.efpcode.domain.user.exceptions.UserStatusChangeException;
 import java.util.Optional;
@@ -189,5 +191,225 @@ class UserTest {
     assertThat(user).isNotSameAs(activeUser);
     assertThat(activeUser.status()).isNotEqualTo(user.status());
     assertThat(activeUser.isActive()).isTrue();
+  }
+
+  @Test
+  @DisplayName("User cannot get promoted if status is deactivated throws error")
+  void userCannotGetPromotedIfStatusIsDeactivatedThrowsError() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(user::promoteToAdmin)
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining("status current: " + user.status());
+  }
+
+  @Test
+  @DisplayName("User cannot be promoted if role is already Admin throws error")
+  void userCannotBePromotedIfRoleIsAlreadyAdminThrowsError() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.ADMIN,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(user::promoteToAdmin)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("is already: " + user.role());
+  }
+
+  @Test
+  @DisplayName("User cannot be promoted if role is Customer throws error")
+  void userCannotBePromotedIfRoleIsCustomerThrowsError() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(user::promoteToAdmin)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("User role " + user.role());
+  }
+
+  @Test
+  @DisplayName("User can be promoted if role is Support and status is activated")
+  void userCanBePromotedIfRoleIsSupportAndStatusIsActivated() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    var promptedUser = user.promoteToAdmin();
+
+    assertThat(promptedUser).isNotNull().isInstanceOf(User.class).isNotSameAs(user);
+    assertThat(promptedUser.role()).isNotEqualTo(user.role());
+  }
+
+  @Test
+  @DisplayName("User cannot be demoted if status is not activated throws error")
+  void userCannotBeDemotedIfStatusIsNotActivatedThrowsError() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.ADMIN,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(user::demoteToSupport)
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining("status current: " + user.status());
+  }
+
+  @Test
+  @DisplayName("User cannot be demoted if role is Support throws error")
+  void userCannotBeDemotedIfRoleIsSupportThrowsError() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(user::demoteToSupport)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("User is already: " + user.role());
+  }
+
+  @Test
+  @DisplayName("User cannot be demoted if role is Customer throws error")
+  void userCannotBeDemotedIfRoleIsCustomerThrowsError() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(user::demoteToSupport)
+        .isInstanceOf(IllegalRoleTransitionException.class)
+        .hasMessageContaining("User role " + user.role() + " cannot");
+  }
+
+  @Test
+  @DisplayName("User can be demoted if role is Admin and status is activated")
+  void userCanBeDemotedIfRoleIsAdminAndStatusIsActivated() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.ADMIN,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    var demotedUser = user.demoteToSupport();
+
+    assertThat(demotedUser).isNotSameAs(user);
+    assertThat(demotedUser.role()).isNotEqualTo(user.role()).isEqualTo(UserRole.SUPPORT);
+  }
+
+  @Test
+  @DisplayName("User with customer role cannot assign tickets")
+  void userWithCustomerRoleCannotAssignTickets() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+    assertThat(user.canAssignTickets()).isFalse();
+  }
+
+  @Test
+  @DisplayName("User that are deactivated cannot assign tickets")
+  void userThatAreDeactivatedCannotAssignTickets() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.ADMIN,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+    assertThat(user.canAssignTickets()).isFalse();
+  }
+
+  @Test
+  @DisplayName("User with roles Admin and Support can assign tickets")
+  void userWithRolesAdminAndSupportCanAssignTickets() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.ADMIN,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    var user2 =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+    assertThat(user.canAssignTickets()).isTrue();
+    assertThat(user2.canAssignTickets()).isTrue();
   }
 }
