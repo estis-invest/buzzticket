@@ -1,0 +1,193 @@
+package com.efpcode.domain.user.model;
+
+import static org.assertj.core.api.Assertions.*;
+
+import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
+import com.efpcode.domain.user.exceptions.UserStatusChangeException;
+import java.util.Optional;
+import java.util.stream.Stream;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+class UserTest {
+
+  // Easy setup things
+  private static final UserId ANY_ID = UserId.generate();
+  private static final UserName ANY_NAME = new UserName("John Doe");
+  private static final UserEmail ANY_EMAIL = new UserEmail("test@example.com");
+  private static final UserPassword ANY_PASS = new UserPassword("secure123");
+  private static final UserCreatedAt ANY_TIME = UserCreatedAt.createNow();
+  private static final PartnerId ANY_PARTNER = PartnerId.generate();
+
+  private static Stream<Arguments> provideInvalidConstructorArgs() {
+    var id = ANY_ID;
+    var name = ANY_NAME;
+    var email = ANY_EMAIL;
+    var pass = ANY_PASS;
+    var role = UserRole.CUSTOMER;
+    var status = UserAccountStatus.ACTIVATED;
+    var time = ANY_TIME;
+    var partner = Optional.of(ANY_PARTNER);
+
+    return Stream.of(
+        Arguments.of(null, name, email, pass, role, status, time, partner, "Id cannot be null"),
+        Arguments.of(id, null, email, pass, role, status, time, partner, "Name cannot be null"),
+        Arguments.of(id, name, null, pass, role, status, time, partner, "Email cannot be null"),
+        Arguments.of(id, name, email, null, role, status, time, partner, "Password cannot be null"),
+        Arguments.of(
+            id, name, email, pass, null, status, time, partner, "User role cannot be null"),
+        Arguments.of(
+            id, name, email, pass, role, null, time, partner, "User status cannot be null"),
+        Arguments.of(id, name, email, pass, role, status, null, partner, "Time cannot be null"),
+        Arguments.of(
+            id, name, email, pass, role, status, time, null, "Optional <Partner> cannot be null"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideInvalidConstructorArgs")
+  @DisplayName("UserConstructor throws NullPointException If any field is null")
+  void userConstructorThrowsNullPointExceptionIfAnyFieldIsNull(
+      UserId id,
+      UserName name,
+      UserEmail email,
+      UserPassword password,
+      UserRole role,
+      UserAccountStatus status,
+      UserCreatedAt time,
+      Optional<PartnerId> partner,
+      String expectedMessage) {
+    assertThatThrownBy(() -> new User(id, name, email, password, role, status, time, partner))
+        .isInstanceOf(NullPointerException.class)
+        .hasMessageContaining(expectedMessage);
+  }
+
+  @Test
+  @DisplayName("User with Support role requires partner throws error if partner is missing")
+  void userWithSupportRoleRequiresPartnerThrowsErrorIfPartnerIsMissing() {
+    Optional<PartnerId> partnerId = Optional.empty();
+
+    assertThatThrownBy(
+            () ->
+                new User(
+                    ANY_ID,
+                    ANY_NAME,
+                    ANY_EMAIL,
+                    ANY_PASS,
+                    UserRole.SUPPORT,
+                    UserAccountStatus.ACTIVATED,
+                    ANY_TIME,
+                    partnerId))
+        .isInstanceOf(InvalidUserRolePartnerMissingException.class)
+        .hasMessageContaining("User role must have a partnerId");
+  }
+
+  @Test
+  @DisplayName("User with Admin Role requires a partner throws error if partner is Missing")
+  void userWithAdminRoleRequiresAPartnerThrowsErrorIfPartnerIsMissing() {
+    Optional<PartnerId> partnerId = Optional.empty();
+
+    assertThatThrownBy(
+            () ->
+                new User(
+                    ANY_ID,
+                    ANY_NAME,
+                    ANY_EMAIL,
+                    ANY_PASS,
+                    UserRole.ADMIN,
+                    UserAccountStatus.ACTIVATED,
+                    ANY_TIME,
+                    partnerId))
+        .isInstanceOf(InvalidUserRolePartnerMissingException.class)
+        .hasMessageContaining("User role must have a partnerId");
+  }
+
+  @Test
+  @DisplayName("User can only be deactivated if status activated else throws error")
+  void userCanOnlyBeDeactivatedIfStatusActivatedElseThrowsError() {
+
+    var deactivedUser =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(deactivedUser::deactivate)
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining(
+            String.format("User is already %s. Cannot be deactivated", deactivedUser.status()));
+  }
+
+  @Test
+  @DisplayName("User with activated status can be deactivated")
+  void userWithActivatedStatusCanBeDeactivated() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    var deactivatedUser = user.deactivate();
+
+    assertThat(user.status()).isNotEqualTo(deactivatedUser.status());
+
+    assertThat(deactivatedUser.isActive()).isFalse();
+    assertThat(deactivatedUser.status()).isEqualTo(UserAccountStatus.DEACTIVATED);
+  }
+
+  @Test
+  @DisplayName("User can only be activated if status is deactivated else throws errors")
+  void userCanOnlyBeActivatedIfStatusIsDeactivatedElseThrowsErrors() {
+
+    var activedUser =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(activedUser::activate)
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining(
+            String.format("User is already %s. Cannot be activated", activedUser.status()));
+  }
+
+  @Test
+  @DisplayName("User with deactivated status can change to activated status")
+  void userWithDeactivatedStatusCanChangeToActivatedStatus() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.SUPPORT,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            Optional.of(ANY_PARTNER));
+
+    var activeUser = user.activate();
+
+    assertThat(user).isNotSameAs(activeUser);
+    assertThat(activeUser.status()).isNotEqualTo(user.status());
+    assertThat(activeUser.isActive()).isTrue();
+  }
+}

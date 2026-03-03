@@ -8,4 +8,8 @@ public enum UserRole {
   public boolean requiresPartner() {
     return this == SUPPORT || this == ADMIN;
   }
+
+  public boolean canAssignTicket() {
+    return this == SUPPORT || this == ADMIN;
+  }
 }

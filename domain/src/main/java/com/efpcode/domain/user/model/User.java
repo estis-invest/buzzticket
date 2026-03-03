@@ -2,6 +2,7 @@ package com.efpcode.domain.user.model;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
+import com.efpcode.domain.user.exceptions.UserStatusChangeException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -30,11 +31,17 @@ public record User(
   }
 
   public User deactivate() {
+    if (!isActive())
+      throw new UserStatusChangeException(
+          String.format("User is already %s. Cannot be deactivated", this.status));
     return new User(
         id, name, email, password, role, UserAccountStatus.DEACTIVATED, time, partnerId);
   }
 
   public User activate() {
+    if (isActive())
+      throw new UserStatusChangeException(
+          String.format("User is already %s. Cannot be activated", this.status));
     return new User(id, name, email, password, role, UserAccountStatus.ACTIVATED, time, partnerId);
   }
 
@@ -54,11 +61,11 @@ public record User(
   }
 
   public boolean canAssignTickets() {
-    return isActive() && (this.role == UserRole.SUPPORT || this.role == UserRole.ADMIN);
+    return isActive() && (this.role.canAssignTicket());
   }
 
   public boolean isActive() {
-    return this.status() == UserAccountStatus.ACTIVATED;
+    return this.status().isActive();
   }
 
   private User withRole(UserRole newRole) {

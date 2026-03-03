@@ -2,5 +2,9 @@ package com.efpcode.domain.user.model;
 
 public enum UserAccountStatus {
   ACTIVATED,
-  DEACTIVATED
+  DEACTIVATED;
+
+  public boolean isActive() {
+    return this == ACTIVATED;
+  }
 }
