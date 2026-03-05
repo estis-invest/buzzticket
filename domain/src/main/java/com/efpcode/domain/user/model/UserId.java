@@ -1,16 +1,17 @@
 package com.efpcode.domain.user.model;
 
+import com.efpcode.domain.user.exceptions.InvalidUserIdException;
 import java.util.UUID;
 
 public record UserId(UUID id) {
 
   public UserId {
     if (id == null) {
-      throw new IllegalArgumentException("UserId cannot pass null");
+      throw new InvalidUserIdException("UserId cannot pass null");
     }
   }
 
-  public static UserId createRandom() {
+  public static UserId generate() {
 
     return new UserId(UUID.randomUUID());
   }

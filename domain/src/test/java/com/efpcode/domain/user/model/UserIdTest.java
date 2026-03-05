@@ -2,6 +2,7 @@ package com.efpcode.domain.user.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.user.exceptions.InvalidUserIdException;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -13,14 +14,14 @@ class UserIdTest {
   void userIdCannotPassNullThrowsError() {
 
     assertThatThrownBy(() -> new UserId(null))
-        .isInstanceOf(IllegalArgumentException.class)
+        .isInstanceOf(InvalidUserIdException.class)
         .hasMessageContaining("cannot pass null");
   }
 
   @Test
-  @DisplayName("UserId method createRandom returns a valid UserId object")
+  @DisplayName("UserId method generate returns a valid UserId object")
   void userIdMethodCreateRandomReturnsAValidUserIdObject() {
-    var result = UserId.createRandom();
+    var result = UserId.generate();
     assertThat(result).isInstanceOf(UserId.class).isNotNull();
   }
 

@@ -1,5 +1,8 @@
 package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.ticket.exceptions.InvalidTicketSlugException;
+import com.efpcode.domain.ticket.exceptions.TicketSlugFormatException;
+import com.efpcode.domain.ticket.exceptions.TicketSlugLengthException;
 import java.util.regex.Pattern;
 
 public record TicketSlug(String slug) {
@@ -8,15 +11,15 @@ public record TicketSlug(String slug) {
   public TicketSlug {
 
     if (slug == null || slug.isBlank()) {
-      throw new IllegalArgumentException("Slug cannot be null or blank");
+      throw new InvalidTicketSlugException("Slug cannot be null or blank");
     }
 
     if (slug.length() > 64) {
-      throw new IllegalArgumentException("Slug length is greater than max range");
+      throw new TicketSlugLengthException("Slug length is greater than max range");
     }
 
     if (!FORMAT.matcher(slug).matches()) {
-      throw new IllegalArgumentException("Slug must follow format `AAA-0000...000`");
+      throw new TicketSlugFormatException("Slug must follow format `AAA-0000...000`");
     }
   }
 }
