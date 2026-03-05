@@ -1,6 +1,7 @@
 package com.efpcode.domain.user.model;
 
 import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
+import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 
 public enum UserRole {
   CUSTOMER,
@@ -37,5 +38,12 @@ public enum UserRole {
           throw new IllegalRoleTransitionException(
               String.format("User role %s cannot be demoted", this));
     };
+  }
+
+  public void roleGuardAssignTickets() {
+    if (!this.canAssignTicket()) {
+      throw new IllegalUserRolePrivilegeException(
+          String.format("User role: %s cannot assign ticket", this));
+    }
   }
 }
