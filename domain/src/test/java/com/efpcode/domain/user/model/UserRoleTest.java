@@ -3,6 +3,7 @@ package com.efpcode.domain.user.model;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
+import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -90,6 +91,9 @@ class UserRoleTest {
 
     assertThat(UserRole.ADMIN.canAssignTicket()).isTrue();
     assertThat(UserRole.SUPPORT.canAssignTicket()).isTrue();
+
+    assertThatCode(UserRole.ADMIN::roleGuardAssignTickets).doesNotThrowAnyException();
+    assertThatCode(UserRole.SUPPORT::roleGuardAssignTickets).doesNotThrowAnyException();
   }
 
   @Test
@@ -97,5 +101,16 @@ class UserRoleTest {
   void userRoleMethodCanAssignTicketIsFalseForCustomer() {
 
     assertThat(UserRole.CUSTOMER.canAssignTicket()).isFalse();
+  }
+
+  @Test
+  @DisplayName("UserRole method roleGuardAssignTickets throws error if UserRole is Customer")
+  void userRoleMethodRoleGuardAssignTicketsThrowsErrorIfUserRoleIsCustomer() {
+
+    var customerRole = UserRole.CUSTOMER;
+
+    assertThatThrownBy(customerRole::roleGuardAssignTickets)
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining("User role: " + customerRole + " cannot assign ticket");
   }
 }
