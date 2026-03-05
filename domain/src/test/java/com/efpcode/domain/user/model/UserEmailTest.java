@@ -43,11 +43,39 @@ class UserEmailTest {
   @Test
   @DisplayName("UserEmail throws error if email exceeds limit")
   void userEmailThrowsErrorIfEmailExceedsLimit() {
-    var testEmail = "test@" + "a".repeat(57) + ".xyz";
+    var upperLimit = 254;
+    var testEmail = "test@" + "a".repeat(246) + ".xyz";
 
     assertThatThrownBy(() -> new UserEmail(testEmail))
         .isInstanceOf(UserEmailLengthException.class)
-        .hasMessageContaining("Email exceeds character limit of 64");
+        .hasMessageContaining(
+            "Email exceeds character limit of "
+                + upperLimit
+                + ". Email length: "
+                + testEmail.length());
+  }
+
+  @Test
+  @DisplayName("UserEmail throws error if local exceeds limit")
+  void userEmailThrowsErrorIfLocalExceedsLimit() {
+
+    var upperLimit = 64;
+    var testEmail = "a".repeat(65) + "@" + "domain" + ".xyz";
+
+    assertThatThrownBy(() -> new UserEmail(testEmail))
+        .isInstanceOf(UserEmailLengthException.class)
+        .hasMessageContaining("Local-part (before @) exceeds " + upperLimit + " characters");
+  }
+
+  @Test
+  @DisplayName("UserEmail throws error if domain exceeds limit")
+  void userEmailThrowsErrorIfDomainExceedsLimit() {
+    var upperLimit = 255;
+    var testEmail = "a@" + "a".repeat(255) + ".io";
+
+    assertThatThrownBy(() -> new UserEmail(testEmail))
+        .isInstanceOf(UserEmailLengthException.class)
+        .hasMessageContaining("Domain-part (after @) exceeds " + upperLimit + " characters");
   }
 
   @Test
@@ -61,5 +89,20 @@ class UserEmailTest {
     assertThat(results.email()).hasToString(testEmail);
     assertThat(results).isNotNull();
     assertThat(results.email()).hasSameSizeAs(testEmail);
+  }
+
+  @Test
+  @DisplayName("UserEmail accepts exactly 64 characters in local part")
+  void userEmailAcceptsExactLocalLimit() {
+    String local64 = "a".repeat(64) + "@domain.io";
+    assertThatCode(() -> new UserEmail(local64)).doesNotThrowAnyException();
+  }
+
+  @Test
+  @DisplayName("UserEmail accepts exactly 254 characters total")
+  void userEmailAcceptsExactTotalLimit() {
+    String total254 = "a".repeat(64) + "@" + "d".repeat(185) + ".com";
+    assertThat(total254.length()).isEqualTo(254);
+    assertThatCode(() -> new UserEmail(total254)).doesNotThrowAnyException();
   }
 }

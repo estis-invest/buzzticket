@@ -1,6 +1,7 @@
 package com.efpcode.domain.user.model;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.user.exceptions.InvalidUserCreatedAtException;
 import com.efpcode.domain.user.exceptions.UserCreatedAtDateException;
@@ -68,9 +69,10 @@ class UserCreatedAtTest {
   void userCreatedAtCreateNowReturnsAValidObject() {
 
     UserCreatedAt results = UserCreatedAt.createNow();
+    var now = Instant.now();
     assertThat(results).isNotNull().isInstanceOf(UserCreatedAt.class);
-    assertThat(results.time()).isBeforeOrEqualTo(Instant.now());
-    assertThat(results.time()).isAfter(Instant.now().minusSeconds(5));
+    assertThat(results.time()).isBeforeOrEqualTo(now);
+    assertThat(results.time()).isAfter(now.minusSeconds(5));
   }
 
   @Test
