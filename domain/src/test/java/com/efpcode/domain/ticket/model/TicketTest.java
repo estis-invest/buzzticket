@@ -1,7 +1,9 @@
 package com.efpcode.domain.ticket.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
 import com.efpcode.domain.user.model.UserId;
 import java.util.Set;
 import java.util.UUID;
@@ -20,8 +22,8 @@ class TicketTest {
   private final UserId anyCustomer = UserId.generate();
 
   @Test
-  @DisplayName("Opening a ticket that is not PENDING return the same instance")
-  void openingATicketThatIsNotPendingReturnTheSameInstance() {
+  @DisplayName("Opening a ticket that is not PENDING throws error")
+  void openingATicketThatIsNotPendingThrowsError() {
 
     var closedTicket =
         new Ticket(
@@ -34,10 +36,10 @@ class TicketTest {
             anyTime,
             anyWorker,
             anyCustomer);
-    var result = closedTicket.open();
 
-    assertThat(closedTicket).isSameAs(result);
-    assertThat(closedTicket.status()).isEqualTo(result.status());
+    assertThatThrownBy(closedTicket::open)
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("TicketStatus cannot be transferred from " + closedTicket.status());
   }
 
   @Test
@@ -140,12 +142,9 @@ class TicketTest {
             anyWorker,
             anyCustomer);
 
-    var result = pendingTicket.close();
-
-    assertThat(pendingTicket).isSameAs(result);
-    assertThat(result.status()).isEqualTo(pendingTicket.status());
-    assertThat(result.id()).isEqualTo(pendingTicket.id());
-    assertThat(result.status()).isEqualTo(TicketStatus.PENDING);
+    assertThatThrownBy(pendingTicket::close)
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("TicketStatus cannot be transferred from " + pendingTicket.status());
   }
 
   @Test
@@ -164,12 +163,9 @@ class TicketTest {
             anyWorker,
             anyCustomer);
 
-    var result = pendingTicket.archive();
-
-    assertThat(pendingTicket).isSameAs(result);
-    assertThat(result.status()).isEqualTo(pendingTicket.status());
-    assertThat(result.id()).isEqualTo(pendingTicket.id());
-    assertThat(result.status()).isEqualTo(TicketStatus.PENDING);
+    assertThatThrownBy(pendingTicket::archive)
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("TicketStatus cannot be transferred from " + pendingTicket.status());
   }
 
   @Test

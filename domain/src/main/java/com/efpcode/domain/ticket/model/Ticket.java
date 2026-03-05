@@ -1,6 +1,7 @@
 package com.efpcode.domain.ticket.model;
 
 import com.efpcode.domain.user.model.UserId;
+import com.efpcode.domain.user.model.UserRole;
 import java.util.Objects;
 
 public record Ticket(
@@ -27,27 +28,15 @@ public record Ticket(
   }
 
   public Ticket open() {
-    if (this.status != TicketStatus.PENDING) {
-      return this;
-    }
-
-    return withStatus(TicketStatus.OPEN);
+    return withStatus(this.status.open());
   }
 
   public Ticket close() {
-
-    if (this.status != TicketStatus.OPEN) {
-      return this;
-    }
-    return withStatus(TicketStatus.CLOSED);
+    return withStatus(this.status().close());
   }
 
   public Ticket archive() {
-
-    if (this.status != TicketStatus.CLOSED) {
-      return this;
-    }
-    return withStatus(TicketStatus.ARCHIVED);
+    return withStatus(this.status.archive());
   }
 
   public static Ticket createPending(
@@ -69,6 +58,14 @@ public record Ticket(
         time,
         TicketAssignees.empty(),
         reportedBy);
+  }
+
+  public Ticket assign(UserId staffId, UserRole actorRole) {
+    actorRole.roleGuardAssignTickets();
+    this.status.ticketStatusAssignGuard();
+
+    return new Ticket(
+        id, slug, title, description, status, priority, time, workers.add(staffId), reportedBy);
   }
 
   public Ticket withPriority(TicketPriority ticketPriority) {
