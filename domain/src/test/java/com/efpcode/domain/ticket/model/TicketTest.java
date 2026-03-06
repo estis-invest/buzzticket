@@ -212,7 +212,8 @@ class TicketTest {
   @ParameterizedTest
   @MethodSource("provideNullArgumentsToPassInTicketAssignMethod")
   @DisplayName("Ticket assign methods throws error if staffId or actorRole is null")
-  void ticketAssignMethodsThrowsErrorIfStaffIdOrActorRoleIsNull(UserId staffId, UserRole status) {
+  void ticketAssignMethodsThrowsErrorIfStaffIdOrActorRoleIsNull(
+      UserId staffId, UserRole actorRole) {
     var ticket =
         new Ticket(
             anyId,
@@ -225,7 +226,7 @@ class TicketTest {
             TicketAssignees.empty(),
             anyCustomer);
 
-    assertThatThrownBy(() -> ticket.assign(staffId, status))
+    assertThatThrownBy(() -> ticket.assign(staffId, actorRole))
         .isInstanceOf(IllegalTicketAssignmentException.class)
         .hasMessageContaining("TicketAssign method cannot pass null!");
   }
