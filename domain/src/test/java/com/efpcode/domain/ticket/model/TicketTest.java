@@ -1,12 +1,23 @@
 package com.efpcode.domain.ticket.model;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusAssignmentException;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
+import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.model.UserId;
+import com.efpcode.domain.user.model.UserRole;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TicketTest {
 
@@ -20,8 +31,8 @@ class TicketTest {
   private final UserId anyCustomer = UserId.generate();
 
   @Test
-  @DisplayName("Opening a ticket that is not PENDING return the same instance")
-  void openingATicketThatIsNotPendingReturnTheSameInstance() {
+  @DisplayName("Opening a ticket that is not PENDING throws error")
+  void openingATicketThatIsNotPendingThrowsError() {
 
     var closedTicket =
         new Ticket(
@@ -34,10 +45,10 @@ class TicketTest {
             anyTime,
             anyWorker,
             anyCustomer);
-    var result = closedTicket.open();
 
-    assertThat(closedTicket).isSameAs(result);
-    assertThat(closedTicket.status()).isEqualTo(result.status());
+    assertThatThrownBy(closedTicket::open)
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("TicketStatus cannot be transferred from " + closedTicket.status());
   }
 
   @Test
@@ -140,12 +151,9 @@ class TicketTest {
             anyWorker,
             anyCustomer);
 
-    var result = pendingTicket.close();
-
-    assertThat(pendingTicket).isSameAs(result);
-    assertThat(result.status()).isEqualTo(pendingTicket.status());
-    assertThat(result.id()).isEqualTo(pendingTicket.id());
-    assertThat(result.status()).isEqualTo(TicketStatus.PENDING);
+    assertThatThrownBy(pendingTicket::close)
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("TicketStatus cannot be transferred from " + pendingTicket.status());
   }
 
   @Test
@@ -164,12 +172,9 @@ class TicketTest {
             anyWorker,
             anyCustomer);
 
-    var result = pendingTicket.archive();
-
-    assertThat(pendingTicket).isSameAs(result);
-    assertThat(result.status()).isEqualTo(pendingTicket.status());
-    assertThat(result.id()).isEqualTo(pendingTicket.id());
-    assertThat(result.status()).isEqualTo(TicketStatus.PENDING);
+    assertThatThrownBy(pendingTicket::archive)
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("TicketStatus cannot be transferred from " + pendingTicket.status());
   }
 
   @Test
@@ -192,5 +197,220 @@ class TicketTest {
     assertThat(result.priority()).isNotEqualTo(pendingTicket.priority());
     assertThat(result.id()).isEqualTo(pendingTicket.id());
     assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
+  }
+
+  private static Stream<Arguments> provideNullArgumentsToPassInTicketAssignMethod() {
+
+    UserId anyStaffId = UserId.generate();
+
+    return Stream.of(
+        Arguments.of(null, null),
+        Arguments.of(anyStaffId, null),
+        Arguments.of(null, UserRole.ADMIN));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideNullArgumentsToPassInTicketAssignMethod")
+  @DisplayName("Ticket assign methods throws error if staffId or actorRole is null")
+  void ticketAssignMethodsThrowsErrorIfStaffIdOrActorRoleIsNull(
+      UserId staffId, UserRole actorRole) {
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    assertThatThrownBy(() -> ticket.assign(staffId, actorRole))
+        .isInstanceOf(IllegalTicketAssignmentException.class)
+        .hasMessageContaining("TicketAssign method cannot pass null!");
+  }
+
+  @Test
+  @DisplayName("TicketAssignMethod throws error is User Role is Customer")
+  void ticketAssignMethodThrowsErrorIsUserRoleIsCustomer() {
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    var userRole = UserRole.CUSTOMER;
+
+    assertThatThrownBy(() -> ticket.assign(anyCustomer, userRole))
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining("User role: " + userRole);
+  }
+
+  @Test
+  @DisplayName("Ticket assign throws error with status CLOSED")
+  void ticketAssignThrowsErrorWithStatusClosed() {
+    var ticketClosed =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.CLOSED,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+    assertThatThrownBy(() -> ticketClosed.assign(anyCustomer, UserRole.SUPPORT))
+        .isInstanceOf(IllegalTicketStatusAssignmentException.class)
+        .hasMessageContaining("TicketStatus: " + TicketStatus.CLOSED + " cannot assign users");
+  }
+
+  @Test
+  @DisplayName("Ticket assign throws error with status ARCHIVED ")
+  void ticketAssignThrowsErrorWithStatusArchived() {
+    var ticketArchived =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.ARCHIVED,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    assertThatThrownBy(() -> ticketArchived.assign(anyCustomer, UserRole.SUPPORT))
+        .isInstanceOf(IllegalTicketStatusAssignmentException.class)
+        .hasMessageContaining("TicketStatus: " + TicketStatus.ARCHIVED + " cannot assign users");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"PENDING", "OPEN"})
+  @DisplayName("Ticket assign methods returns a new Ticket object with status PENDING and OPEN")
+  void ticketAssignMethodsReturnsANewTicketObjectWithStatusPendingAndOpen(TicketStatus status) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    var staffId = UserId.generate();
+    var result = ticket.assign(staffId, UserRole.SUPPORT);
+    assertThat(result).isNotSameAs(ticket).isInstanceOf(Ticket.class);
+    assertThat(result.workers().workers()).hasSize(1);
+  }
+
+  private static Stream<Arguments> provideStatusAndRoleCombinations() {
+    return Stream.of(
+        Arguments.of(TicketStatus.PENDING, UserRole.SUPPORT),
+        Arguments.of(TicketStatus.PENDING, UserRole.ADMIN),
+        Arguments.of(TicketStatus.OPEN, UserRole.SUPPORT),
+        Arguments.of(TicketStatus.OPEN, UserRole.ADMIN));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideStatusAndRoleCombinations")
+  @DisplayName("Ticket assign works for valid Status and Staff Roles")
+  void ticketAssignMethodsReturnsANewTicketObject(TicketStatus status, UserRole role) {
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    var staffId = UserId.generate();
+    var result = ticket.assign(staffId, role);
+
+    assertThat(result).isNotSameAs(ticket);
+    assertThat(result.workers().workers()).hasSize(1);
+  }
+
+  @Test
+  @DisplayName("Ticket method withPriority throws error if null is passed")
+  void ticketMethodWithPriorityThrowsErrorIfNullIsPassed() {
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    assertThatThrownBy(() -> ticket.withPriority(null))
+        .isInstanceOf(IllegalTicketPriorityException.class)
+        .hasMessageContaining("Ticket priority passed cannot be null");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"ARCHIVED", "CLOSED"})
+  @DisplayName("Ticket method withPriority throws error with status ARCHIVED and CLOSED")
+  void ticketMethodWithPriorityThrowsErrorWithStatusArchivedAndClosed(TicketStatus status) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    assertThatThrownBy(() -> ticket.withPriority(TicketPriority.HIGH))
+        .isInstanceOf(IllegalTicketStatusAssignmentException.class)
+        .hasMessageContaining("TicketPriority cannot be altered in status: " + status);
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"PENDING", "OPEN"})
+  @DisplayName("Ticket method withPriority return valid object with status PENDING and OPEN")
+  void ticketMethodWithPriorityReturnValidObjectWithStatusPendingAndOpen(TicketStatus status) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            TicketAssignees.empty(),
+            anyCustomer);
+
+    assertThatCode(() -> ticket.withPriority(TicketPriority.HIGH)).doesNotThrowAnyException();
   }
 }
