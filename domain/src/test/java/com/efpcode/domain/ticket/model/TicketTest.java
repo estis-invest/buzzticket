@@ -254,7 +254,7 @@ class TicketTest {
 
   @Test
   @DisplayName("Ticket assign throws error with status CLOSED")
-  void TicketAssignThrowsErrorWithStatusClosed() {
+  void ticketAssignThrowsErrorWithStatusClosed() {
     var ticketClosed =
         new Ticket(
             anyId,

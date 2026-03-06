@@ -141,8 +141,8 @@ class TicketStatusTest {
       value = TicketStatus.class,
       names = {"PENDING", "OPEN"})
   @DisplayName(
-      "TicketStatus method ticketStatusAssignGuard throws error for status PENDING and OPEN")
-  void ticketStatusMethodTicketStatusAssignGuardThrowsErrorForStatusPendingAndOPEN(
+      "TicketStatus method ticketStatusAssignGuard throws no errors for status PENDING and OPEN")
+  void ticketStatusMethodTicketStatusAssignGuardThrowsNoErrorsForStatusPendingAndOPEN(
       TicketStatus status) {
     assertThatCode(status::ticketStatusAssignGuard).doesNotThrowAnyException();
   }
