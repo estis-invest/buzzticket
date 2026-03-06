@@ -42,11 +42,24 @@ public enum TicketStatus {
     };
   }
 
+  public boolean canChangeTicketPriority() {
+    return switch (this) {
+      case OPEN, PENDING -> true;
+      default -> false;
+    };
+  }
+
   public void ticketStatusAssignGuard() {
     if (!isTicketAssignable()) {
       throw new IllegalTicketStatusAssignmentException(
           String.format("TicketStatus: %s cannot assign users", this));
     }
+  }
+
+  public void ticketChangeStatusPriorityGuard() {
+    if (!canChangeTicketPriority())
+      throw new IllegalTicketStatusAssignmentException(
+          String.format("TicketPriority cannot be altered in status: %s", this));
   }
 
   private void invalidTransition(TicketStatus fromStatus, TicketStatus toStatus) {

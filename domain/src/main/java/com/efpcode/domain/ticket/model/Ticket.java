@@ -1,5 +1,7 @@
 package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.util.Objects;
@@ -61,6 +63,9 @@ public record Ticket(
   }
 
   public Ticket assign(UserId staffId, UserRole actorRole) {
+    if (staffId == null || actorRole == null)
+      throw new IllegalTicketAssignmentException("TicketAssign method cannot pass null!");
+
     actorRole.roleGuardAssignTickets();
     this.status.ticketStatusAssignGuard();
 
@@ -69,6 +74,9 @@ public record Ticket(
   }
 
   public Ticket withPriority(TicketPriority ticketPriority) {
+    if (ticketPriority == null)
+      throw new IllegalTicketPriorityException("Ticket priority passed cannot be null");
+    this.status().ticketChangeStatusPriorityGuard();
     return new Ticket(
         id, slug, title, description, status, ticketPriority, time, workers, reportedBy);
   }
