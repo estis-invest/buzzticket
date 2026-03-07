@@ -10,6 +10,8 @@ public record UserName(String name) {
     if (name == null || name.isBlank())
       throw new InvalidUserNameException("Name cannot be null or blank");
 
+    name = name.trim();
+
     if (name.length() > MAX_CHARACTER_LIMIT)
       throw new UserNameLengthException("Username cannot exceed " + MAX_CHARACTER_LIMIT + " limit");
   }

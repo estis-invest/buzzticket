@@ -10,6 +10,8 @@ public record TicketTitle(String title) {
     if (title == null || title.isBlank())
       throw new InvalidTicketTitleException("Title cannot be blank or null");
 
+    title = title.trim();
+
     if (title.length() > 50) {
       throw new TicketTitleLengthException("Max length of title reached");
     }
