@@ -49,6 +49,7 @@ class PartnerCityTest {
         Arguments.of("Vrångö"),
         Arguments.of("Bishop's Castle"),
         Arguments.of("São Paulo"),
+        Arguments.of("S\u0061\u0303o Paulo"),
         Arguments.of("München"));
   }
 
@@ -58,6 +59,18 @@ class PartnerCityTest {
   void cityNamesFormatAcceptsOnlyLettersDotsHyphenAndSpace(String cityName) {
 
     assertThatCode(() -> new PartnerCity(cityName)).doesNotThrowAnyException();
+  }
+
+  @Test
+  @DisplayName("Should accept and normalize decomposed Unicode characters (NFD)")
+  void shouldHandleDecomposedUnicode() {
+    // 'ã' as two characters: 'a' + combining tilde (\u0303)
+    String decomposedCity = "S\u0061\u0303o Paulo";
+
+    var city = new PartnerCity(decomposedCity);
+
+    // It should pass validation and internally become the single 'ã' (\u00E3)
+    assertThat(city.partnerCity()).isEqualTo("São Paulo");
   }
 
   private static Stream<Arguments> provideCityNamesThatFail() {
