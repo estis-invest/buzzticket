@@ -43,8 +43,8 @@ class UserFactoryTest {
   }
 
   @Test
-  @DisplayName("createCustomerWithoutPartner creates a user with Customer wiht no Partner")
-  void createCustomerWithoutPartnerCreatesAUserWithCustomerWihtNoPartner() {
+  @DisplayName("createCustomerWithoutPartner creates a user with Customer with no Partner")
+  void createCustomerWithoutPartnerCreatesAUserWithCustomerWithNoPartner() {
 
     var user = UserFactory.createCustomerUserWithoutPartner(ANY_NAME, ANY_EMAIL, ANY_PASS);
     assertThat(user).isNotNull().isInstanceOf(User.class);

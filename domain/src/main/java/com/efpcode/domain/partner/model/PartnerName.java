@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public record PartnerName(String partnerName) {
 
   private static final int CHARACTER_LIMIT = 255;
-  private static final Pattern FORMAT = Pattern.compile("^[0-9\\p{L}\\s.'&,()@-]+$");
+  private static final Pattern FORMAT = Pattern.compile("^[0-9\\p{L} .'&,()@-]+$");
 
   public PartnerName {
     if (partnerName == null || partnerName.isBlank())

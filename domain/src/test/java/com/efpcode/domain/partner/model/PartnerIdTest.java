@@ -40,7 +40,7 @@ class PartnerIdTest {
   }
 
   private static Stream<Arguments> provideBlankAndNull() {
-    return Stream.of(Arguments.of(null, true), Arguments.of("", true), Arguments.of("   ", true));
+    return Stream.of(Arguments.of((String) null), Arguments.of(""), Arguments.of("   "));
   }
 
   @ParameterizedTest

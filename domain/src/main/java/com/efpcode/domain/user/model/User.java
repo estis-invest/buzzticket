@@ -69,6 +69,7 @@ public record User(
       UserName name, UserEmail email, UserPassword password, UserRole staffRole) {
     ensureActiveUser();
     this.role.roleGuardIsAdmin();
+    Objects.requireNonNull(staffRole, "User role cannot be null");
     staffRole.roleGuardIsStaff();
     PartnerId partnerId =
         this.partnerId.orElseThrow(

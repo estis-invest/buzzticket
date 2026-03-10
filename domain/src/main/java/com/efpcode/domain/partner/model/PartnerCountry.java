@@ -31,8 +31,6 @@ public record PartnerCountry(String partnerCountry) {
               "Country name: %s does not follow format: only upper case letters, commas, parenthesis, hyphens and dots are allowed",
               partnerCountry));
 
-    partnerCountry = partnerCountry.toUpperCase();
-
     if (partnerCountry.length() > MAX_LENGTH)
       throw new IllegalPartnerCountryMaxLengthException(
           String.format(

@@ -38,7 +38,7 @@ class PartnerCityTest {
     assertThatThrownBy(() -> new PartnerCity(city))
         .isInstanceOf(IllegalPartnerCityMaxLengthException.class)
         .hasMessageContaining(
-            "City name cannot exceed 100 characters, input was: " + city.trim().length());
+            "City name cannot exceed 100 characters, input length was: " + city.trim().length());
   }
 
   private static Stream<Arguments> provideCityNamesThatPasses() {
@@ -80,7 +80,7 @@ class PartnerCityTest {
     assertThatThrownBy(() -> new PartnerCity(city))
         .isInstanceOf(IllegalPartnerCityNameFormatException.class)
         .hasMessageContaining(
-            "City name should only contain letters, dots, hyphen, apostrophe and space");
+            "City name should only contain letters, digits, dots, hyphen, apostrophe and space");
   }
 
   @Test

@@ -470,12 +470,27 @@ class UserTest {
             "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
   }
 
+  @Test
+  @DisplayName("Admin cannot create Null role user throws Null Point Exception error")
+  void adminCannotCreateNullRoleUserThrowsNullPointExceptionError() {
+    PartnerId adminPartnerId = PartnerId.generate();
+    User adminUser =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+
+    UserName userName = new UserName("Customer");
+    UserEmail userEmail = new UserEmail("user@domain.com");
+
+    assertThatThrownBy(() -> adminUser.createStaffMember(userName, userEmail, ANY_PASS, null))
+        .isInstanceOf(NullPointerException.class)
+        .hasMessageContaining("User role cannot be null");
+  }
+
   @ParameterizedTest
   @EnumSource(
       value = UserRole.class,
       names = {"SUPPORT", "ADMIN"})
-  @DisplayName("Support user cannot use createStaffMemeber throws error")
-  void supportUserCannotUseCreateStaffMemeberThrowsError(UserRole userRole) {
+  @DisplayName("Support user cannot use createStaffMember throws error")
+  void supportUserCannotUseCreateStaffMemberThrowsError(UserRole userRole) {
     PartnerId supportPartnerId = PartnerId.generate();
 
     User supportUser =

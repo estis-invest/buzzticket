@@ -58,7 +58,8 @@ class PartnerIsoCodeTest {
   void isoCodeThatDoesNotFollowFormatThrowsError(String isoCode) {
     assertThatThrownBy(() -> new PartnerIsoCode(isoCode))
         .isInstanceOf(IllegalPartnerIsoCodeFormatException.class)
-        .hasMessageContaining("IsoCode must be 3 characters long and letters need to be uppercase");
+        .hasMessageContaining(
+            "IsoCode must be exactly 3 characters long and only contain letters in uppercase");
   }
 
   @ParameterizedTest
@@ -74,15 +75,18 @@ class PartnerIsoCodeTest {
   }
 
   private static Stream<Arguments> provideIsoCodeLowerCaseThatFails() {
-    return Stream.of(Arguments.of("swe"), Arguments.of("gbr"), Arguments.of("usa"));
+    return Stream.of(
+        Arguments.of("swe"), Arguments.of("gb1"), Arguments.of("US@"), Arguments.of("USa"));
   }
 
   @ParameterizedTest
   @MethodSource("provideIsoCodeLowerCaseThatFails")
   @DisplayName("IsoCode method update throws error if isoCode is not uppercase")
   void isoCodeMethodUpdateThrowsErrorIfIsoCodeIsNotUpperCase(String isoCode) {
-    assertThatThrownBy(() -> new PartnerIsoCode(isoCode))
+    var oldIsoCode = new PartnerIsoCode("CHN");
+    assertThatThrownBy(() -> oldIsoCode.update(isoCode))
         .isInstanceOf(IllegalPartnerIsoCodeFormatException.class)
-        .hasMessageContaining("IsoCode must be uppercase");
+        .hasMessageContaining(
+            "IsoCode must be exactly 3 characters long and only contain letters in uppercase");
   }
 }

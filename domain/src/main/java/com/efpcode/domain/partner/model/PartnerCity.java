@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public record PartnerCity(String partnerCity) {
 
   private static final int MAX_LENGTH = 100;
-  private static final Pattern FORMAT = Pattern.compile("^[0-9\\p{L}\\s.'-]+$");
+  private static final Pattern FORMAT = Pattern.compile("^[0-9\\p{L} .'-]+$");
 
   public PartnerCity {
     if (partnerCity == null || partnerCity.isBlank())
@@ -19,12 +19,12 @@ public record PartnerCity(String partnerCity) {
     if (partnerCity.length() > MAX_LENGTH)
       throw new IllegalPartnerCityMaxLengthException(
           String.format(
-              "City name cannot exceed %s characters, input was: %s",
+              "City name cannot exceed %s characters, input length was: %s",
               MAX_LENGTH, partnerCity.length()));
 
     if (!FORMAT.matcher(partnerCity).matches())
       throw new IllegalPartnerCityNameFormatException(
-          "City name should only contain letters, dots, hyphen, apostrophe and space");
+          "City name should only contain letters, digits, dots, hyphen, apostrophe and space");
   }
 
   public PartnerCity update(String newCity) {

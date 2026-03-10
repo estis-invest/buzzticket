@@ -95,6 +95,8 @@ class PartnerNameTest {
         Arguments.of("Apple_Inc"), // Underscore is not allowed
         Arguments.of("Buda/Pest"), // Forward slash is not allowed
         Arguments.of("Partner#1"), // Hash/Pound is not allowed
+        Arguments.of("Partner\nNew"), // newline is not allowed
+        Arguments.of("Partner\tNew"), // tab is not allowed
         Arguments.of("Price < 100"), // Angle brackets / Math symbols
         Arguments.of("Profit+Growth"), // Plus (Unless you explicitly add it!)
         Arguments.of("Total = 50"), // Equals sign
