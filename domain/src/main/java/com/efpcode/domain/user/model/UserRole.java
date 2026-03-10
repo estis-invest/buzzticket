@@ -16,6 +16,14 @@ public enum UserRole {
     return this == SUPPORT || this == ADMIN;
   }
 
+  public boolean isAdmin() {
+    return this == ADMIN;
+  }
+
+  public boolean isStaff() {
+    return this == SUPPORT || this == ADMIN;
+  }
+
   public UserRole promote() {
     return switch (this) {
       case SUPPORT -> ADMIN;
@@ -44,6 +52,20 @@ public enum UserRole {
     if (!this.canAssignTicket()) {
       throw new IllegalUserRolePrivilegeException(
           String.format("User role: %s cannot assign ticket", this));
+    }
+  }
+
+  public void roleGuardIsAdmin() {
+    if (!this.isAdmin()) {
+      throw new IllegalUserRolePrivilegeException(
+          String.format("Action requires ADMIN role, but current role is %s", this));
+    }
+  }
+
+  public void roleGuardIsStaff() {
+    if (!this.isStaff()) {
+      throw new IllegalUserRolePrivilegeException(
+          String.format("This role is %s and cannot be created by an ADMIN user", this));
     }
   }
 }

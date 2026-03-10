@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
+import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
 import com.efpcode.domain.user.exceptions.UserStatusChangeException;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class UserTest {
@@ -430,5 +432,41 @@ class UserTest {
             Optional.of(ANY_PARTNER));
     assertThat(user.canAssignTickets()).isTrue();
     assertThat(user2.canAssignTickets()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "ADMIN"})
+  @DisplayName("Admin can create Support and Admin staff member that inherits the same PartnerId ")
+  void adminCanCreateSupportStaffMemberThatInheritsTheSamePartnerId(UserRole userRole) {
+    PartnerId adminPartnerId = PartnerId.generate();
+    User adminUser =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+
+    UserName staffName = new UserName("Support Staff");
+    UserEmail staffEmail = new UserEmail("staff@partner.com");
+
+    User staffMember = adminUser.createStaffMember(staffName, staffEmail, ANY_PASS, userRole);
+    assertThat(staffMember.partnerId()).contains(adminPartnerId);
+    assertThat(staffMember.role()).isEqualTo(userRole);
+    assertThat(staffMember.status()).isEqualTo(UserAccountStatus.ACTIVATED);
+    assertThat(staffMember.isActive()).isTrue();
+  }
+
+  @Test
+  @DisplayName("Admin cannot create Customer user throws error")
+  void adminCannotCreateCustomerUserThrowsError() {
+    PartnerId adminPartnerId = PartnerId.generate();
+    User adminUser =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+    UserName userName = new UserName("Customer");
+    UserEmail userEmail = new UserEmail("user@domain.com");
+
+    assertThatThrownBy(
+            () -> adminUser.createStaffMember(userName, userEmail, ANY_PASS, UserRole.CUSTOMER))
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining(
+            "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
   }
 }
