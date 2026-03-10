@@ -21,7 +21,7 @@ class UserCreatedAtTest {
   }
 
   @Test
-  @DisplayName("UserCreatedAt cannot pass zero time")
+  @DisplayName("UserCreatedAt cannot pass zero userCreatedAt")
   void userCreatedAtCannotPassZeroTime() {
 
     var timeZero = Instant.ofEpochMilli(0);

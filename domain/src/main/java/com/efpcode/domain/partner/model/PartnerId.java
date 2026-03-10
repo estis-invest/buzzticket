@@ -1,10 +1,10 @@
 package com.efpcode.domain.partner.model;
 
+import com.efpcode.domain.partner.exceptions.IllegalPartnerIdArgumentException;
 import com.efpcode.domain.partner.exceptions.InvalidPartnerIdException;
 import java.util.UUID;
 
 public record PartnerId(UUID partnerId) {
-  private static final UUID EMPTY_UUID = new UUID(0L, 0L);
 
   public PartnerId {
     if (partnerId == null) throw new InvalidPartnerIdException("Partner cannot be null");
@@ -15,6 +15,9 @@ public record PartnerId(UUID partnerId) {
   }
 
   public static PartnerId fromString(String uuid) {
+    if (uuid == null || uuid.isBlank())
+      throw new IllegalPartnerIdArgumentException("fromString method cannot pass null or blank");
+
     return new PartnerId(UUID.fromString(uuid));
   }
 }

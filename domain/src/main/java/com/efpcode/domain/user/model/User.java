@@ -13,7 +13,7 @@ public record User(
     UserPassword password,
     UserRole role,
     UserAccountStatus status,
-    UserCreatedAt time,
+    UserCreatedAt userCreatedAt,
     Optional<PartnerId> partnerId) {
 
   public User {
@@ -23,7 +23,7 @@ public record User(
     Objects.requireNonNull(password, "Password cannot be null");
     Objects.requireNonNull(role, "User role cannot be null");
     Objects.requireNonNull(status, "User status cannot be null");
-    Objects.requireNonNull(time, "Time cannot be null");
+    Objects.requireNonNull(userCreatedAt, "Time cannot be null");
     Objects.requireNonNull(partnerId, "Optional <Partner> cannot be null");
 
     if (role.requiresPartner() && partnerId.isEmpty())
@@ -35,14 +35,15 @@ public record User(
       throw new UserStatusChangeException(
           String.format("User is already %s. Cannot be deactivated", this.status));
     return new User(
-        id, name, email, password, role, UserAccountStatus.DEACTIVATED, time, partnerId);
+        id, name, email, password, role, UserAccountStatus.DEACTIVATED, userCreatedAt, partnerId);
   }
 
   public User activate() {
     if (isActive())
       throw new UserStatusChangeException(
           String.format("User is already %s. Cannot be activated", this.status));
-    return new User(id, name, email, password, role, UserAccountStatus.ACTIVATED, time, partnerId);
+    return new User(
+        id, name, email, password, role, UserAccountStatus.ACTIVATED, userCreatedAt, partnerId);
   }
 
   public User promoteToAdmin() {
@@ -64,8 +65,28 @@ public record User(
     return this.status().isActive();
   }
 
+  public User createStaffMember(
+      UserName name, UserEmail email, UserPassword password, UserRole staffRole) {
+    ensureActiveUser();
+    this.role.roleGuardIsAdmin();
+    Objects.requireNonNull(staffRole, "User role cannot be null");
+    staffRole.roleGuardIsStaff();
+    PartnerId partnerId =
+        this.partnerId.orElseThrow(
+            () -> new InvalidUserRolePartnerMissingException("User role must have a partnerId"));
+    return new User(
+        UserId.generate(),
+        name,
+        email,
+        password,
+        staffRole,
+        UserAccountStatus.ACTIVATED,
+        UserCreatedAt.createNow(),
+        Optional.of(partnerId));
+  }
+
   private User withRole(UserRole newRole) {
-    return new User(id, name, email, password, newRole, status, time, partnerId);
+    return new User(id, name, email, password, newRole, status, userCreatedAt, partnerId);
   }
 
   private void ensureActiveUser() {

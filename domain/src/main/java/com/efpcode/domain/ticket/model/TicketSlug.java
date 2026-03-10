@@ -13,6 +13,7 @@ public record TicketSlug(String slug) {
     if (slug == null || slug.isBlank()) {
       throw new InvalidTicketSlugException("Slug cannot be null or blank");
     }
+    slug = slug.trim();
 
     if (slug.length() > 64) {
       throw new TicketSlugLengthException("Slug length is greater than max range");

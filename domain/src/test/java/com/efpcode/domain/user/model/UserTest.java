@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
+import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
 import com.efpcode.domain.user.exceptions.UserStatusChangeException;
 import java.util.Optional;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class UserTest {
@@ -430,5 +432,130 @@ class UserTest {
             Optional.of(ANY_PARTNER));
     assertThat(user.canAssignTickets()).isTrue();
     assertThat(user2.canAssignTickets()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "ADMIN"})
+  @DisplayName("Admin can create Support and Admin staff member that inherits the same PartnerId ")
+  void adminCanCreateSupportStaffMemberThatInheritsTheSamePartnerId(UserRole userRole) {
+    PartnerId adminPartnerId = PartnerId.generate();
+    User adminUser =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+
+    UserName staffName = new UserName("Support Staff");
+    UserEmail staffEmail = new UserEmail("staff@partner.com");
+
+    User staffMember = adminUser.createStaffMember(staffName, staffEmail, ANY_PASS, userRole);
+    assertThat(staffMember.partnerId()).contains(adminPartnerId);
+    assertThat(staffMember.role()).isEqualTo(userRole);
+    assertThat(staffMember.status()).isEqualTo(UserAccountStatus.ACTIVATED);
+    assertThat(staffMember.isActive()).isTrue();
+  }
+
+  @Test
+  @DisplayName("Admin cannot create Customer user throws error")
+  void adminCannotCreateCustomerUserThrowsError() {
+    PartnerId adminPartnerId = PartnerId.generate();
+    User adminUser =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+    UserName userName = new UserName("Customer");
+    UserEmail userEmail = new UserEmail("user@domain.com");
+
+    assertThatThrownBy(
+            () -> adminUser.createStaffMember(userName, userEmail, ANY_PASS, UserRole.CUSTOMER))
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining(
+            "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
+  }
+
+  @Test
+  @DisplayName("Admin cannot create Null role user throws Null Point Exception error")
+  void adminCannotCreateNullRoleUserThrowsNullPointExceptionError() {
+    PartnerId adminPartnerId = PartnerId.generate();
+    User adminUser =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+
+    UserName userName = new UserName("Customer");
+    UserEmail userEmail = new UserEmail("user@domain.com");
+
+    assertThatThrownBy(() -> adminUser.createStaffMember(userName, userEmail, ANY_PASS, null))
+        .isInstanceOf(NullPointerException.class)
+        .hasMessageContaining("User role cannot be null");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "ADMIN"})
+  @DisplayName("Support user cannot use createStaffMember throws error")
+  void supportUserCannotUseCreateStaffMemberThrowsError(UserRole userRole) {
+    PartnerId supportPartnerId = PartnerId.generate();
+
+    User supportUser =
+        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, supportPartnerId);
+    var supportName = new UserName("Support Staff");
+    var supportEmail = new UserEmail("support@domain.com");
+
+    assertThatThrownBy(
+            () -> supportUser.createStaffMember(supportName, supportEmail, ANY_PASS, userRole))
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining(
+            "Action requires ADMIN role, but current role is " + supportUser.role());
+  }
+
+  @Test
+  @DisplayName("Deactivated Admin cannot create staff member")
+  void deactivatedAdminCannotCreateStaffMember() {
+    User admin =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
+            .deactivate();
+
+    assertThatThrownBy(
+            () -> admin.createStaffMember(ANY_NAME, ANY_EMAIL, ANY_PASS, UserRole.SUPPORT))
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining("User must have activated status");
+  }
+
+  @Test
+  @DisplayName("Promotion should preserve all user data except role")
+  void promotionPreservesUserData() {
+    User user =
+        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+
+    User promoted = user.promoteToAdmin();
+
+    assertThat(promoted.id()).isEqualTo(user.id());
+    assertThat(promoted.name()).isEqualTo(user.name());
+    assertThat(promoted.email()).isEqualTo(user.email());
+    assertThat(promoted.password()).isEqualTo(user.password());
+    assertThat(promoted.status()).isEqualTo(user.status());
+    assertThat(promoted.userCreatedAt()).isEqualTo(user.userCreatedAt());
+    assertThat(promoted.partnerId()).isEqualTo(user.partnerId());
+  }
+
+  @Test
+  @DisplayName("Demotion should preserve all user data except role")
+  void demotionShouldPreserveAllUserDataExceptRole() {
+    User user = UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+    User demoted = user.demoteToSupport();
+
+    assertThat(demoted.id()).isEqualTo(user.id());
+    assertThat(demoted.name()).isEqualTo(user.name());
+    assertThat(demoted.email()).isEqualTo(user.email());
+    assertThat(demoted.password()).isEqualTo(user.password());
+    assertThat(demoted.status()).isEqualTo(user.status());
+    assertThat(demoted.userCreatedAt()).isEqualTo(user.userCreatedAt());
+    assertThat(demoted.partnerId()).isEqualTo(user.partnerId());
+  }
+
+  @Test
+  @DisplayName("Deactivated Support user cannot assign tickets")
+  void deactivatedSupportCannotAssignTickets() {
+    User support =
+        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
+            .deactivate();
+    assertThat(support.canAssignTickets()).isFalse();
   }
 }

@@ -6,6 +6,8 @@ import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 class UserRoleTest {
   @Test
@@ -112,5 +114,70 @@ class UserRoleTest {
     assertThatThrownBy(customerRole::roleGuardAssignTickets)
         .isInstanceOf(IllegalUserRolePrivilegeException.class)
         .hasMessageContaining("User role: " + customerRole + " cannot assign ticket");
+  }
+
+  @Test
+  @DisplayName("isAdmin in UseRole returns true with role:ADMIN")
+  void isAdminInUseRoleReturnsTrueWithRoleAdmin() {
+    var adminRole = UserRole.ADMIN;
+    assertThatCode(adminRole::roleGuardIsAdmin).doesNotThrowAnyException();
+    assertThat(adminRole.isAdmin()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "CUSTOMER"})
+  @DisplayName("isAdmin return false for if role is not ADMIN")
+  void isAdminReturnFalseForIfRoleIsNotAdmin(UserRole userRole) {
+    assertThat(userRole.isAdmin()).isFalse();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "CUSTOMER"})
+  @DisplayName("roleGuardIsAdmin throws error if UserRole is not Admin")
+  void roleGuardIsAdminThrowsErrorIfUserRoleIsNotAdmin(UserRole userRole) {
+
+    assertThatThrownBy(userRole::roleGuardIsAdmin)
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining("Action requires ADMIN role, but current role is " + userRole);
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"ADMIN", "SUPPORT"})
+  @DisplayName("isStaff return true for if role is Staff")
+  void isStaffReturnTrueForIfRoleIsStaff(UserRole userRole) {
+    assertThat(userRole.isStaff()).isTrue();
+    assertThatCode(userRole::roleGuardIsStaff).doesNotThrowAnyException();
+  }
+
+  @Test
+  @DisplayName("roleGuardIsStaff throws error if role are not ADMIN or SUPPORT")
+  void roleGuardIsStaffThrowsErrorIfRoleAreNotAdminOrSupport() {
+
+    assertThatThrownBy(UserRole.CUSTOMER::roleGuardIsStaff)
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining(
+            "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
+  }
+
+  @Test
+  @DisplayName("isAdmin return true only for user role ADMIN")
+  void isAdminReturnTrueOnlyForUserRoleAdmin() {
+    assertThat(UserRole.ADMIN.isAdmin()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "CUSTOMER"})
+  @DisplayName("isAdmin return false for SUPPORT and CUSTOMER")
+  void isAdminReturnFalseForSupportAndCustomer(UserRole userRole) {
+
+    assertThat(userRole.isAdmin()).isFalse();
   }
 }
