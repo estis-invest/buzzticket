@@ -469,4 +469,78 @@ class UserTest {
         .hasMessageContaining(
             "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
   }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = UserRole.class,
+      names = {"SUPPORT", "ADMIN"})
+  @DisplayName("Support user cannot use createStaffMemeber throws error")
+  void supportUserCannotUseCreateStaffMemeberThrowsError(UserRole userRole) {
+    PartnerId supportPartnerId = PartnerId.generate();
+
+    User supportUser =
+        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, supportPartnerId);
+    var supportName = new UserName("Support Staff");
+    var supportEmail = new UserEmail("support@domain.com");
+
+    assertThatThrownBy(
+            () -> supportUser.createStaffMember(supportName, supportEmail, ANY_PASS, userRole))
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining(
+            "Action requires ADMIN role, but current role is " + supportUser.role());
+  }
+
+  @Test
+  @DisplayName("Deactivated Admin cannot create staff member")
+  void deactivatedAdminCannotCreateStaffMember() {
+    User admin =
+        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
+            .deactivate();
+
+    assertThatThrownBy(
+            () -> admin.createStaffMember(ANY_NAME, ANY_EMAIL, ANY_PASS, UserRole.SUPPORT))
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining("User must have activated status");
+  }
+
+  @Test
+  @DisplayName("Promotion should preserve all user data except role")
+  void promotionPreservesUserData() {
+    User user =
+        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+
+    User promoted = user.promoteToAdmin();
+
+    assertThat(promoted.id()).isEqualTo(user.id());
+    assertThat(promoted.name()).isEqualTo(user.name());
+    assertThat(promoted.email()).isEqualTo(user.email());
+    assertThat(promoted.password()).isEqualTo(user.password());
+    assertThat(promoted.status()).isEqualTo(user.status());
+    assertThat(promoted.userCreatedAt()).isEqualTo(user.userCreatedAt());
+    assertThat(promoted.partnerId()).isEqualTo(user.partnerId());
+  }
+
+  @Test
+  @DisplayName("Demotion should preserve all user data except role")
+  void demotionShouldPreserveAllUserDataExceptRole() {
+    User user = UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+    User demoted = user.demoteToSupport();
+
+    assertThat(demoted.id()).isEqualTo(user.id());
+    assertThat(demoted.name()).isEqualTo(user.name());
+    assertThat(demoted.email()).isEqualTo(user.email());
+    assertThat(demoted.password()).isEqualTo(user.password());
+    assertThat(demoted.status()).isEqualTo(user.status());
+    assertThat(demoted.userCreatedAt()).isEqualTo(user.userCreatedAt());
+    assertThat(demoted.partnerId()).isEqualTo(user.partnerId());
+  }
+
+  @Test
+  @DisplayName("Deactivated Support user cannot assign tickets")
+  void deactivatedSupportCannotAssignTickets() {
+    User support =
+        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
+            .deactivate();
+    assertThat(support.canAssignTickets()).isFalse();
+  }
 }
