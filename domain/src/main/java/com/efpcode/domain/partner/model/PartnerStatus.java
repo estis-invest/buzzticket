@@ -20,6 +20,10 @@ public enum PartnerStatus {
     return this == EDIT;
   }
 
+  public boolean canBeEdit() {
+    return this == ACTIVE;
+  }
+
   public boolean isDeactivated() {
     return this == DEACTIVATED;
   }
@@ -34,20 +38,35 @@ public enum PartnerStatus {
 
   public PartnerStatus toDelete() {
     if (this == DEACTIVATED) return DELETED;
-    return this;
+    throw new IllegalPartnerStatusTransitionException(
+        String.format(
+            "PartnerStatus %s cannot be deleted. Only DEACTIVATED PartnerStatus can transition to DELETED",
+            this));
   }
 
   public PartnerStatus toActivate() {
     return switch (this) {
       case DEACTIVATED, EDIT -> ACTIVE;
-      default -> this;
+      default ->
+          throw new IllegalPartnerStatusTransitionException(
+              String.format(
+                  "PartnerStatus %s cannot be activated. Only DEACTIVATED and EDIT PartnerStatus can transition to ACTIVE",
+                  this));
     };
   }
 
   public PartnerStatus toEdit() {
-    return switch (this) {
-      case ACTIVE -> EDIT;
-      default -> this;
-    };
+    if (this == ACTIVE) return EDIT;
+    throw new IllegalPartnerStatusTransitionException(
+        String.format(
+            "PartnerStatus %s cannot be edited. Only ACTIVE PartnerStatus can transition to EDIT",
+            this));
+  }
+
+  public void partnerStatusEditGuard() {
+    if (!canBeEdit()) {
+      throw new IllegalPartnerStatusTransitionException(
+          String.format("PartnerStatus: %s cannot be edited.", this));
+    }
   }
 }

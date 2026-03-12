@@ -110,15 +110,4 @@ class PartnerCityTest {
         .hasSameSizeAs(expected)
         .hasToString(expected);
   }
-
-  @Test
-  @DisplayName("PartnerCity method update returns a new object")
-  void partnerCityMethodUpdateReturnsANewObject() {
-
-    var oldCity = new PartnerCity("Stockholm");
-    var newCity = oldCity.update("Göteborg");
-
-    assertThat(newCity).isNotSameAs(oldCity);
-    assertThat(newCity.partnerCity()).hasToString("Göteborg");
-  }
 }

@@ -37,8 +37,4 @@ public record PartnerCountry(String partnerCountry) {
               "Country name passed exceeds max length: %d characters. Passed name had a length of %d characters",
               MAX_LENGTH, partnerCountry.length()));
   }
-
-  public PartnerCountry update(String country) {
-    return new PartnerCountry(country);
-  }
 }
