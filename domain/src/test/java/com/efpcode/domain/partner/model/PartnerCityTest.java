@@ -47,6 +47,7 @@ class PartnerCityTest {
         Arguments.of("St. Petersburg"),
         Arguments.of("São Paulo"),
         Arguments.of("Vrångö"),
+        Arguments.of("   Vrångö   "),
         Arguments.of("Bishop's Castle"),
         Arguments.of("São Paulo"),
         Arguments.of("S\u0061\u0303o Paulo"),
