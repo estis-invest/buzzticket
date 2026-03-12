@@ -2,8 +2,12 @@ package com.efpcode.domain.partner.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
+import java.util.function.Function;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -160,7 +164,10 @@ class PartnerTest {
   @Test
   @DisplayName("isDeleted is true if Partner is labelled as deleted")
   void isDeletedIsTrueIfPartnerIsLabelledAsDeleted() {
-    assertThat(PartnerStatus.DELETED.isDeleted()).isTrue();
+    var partner =
+        new Partner(
+            ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, PartnerStatus.DELETED, ANY_TIME);
+    assertThat(partner.isDeleted()).isTrue();
   }
 
   @ParameterizedTest
@@ -170,13 +177,18 @@ class PartnerTest {
       mode = EnumSource.Mode.EXCLUDE)
   @DisplayName("isDeleted is false if Partner is not labelled as deleted")
   void isDeletedIsFalseIfPartnerIsNotLabelledAsDeleted(PartnerStatus status) {
-    assertThat(status.isDeleted()).isFalse();
+    var partner =
+        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+    assertThat(partner.isDeleted()).isFalse();
   }
 
   @Test
   @DisplayName("isEdit true when Partner is in Edit mode")
   void isEditTrueWhenPartnerIsInEditMode() {
-    assertThat(PartnerStatus.EDIT.isEdit()).isTrue();
+    var partner =
+        new Partner(
+            ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, PartnerStatus.EDIT, ANY_TIME);
+    assertThat(partner.isEdit()).isTrue();
   }
 
   @ParameterizedTest
@@ -185,13 +197,24 @@ class PartnerTest {
       names = {"ACTIVE", "DEACTIVATED", "DELETED"})
   @DisplayName("isEdit false when Partner is not in Edit mode")
   void isEditFalseWhenPartnerIsNotInEditMode(PartnerStatus status) {
-    assertThat(status.isEdit()).isFalse();
+    var partner =
+        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+    assertThat(partner.isEdit()).isFalse();
   }
 
   @Test
   @DisplayName("isDeactivated true when Partner is in Deactivated mode")
   void isDeactivatedTrueWhenPartnerIsInDeactivatedMode() {
-    assertThat(PartnerStatus.DEACTIVATED.isDeactivated()).isTrue();
+    var partner =
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            PartnerStatus.DEACTIVATED,
+            ANY_TIME);
+    assertThat(partner.isDeactivated()).isTrue();
   }
 
   @ParameterizedTest
@@ -200,6 +223,105 @@ class PartnerTest {
       names = {"ACTIVE", "EDIT", "DELETED"})
   @DisplayName("isDeactivated false when Partner is not in Deactivated mode")
   void isDeactivatedFalseWhenPartnerIsNotInDeactivatedMode(PartnerStatus status) {
-    assertThat(status.isDeactivated()).isFalse();
+    var partner =
+        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+    assertThat(partner.isDeactivated()).isFalse();
+  }
+
+  @Test
+  @DisplayName("canBeEdit is true for Partner with ACTIVE status")
+  void canBeEditIsTrueForPartnerWithActiveStatus() {
+    Partner partner =
+        new Partner(
+            ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, PartnerStatus.ACTIVE, ANY_TIME);
+    assertThat(partner.canBeEdit()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = PartnerStatus.class,
+      names = {"DELETED", "DEACTIVATED", "EDIT"})
+  @DisplayName("canBeEdit is false for Partner with status other than ACTIVE")
+  void canBeEditIsFalseForPartnerWithStatusOtherThanActive(PartnerStatus status) {
+    Partner partner =
+        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+    assertThat(partner.canBeEdit()).isFalse();
+  }
+
+  @Nested
+  class PartnerStateTest {
+
+    private Partner draft;
+    private Partner active;
+    private Partner deactivated;
+    private Partner deleted;
+
+    @BeforeEach
+    void setUp() {
+      var id = PartnerId.generate();
+      var name = new PartnerName("EFP");
+      var city = new PartnerCity("Berlin");
+      var country = new PartnerCountry("DE");
+      var iso = new PartnerIsoCode("DEU");
+      var now = PartnerCreatedAt.createNow();
+
+      draft = new Partner(id, name, city, country, iso, PartnerStatus.EDIT, now);
+      active = new Partner(id, name, city, country, iso, PartnerStatus.ACTIVE, now);
+      deactivated = new Partner(id, name, city, country, iso, PartnerStatus.DEACTIVATED, now);
+      deleted = new Partner(id, name, city, country, iso, PartnerStatus.DELETED, now);
+    }
+
+    private static Stream<Arguments> happyPathTransitions() {
+      return Stream.of(
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>) t -> t.draft.toActivate(),
+              PartnerStatus.ACTIVE),
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>) t -> t.active.toEdit(), PartnerStatus.EDIT),
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>) t -> t.active.toDeactivate(),
+              PartnerStatus.DEACTIVATED),
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>) t -> t.deactivated.toActivate(),
+              PartnerStatus.ACTIVE),
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>) t -> t.deactivated.toDelete(),
+              PartnerStatus.DELETED));
+    }
+
+    @ParameterizedTest
+    @MethodSource("happyPathTransitions")
+    @DisplayName("Partner state transition works")
+    void partnerStateTransitionWorks(
+        Function<PartnerStateTest, Partner> transition, PartnerStatus expectedStatus) {
+      Partner result = transition.apply(this);
+      assertThat(result.status()).isEqualTo(expectedStatus);
+    }
+
+    private static Stream<Arguments> deletedStatusTransitionThatFail() {
+      return Stream.of(
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toActivate,
+              "Only DEACTIVATED and EDIT PartnerStatus can transition to ACTIVE"),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toEdit,
+              "PartnerStatus: DELETED cannot be edited."),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toDeactivate,
+              "Only ACTIVE PartnerStatus can transition to DEACTIVATED"),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toDelete,
+              "Only DEACTIVATED PartnerStatus can transition to DELETED"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("deletedStatusTransitionThatFail")
+    @DisplayName("Deleted partner throws errors for all transitions")
+    void deletedPartnerThrowsErrorsForAllTransitions(
+        Function<Partner, Partner> transition, String expectedMessage) {
+      assertThatThrownBy(() -> transition.apply(deleted))
+          .isInstanceOf(IllegalPartnerStatusTransitionException.class)
+          .hasMessageContaining(expectedMessage);
+    }
   }
 }

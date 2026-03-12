@@ -1,6 +1,5 @@
 package com.efpcode.domain.partner.model;
 
-import com.efpcode.domain.partner.exceptions.InvalidPartnerException;
 import java.util.Objects;
 
 public record Partner(
@@ -79,16 +78,13 @@ public record Partner(
     return updatedPartner.toActivate();
   }
 
-  Partner withStatus(PartnerStatus status) {
+  private Partner withStatus(PartnerStatus status) {
     return new Partner(
         this.id, this.name, this.city, this.country, this.isoCode, status, this.createdAt);
   }
 
   public static Partner createDraftPartner(
       String name, String city, String country, String isoCode) {
-    if (name == null || city == null || country == null || isoCode == null) {
-      throw new InvalidPartnerException("Partner cannot parse null values");
-    }
 
     return new Partner(
         PartnerId.generate(),
