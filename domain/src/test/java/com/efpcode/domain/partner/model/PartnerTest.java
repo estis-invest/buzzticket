@@ -298,6 +298,68 @@ class PartnerTest {
       assertThat(result.status()).isEqualTo(expectedStatus);
     }
 
+    private static Stream<Arguments> deactivatedStatusTransitionThatFail() {
+      return Stream.of(
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toEdit,
+              "PartnerStatus: DEACTIVATED cannot be edited."),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toDeactivate,
+              "Only ACTIVE PartnerStatus can transition to DEACTIVATED"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("deactivatedStatusTransitionThatFail")
+    @DisplayName("Deactivated partner throws errors for all transitions")
+    void deactivatedPartnerThrowsErrorsForAllTransitions(
+        Function<Partner, Partner> transition, String expectedMessage) {
+      assertThatThrownBy(() -> transition.apply(deactivated))
+          .isInstanceOf(IllegalPartnerStatusTransitionException.class)
+          .hasMessageContaining(expectedMessage);
+    }
+
+    private static Stream<Arguments> activeStatusTransitionThatFail() {
+      return Stream.of(
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toActivate,
+              "Only DEACTIVATED and EDIT PartnerStatus can transition to ACTIVE"),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toDelete,
+              "Only DEACTIVATED PartnerStatus can transition to DELETED"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("activeStatusTransitionThatFail")
+    @DisplayName("Active partner throws errors for all transitions")
+    void activePartnerThrowsErrorsForAllTransitions(
+        Function<Partner, Partner> transition, String expectedMessage) {
+      assertThatThrownBy(() -> transition.apply(active))
+          .isInstanceOf(IllegalPartnerStatusTransitionException.class)
+          .hasMessageContaining(expectedMessage);
+    }
+
+    private static Stream<Arguments> editStatusTransitionThatFail() {
+      return Stream.of(
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toEdit, "PartnerStatus: EDIT cannot be edited"),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toDeactivate,
+              "Only ACTIVE PartnerStatus can transition to DEACTIVATED"),
+          Arguments.of(
+              (Function<Partner, Partner>) Partner::toDelete,
+              "Only DEACTIVATED PartnerStatus can transition to DELETED"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("editStatusTransitionThatFail")
+    @DisplayName("Edit partner throws errors for all transitions")
+    void editPartnerThrowsErrorsForAllTransitions(
+        Function<Partner, Partner> transition, String expectedMessage) {
+      assertThatThrownBy(() -> transition.apply(draft))
+          .isInstanceOf(IllegalPartnerStatusTransitionException.class)
+          .hasMessageContaining(expectedMessage);
+    }
+
     private static Stream<Arguments> deletedStatusTransitionThatFail() {
       return Stream.of(
           Arguments.of(
@@ -323,5 +385,106 @@ class PartnerTest {
           .isInstanceOf(IllegalPartnerStatusTransitionException.class)
           .hasMessageContaining(expectedMessage);
     }
+
+    @Test
+    @DisplayName("updatePartner should change data and return to ACTIVE status")
+    void updatePartnerShouldChangeDataAndReturnToActiveStatus() {
+      var newName = new PartnerName("Updated Name");
+      var newCity = new PartnerCity("Munich");
+
+      Partner updated = active.updatePartner(newName, newCity, null, null);
+
+      assertThat(updated.name()).isEqualTo(newName);
+      assertThat(updated.city()).isEqualTo(newCity);
+      assertThat(updated.id()).isEqualTo(active.id());
+      assertThat(updated.createdAt()).isEqualTo(active.createdAt());
+      assertThat(updated.country()).isEqualTo(active.country());
+      assertThat(updated.status()).isEqualTo(PartnerStatus.ACTIVE);
+    }
+
+    private static Stream<Arguments> updatePartnerCallsThatFail() {
+      return Stream.of(
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>)
+                  t -> t.draft.updatePartner(null, null, null, null),
+              "PartnerStatus: EDIT cannot be edited"),
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>)
+                  t -> t.deleted.updatePartner(null, null, null, null),
+              "PartnerStatus: DELETED cannot be edited."),
+          Arguments.of(
+              (Function<PartnerStateTest, Partner>)
+                  t -> t.deactivated.updatePartner(null, null, null, null),
+              "PartnerStatus: DEACTIVATED cannot be edited."));
+    }
+
+    @ParameterizedTest
+    @MethodSource("updatePartnerCallsThatFail")
+    @DisplayName("updatePartner throws errors for all transitions")
+    void updatePartnerThrowsErrorsForAllTransitions(
+        Function<PartnerStateTest, Partner> transition, String expectedMessage) {
+      assertThatThrownBy(() -> transition.apply(this))
+          .isInstanceOf(IllegalPartnerStatusTransitionException.class)
+          .hasMessageContaining(expectedMessage);
+    }
+  }
+
+  @Test
+  @DisplayName("updatePartner returns the same object if all values are null")
+  void updatePartnerReturnsTheSameObjectIfAllValuesAreNull() {
+    var partner =
+        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, ANY_STATUS, ANY_TIME);
+
+    var updatedPartner = partner.updatePartner(null, null, null, null);
+    assertThat(updatedPartner).isNotSameAs(partner);
+    assertThat(updatedPartner.id()).isEqualTo(partner.id());
+    assertThat(updatedPartner.name()).isEqualTo(partner.name());
+    assertThat(updatedPartner.city()).isEqualTo(partner.city());
+    assertThat(updatedPartner.country()).isEqualTo(partner.country());
+    assertThat(updatedPartner.isoCode()).isEqualTo(partner.isoCode());
+    assertThat(updatedPartner.status()).isEqualTo(partner.status());
+    assertThat(updatedPartner.createdAt()).isEqualTo(partner.createdAt());
+  }
+
+  @Test
+  @DisplayName("updatePartner returns a valid new update object when args are passed")
+  void updatePartnerReturnsAValidNewUpdateObjectWhenArgsArePassed() {
+    var partner =
+        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, ANY_STATUS, ANY_TIME);
+
+    var newName = new PartnerName("New Name");
+    var newCity = new PartnerCity("New City");
+    var newCountry = new PartnerCountry("NEW COUNTRY");
+    var newIsoCode = new PartnerIsoCode("GBR");
+
+    Partner updatedPartner = partner.updatePartner(newName, newCity, newCountry, newIsoCode);
+    assertThat(updatedPartner).isNotSameAs(partner);
+    assertThat(updatedPartner.id()).isEqualTo(partner.id());
+    assertThat(updatedPartner.name()).isEqualTo(newName);
+    assertThat(updatedPartner.city()).isEqualTo(newCity);
+    assertThat(updatedPartner.country()).isEqualTo(newCountry);
+    assertThat(updatedPartner.isoCode()).isEqualTo(newIsoCode);
+    assertThat(updatedPartner.status()).isEqualTo(partner.status());
+    assertThat(updatedPartner.createdAt()).isEqualTo(partner.createdAt());
+  }
+
+  @Test
+  @DisplayName("createDraftPartner creates new Partner in status EDIT")
+  void createDraftPartnerCreatesNewPartnerInStatusEdit() {
+
+    var partner =
+        Partner.createDraftPartner(
+            ANY_NAME.partnerName(),
+            ANY_CITY.partnerCity(),
+            ANY_COUNTRY.partnerCountry(),
+            ANY_ISO_CODE.isoCode());
+
+    assertThat(partner.status()).isEqualTo(PartnerStatus.EDIT);
+    assertThat(partner.createdAt()).isNotNull();
+    assertThat(partner.id()).isNotNull();
+    assertThat(partner.name()).isEqualTo(ANY_NAME);
+    assertThat(partner.city()).isEqualTo(ANY_CITY);
+    assertThat(partner.country()).isEqualTo(ANY_COUNTRY);
+    assertThat(partner.isoCode()).isEqualTo(ANY_ISO_CODE);
   }
 }
