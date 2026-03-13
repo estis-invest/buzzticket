@@ -47,6 +47,7 @@ class PartnerCityTest {
         Arguments.of("St. Petersburg"),
         Arguments.of("São Paulo"),
         Arguments.of("Vrångö"),
+        Arguments.of("   Vrångö   "),
         Arguments.of("Bishop's Castle"),
         Arguments.of("São Paulo"),
         Arguments.of("S\u0061\u0303o Paulo"),
@@ -108,16 +109,5 @@ class PartnerCityTest {
         .isInstanceOf(String.class)
         .hasSameSizeAs(expected)
         .hasToString(expected);
-  }
-
-  @Test
-  @DisplayName("PartnerCity method update returns a new object")
-  void partnerCityMethodUpdateReturnsANewObject() {
-
-    var oldCity = new PartnerCity("Stockholm");
-    var newCity = oldCity.update("Göteborg");
-
-    assertThat(newCity).isNotSameAs(oldCity);
-    assertThat(newCity.partnerCity()).hasToString("Göteborg");
   }
 }

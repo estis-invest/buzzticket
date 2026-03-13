@@ -17,8 +17,4 @@ public record PartnerIsoCode(String isoCode) {
       throw new IllegalPartnerIsoCodeFormatException(
           "IsoCode must be exactly 3 characters long and only contain letters in uppercase");
   }
-
-  public PartnerIsoCode update(String newIsoCode) {
-    return new PartnerIsoCode(newIsoCode);
-  }
 }

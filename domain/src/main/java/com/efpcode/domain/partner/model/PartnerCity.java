@@ -28,8 +28,4 @@ public record PartnerCity(String partnerCity) {
       throw new IllegalPartnerCityNameFormatException(
           "City name should only contain letters, digits, dots, hyphen, apostrophe and space");
   }
-
-  public PartnerCity update(String newCity) {
-    return new PartnerCity(newCity);
-  }
 }

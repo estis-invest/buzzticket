@@ -27,8 +27,4 @@ public record PartnerName(String partnerName) {
               "Partner name: %s is not following format standard allowed characters are letters, digits, ampersands, apostrophe, hyphen, dots, @, parenthesis and commas",
               partnerName));
   }
-
-  public PartnerName update(String partnerName) {
-    return new PartnerName(partnerName);
-  }
 }

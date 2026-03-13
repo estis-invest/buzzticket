@@ -100,18 +100,6 @@ class PartnerCountryTest {
                 upperLimit, country.trim().length()));
   }
 
-  @ParameterizedTest
-  @MethodSource("provideValidCountries")
-  @DisplayName("PartnerCountry method update returns a new valid object")
-  void partnerCountryMethodUpdateReturnsANewValidObject(String country) {
-
-    var oldCountry = new PartnerCountry("England".toUpperCase());
-    PartnerCountry newCountry = oldCountry.update(country);
-
-    assertThat(newCountry).isNotSameAs(oldCountry);
-    assertThat(newCountry.partnerCountry()).hasToString(country.trim());
-  }
-
   private static Stream<Arguments> provideInvalidCountryWordsThatFails() {
     return Stream.of(
         Arguments.of("S"),

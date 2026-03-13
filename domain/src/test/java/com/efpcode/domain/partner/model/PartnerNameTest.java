@@ -50,27 +50,6 @@ class PartnerNameTest {
     assertThat(partnerName.partnerName()).hasSameSizeAs(testInput).hasToString(testInput);
   }
 
-  @ParameterizedTest
-  @MethodSource("provideBlankAndNull")
-  @DisplayName("PartnerName update throws error if blank or null is passed")
-  void partnerNameUpdateThrowsErrorIfBlankOrNullIsPassed(String testInput) {
-    var partnerName = new PartnerName("a");
-    assertThatThrownBy(() -> partnerName.update(testInput))
-        .isInstanceOf(InvalidPartnerNameException.class)
-        .hasMessageContaining("PartnerName cannot be instantiated with null or blank as argument.");
-  }
-
-  @Test
-  @DisplayName("PartnerName update creates valid object if string is passed")
-  void partnerNameUpdateCreatesValidObjectIfStringIsPassed() {
-
-    var partnerName = new PartnerName("old");
-    var result = partnerName.update("new");
-
-    assertThat(result).isNotSameAs(partnerName);
-    assertThat(result.partnerName()).doesNotContain(partnerName.partnerName());
-  }
-
   private static Stream<Arguments> providePartnerNamesThatPasses() {
     return Stream.of(
         Arguments.of("P.I.X.A.R"),
