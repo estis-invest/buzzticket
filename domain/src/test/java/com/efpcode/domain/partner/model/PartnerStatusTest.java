@@ -75,7 +75,7 @@ class PartnerStatusTest {
   @EnumSource(
       value = PartnerStatus.class,
       names = {"DEACTIVATED", "EDIT", "DELETED"})
-  @DisplayName("toDeactivate throws error if PartnerStatus is other then ACTIVE ")
+  @DisplayName("toDeactivate throws error if PartnerStatus is other than ACTIVE ")
   void toDeactivateThrowsErrorIfPartnerStatusIsOtherThenActive(PartnerStatus status) {
 
     assertThatThrownBy(status::toDeactivate)
@@ -101,7 +101,7 @@ class PartnerStatusTest {
   @EnumSource(
       value = PartnerStatus.class,
       names = {"ACTIVE", "EDIT", "DELETED"})
-  @DisplayName("toDelete throws error if PartnerStatus is other then DEACTIVATED")
+  @DisplayName("toDelete throws error if PartnerStatus is other than DEACTIVATED")
   void toDeleteThrowsErrorIfPartnerStatusIsOtherThenDeactivated(PartnerStatus status) {
     assertThatThrownBy(status::toDelete)
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
@@ -139,8 +139,8 @@ class PartnerStatusTest {
   @EnumSource(
       value = PartnerStatus.class,
       names = {"DEACTIVATED", "EDIT"})
-  @DisplayName("toActive return ACTIVE from PartnerStatus DEACTIVATED and EDIT")
-  void toActiveReturnActiveFromPartnerStatusDeactivatedAndEdit(PartnerStatus status) {
+  @DisplayName("toActivate return ACTIVE from PartnerStatus DEACTIVATED and EDIT")
+  void toActivateReturnActiveFromPartnerStatusDeactivatedAndEdit(PartnerStatus status) {
     var result = status.toActivate();
     assertThat(result).isNotSameAs(status);
     assertThat(result.isActive()).isTrue();
@@ -163,8 +163,8 @@ class PartnerStatusTest {
   }
 
   @Test
-  @DisplayName("toEdit return EDIT PartnerStatus only for ACTIVE status")
-  void toEditReturnEditPartnerStatusOnlyForActiveStatus() {
+  @DisplayName("toEdit return EDIT PartnerStatus from ACTIVE status")
+  void toEditReturnEditPartnerStatusFromActiveStatus() {
     var result = PartnerStatus.ACTIVE.toEdit();
     assertThat(result).isNotSameAs(PartnerStatus.ACTIVE);
     assertThat(result.isEdit()).isTrue();
@@ -175,8 +175,8 @@ class PartnerStatusTest {
   @EnumSource(
       value = PartnerStatus.class,
       names = {"DELETED", "DEACTIVATED"})
-  @DisplayName("canBeEdit is true for ACTIVE or EDIT status")
-  void canBeEditIsTrueForActiveOrEditStatus(PartnerStatus status) {
+  @DisplayName("canBeEdit is false for DELETED or DEACTIVATED status")
+  void canBeEditIsFalseForDeletedOrDeactivatedStatus(PartnerStatus status) {
     assertThat(status.canBeEdit()).isFalse();
   }
 
@@ -200,10 +200,13 @@ class PartnerStatusTest {
         .hasMessageContaining(String.format("PartnerStatus: %s cannot be edited.", status.name()));
   }
 
-  @Test
-  @DisplayName("partnerStatusEditGuard does not throw error if status is ACTIVE")
-  void partnerStatusEditGuardDoesNotThrowErrorIfStatusIsActive() {
-    assertThatCode(PartnerStatus.ACTIVE::partnerStatusEditGuard).doesNotThrowAnyException();
+  @ParameterizedTest
+  @EnumSource(
+      value = PartnerStatus.class,
+      names = {"EDIT", "ACTIVE"})
+  @DisplayName("partnerStatusEditGuard does not throw error if status is ACTIVE or EDIT")
+  void partnerStatusEditGuardDoesNotThrowErrorIfStatusIsActiveorEdit(PartnerStatus status) {
+    assertThatCode(status::partnerStatusEditGuard).doesNotThrowAnyException();
   }
 
   @Test

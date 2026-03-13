@@ -53,7 +53,7 @@ class PartnerCreatedAtTest {
     var now = Instant.now();
     var result = new PartnerCreatedAt(now);
     assertThat(result).isNotNull().isInstanceOf(PartnerCreatedAt.class);
-    assertThat(result.createdAt()).isAfterOrEqualTo(now);
+    assertThat(result.createdAt()).isEqualTo(now);
     assertThat(result.createdAt()).isBeforeOrEqualTo(now.plusSeconds(5));
   }
 
