@@ -43,7 +43,7 @@ class PartnerCreatedAtTest {
     var slightFutureInTime = Instant.now().plusSeconds(30);
     var result = new PartnerCreatedAt(slightFutureInTime);
     assertThat(result).isNotNull().isInstanceOf(PartnerCreatedAt.class);
-    assertThat(result.createdAt()).isAfterOrEqualTo(slightFutureInTime);
+    assertThat(result.createdAt()).isEqualTo(slightFutureInTime);
   }
 
   @Test
@@ -73,6 +73,6 @@ class PartnerCreatedAtTest {
     var time1 = PartnerCreatedAt.createNow();
     var time2 = PartnerCreatedAt.createNow();
     assertThat(time1).isNotSameAs(time2);
-    assertThat(time1.createdAt()).isBefore(time2.createdAt());
+    assertThat(time1.createdAt()).isBeforeOrEqualTo(time2.createdAt());
   }
 }

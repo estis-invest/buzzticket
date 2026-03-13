@@ -21,7 +21,7 @@ public enum PartnerStatus {
   }
 
   public boolean canBeEdit() {
-    return this == ACTIVE;
+    return this == ACTIVE || this == EDIT;
   }
 
   public boolean isDeactivated() {
@@ -56,10 +56,10 @@ public enum PartnerStatus {
   }
 
   public PartnerStatus toEdit() {
-    if (this == ACTIVE) return EDIT;
+    if (this == ACTIVE || this == EDIT) return EDIT;
     throw new IllegalPartnerStatusTransitionException(
         String.format(
-            "PartnerStatus %s cannot be edited. Only ACTIVE PartnerStatus can transition to EDIT",
+            "PartnerStatus %s cannot be edited. Only ACTIVE or EDIT PartnerStatus can transition to EDIT",
             this));
   }
 

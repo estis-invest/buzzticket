@@ -150,15 +150,15 @@ class PartnerStatusTest {
   @ParameterizedTest
   @EnumSource(
       value = PartnerStatus.class,
-      names = {"DELETED", "EDIT", "DEACTIVATED"})
-  @DisplayName("toEdit return EDIT PartnerStatus only for ACTIVE status else throws error")
-  void toEditReturnEditPartnerStatusOnlyForActiveStatusElseThrowsError(PartnerStatus status) {
+      names = {"DELETED", "DEACTIVATED"})
+  @DisplayName("toEdit return EDIT PartnerStatus for ACTIVE or EDIT other status throws error")
+  void toEditReturnEditPartnerStatusForActiveOrEditOtherStatusThrowsError(PartnerStatus status) {
 
     assertThatThrownBy(status::toEdit)
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
         .hasMessageContaining(
             String.format(
-                "PartnerStatus %s cannot be edited. Only ACTIVE PartnerStatus can transition to EDIT",
+                "PartnerStatus %s cannot be edited. Only ACTIVE or EDIT PartnerStatus can transition to EDIT",
                 status.name()));
   }
 
@@ -174,24 +174,27 @@ class PartnerStatusTest {
   @ParameterizedTest
   @EnumSource(
       value = PartnerStatus.class,
-      names = {"DELETED", "EDIT", "DEACTIVATED"})
-  @DisplayName("canBeEdit is true only for ACTIVE status")
-  void canBeEditIsTrueOnlyForActiveStatus(PartnerStatus status) {
+      names = {"DELETED", "DEACTIVATED"})
+  @DisplayName("canBeEdit is true for ACTIVE or EDIT status")
+  void canBeEditIsTrueForActiveOrEditStatus(PartnerStatus status) {
     assertThat(status.canBeEdit()).isFalse();
-  }
-
-  @Test
-  @DisplayName("canBeEdit true for ACTIVE PartnerStatus")
-  void canBeEditTrueForActivePartnerStatus() {
-    assertThat(PartnerStatus.ACTIVE.canBeEdit()).isTrue();
   }
 
   @ParameterizedTest
   @EnumSource(
       value = PartnerStatus.class,
-      names = {"DELETED", "EDIT", "DEACTIVATED"})
-  @DisplayName("partnerStatusEditGuard throws error if status is not ACTIVE")
-  void partnerStatusEditGuardThrowsErrorIfStatusIsNotActive(PartnerStatus status) {
+      names = {"ACTIVE", "EDIT"})
+  @DisplayName("canBeEdit true for ACTIVE or EDIT PartnerStatus")
+  void canBeEditTrueForActiveOrEditPartnerStatus(PartnerStatus status) {
+    assertThat(status.canBeEdit()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = PartnerStatus.class,
+      names = {"DELETED", "DEACTIVATED"})
+  @DisplayName("partnerStatusEditGuard throws error if status is not ACTIVE or EDIT")
+  void partnerStatusEditGuardThrowsErrorIfStatusIsNotActiveOrEdit(PartnerStatus status) {
     assertThatThrownBy(status::partnerStatusEditGuard)
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
         .hasMessageContaining(String.format("PartnerStatus: %s cannot be edited.", status.name()));
@@ -201,5 +204,12 @@ class PartnerStatusTest {
   @DisplayName("partnerStatusEditGuard does not throw error if status is ACTIVE")
   void partnerStatusEditGuardDoesNotThrowErrorIfStatusIsActive() {
     assertThatCode(PartnerStatus.ACTIVE::partnerStatusEditGuard).doesNotThrowAnyException();
+  }
+
+  @Test
+  @DisplayName("toEdit return EDIT even if already in EDIT status")
+  void toEditReturnEditEvenIfAlreadyInEditStatus() {
+    var result = PartnerStatus.EDIT.toEdit();
+    assertThat(result).isEqualTo(PartnerStatus.EDIT);
   }
 }

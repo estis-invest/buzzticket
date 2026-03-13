@@ -240,9 +240,9 @@ class PartnerTest {
   @ParameterizedTest
   @EnumSource(
       value = PartnerStatus.class,
-      names = {"DELETED", "DEACTIVATED", "EDIT"})
-  @DisplayName("canBeEdit is false for Partner with status other than ACTIVE")
-  void canBeEditIsFalseForPartnerWithStatusOtherThanActive(PartnerStatus status) {
+      names = {"DELETED", "DEACTIVATED"})
+  @DisplayName("canBeEdit is false for Partner with status other than ACTIVE or EDIT")
+  void canBeEditIsFalseForPartnerWithStatusOtherThanActiveOrEdit(PartnerStatus status) {
     Partner partner =
         new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
     assertThat(partner.canBeEdit()).isFalse();
@@ -341,8 +341,6 @@ class PartnerTest {
     private static Stream<Arguments> editStatusTransitionThatFail() {
       return Stream.of(
           Arguments.of(
-              (Function<Partner, Partner>) Partner::toEdit, "PartnerStatus: EDIT cannot be edited"),
-          Arguments.of(
               (Function<Partner, Partner>) Partner::toDeactivate,
               "Only ACTIVE PartnerStatus can transition to DEACTIVATED"),
           Arguments.of(
@@ -406,10 +404,6 @@ class PartnerTest {
       return Stream.of(
           Arguments.of(
               (Function<PartnerStateTest, Partner>)
-                  t -> t.draft.updatePartner(null, null, null, null),
-              "PartnerStatus: EDIT cannot be edited"),
-          Arguments.of(
-              (Function<PartnerStateTest, Partner>)
                   t -> t.deleted.updatePartner(null, null, null, null),
               "PartnerStatus: DELETED cannot be edited."),
           Arguments.of(
@@ -426,6 +420,17 @@ class PartnerTest {
       assertThatThrownBy(() -> transition.apply(this))
           .isInstanceOf(IllegalPartnerStatusTransitionException.class)
           .hasMessageContaining(expectedMessage);
+    }
+
+    @Test
+    @DisplayName("updatePartner should work for DRAFT (EDIT) partners and move them to ACTIVE")
+    void updatePartnerShouldWorkForDraftPartners() {
+      var newName = new PartnerName("Draft Updated");
+
+      Partner result = draft.updatePartner(newName, null, null, null);
+
+      assertThat(result.status()).isEqualTo(PartnerStatus.ACTIVE);
+      assertThat(result.name()).isEqualTo(newName);
     }
   }
 
