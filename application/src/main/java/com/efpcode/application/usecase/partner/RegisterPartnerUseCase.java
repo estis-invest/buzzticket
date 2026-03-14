@@ -1,7 +1,7 @@
 package com.efpcode.application.usecase.partner;
 
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
-import com.efpcode.application.usecase.partner.exception.PartnerAlreadyExistsException;
+import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerName;
 import com.efpcode.domain.partner.port.PartnerRepository;

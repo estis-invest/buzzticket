@@ -1,6 +1,6 @@
 package com.efpcode.application.usecase.partner.dto;
 
-import com.efpcode.application.usecase.partner.exception.InvalidRegisterPartnerCommandArgumentException;
+import com.efpcode.application.usecase.partner.exceptions.InvalidRegisterPartnerCommandArgumentException;
 
 public record RegisterPartnerCommand(String name, String city, String country, String isoCode) {
 
