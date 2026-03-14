@@ -7,6 +7,7 @@ import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
 import com.efpcode.infrastructure.web.dto.RegisterPartnerRequest;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +28,7 @@ class PartnerController {
 
   @PostMapping
   public ResponseEntity<PartnerResponse> registerPartner(
-      @RequestBody RegisterPartnerRequest request) {
+      @Valid @RequestBody RegisterPartnerRequest request) {
     var command =
         new RegisterPartnerCommand(
             request.name(), request.city(), request.country(), request.isoCode());
