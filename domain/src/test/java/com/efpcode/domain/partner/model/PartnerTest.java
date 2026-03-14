@@ -3,6 +3,8 @@ package com.efpcode.domain.partner.model;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,6 +25,7 @@ class PartnerTest {
   private static final PartnerIsoCode ANY_ISO_CODE = new PartnerIsoCode("SWE");
   private static final PartnerStatus ANY_STATUS = PartnerStatus.ACTIVE;
   private static final PartnerCreatedAt ANY_TIME = PartnerCreatedAt.createNow();
+  public static final PartnerUpdateAt ANY_TIME_UPDATE = PartnerUpdateAt.createNow();
 
   private static Stream<Arguments> invalidArgumentsThatFail() {
     var testPartnerId = PartnerId.generate();
@@ -32,6 +35,7 @@ class PartnerTest {
     var testPartnerIsoCode = new PartnerIsoCode("SWE");
     var testPartnerStatus = PartnerStatus.ACTIVE;
     var testPartnerCreatedAt = PartnerCreatedAt.createNow();
+    var testPartnerUpdatedAt = ANY_TIME_UPDATE;
     return Stream.of(
         Arguments.of(
             null,
@@ -41,6 +45,7 @@ class PartnerTest {
             testPartnerIsoCode,
             testPartnerStatus,
             testPartnerCreatedAt,
+            testPartnerUpdatedAt,
             "Id cannot be null"),
         Arguments.of(
             testPartnerId,
@@ -50,6 +55,7 @@ class PartnerTest {
             testPartnerIsoCode,
             testPartnerStatus,
             testPartnerCreatedAt,
+            testPartnerUpdatedAt,
             "Name cannot be null"),
         Arguments.of(
             testPartnerId,
@@ -59,6 +65,7 @@ class PartnerTest {
             testPartnerIsoCode,
             testPartnerStatus,
             testPartnerCreatedAt,
+            testPartnerUpdatedAt,
             "City cannot be null"),
         Arguments.of(
             testPartnerId,
@@ -68,6 +75,7 @@ class PartnerTest {
             testPartnerIsoCode,
             testPartnerStatus,
             testPartnerCreatedAt,
+            testPartnerUpdatedAt,
             "Country cannot be null"),
         Arguments.of(
             testPartnerId,
@@ -77,6 +85,7 @@ class PartnerTest {
             null,
             testPartnerStatus,
             testPartnerCreatedAt,
+            testPartnerUpdatedAt,
             "IsoCode cannot be null"),
         Arguments.of(
             testPartnerId,
@@ -86,6 +95,7 @@ class PartnerTest {
             testPartnerIsoCode,
             null,
             testPartnerCreatedAt,
+            testPartnerUpdatedAt,
             "Status cannot be null"),
         Arguments.of(
             testPartnerId,
@@ -95,7 +105,18 @@ class PartnerTest {
             testPartnerIsoCode,
             testPartnerStatus,
             null,
-            "createdAt cannot be null"));
+            testPartnerUpdatedAt,
+            "createdAt cannot be null"),
+        Arguments.of(
+            testPartnerId,
+            testPartnerName,
+            testPartnerCity,
+            testPartnerCountry,
+            testPartnerIsoCode,
+            testPartnerStatus,
+            testPartnerCreatedAt,
+            null,
+            "updateAt cannot be null"));
   }
 
   @ParameterizedTest
@@ -109,6 +130,7 @@ class PartnerTest {
       PartnerIsoCode partnerIsoCode,
       PartnerStatus partnerStatus,
       PartnerCreatedAt partnerCreatedAt,
+      PartnerUpdateAt partnerUpdatedAt,
       String expectedMessage) {
 
     assertThatThrownBy(
@@ -120,7 +142,8 @@ class PartnerTest {
                     partnerCountry,
                     partnerIsoCode,
                     partnerStatus,
-                    partnerCreatedAt))
+                    partnerCreatedAt,
+                    partnerUpdatedAt))
         .isInstanceOf(NullPointerException.class)
         .hasMessageContaining(expectedMessage);
   }
@@ -130,7 +153,15 @@ class PartnerTest {
   void partnerCreatesAValidObjectIfInputIsValid() {
 
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, ANY_STATUS, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            ANY_STATUS,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
 
     assertThat(partner).isNotNull().isInstanceOf(Partner.class);
     assertThat(partner.id()).isEqualTo(ANY_ID);
@@ -146,7 +177,15 @@ class PartnerTest {
   @DisplayName("Partner is active if status is active")
   void partnerIsActiveIfStatusIsActive() {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, ANY_STATUS, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            ANY_STATUS,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isActive()).isTrue();
   }
 
@@ -157,7 +196,15 @@ class PartnerTest {
   @DisplayName("Partner is not active if status is not active")
   void partnerIsNotActiveIfStatusIsNotActive(PartnerStatus status) {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            status,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isActive()).isFalse();
   }
 
@@ -166,7 +213,14 @@ class PartnerTest {
   void isDeletedIsTrueIfPartnerIsLabelledAsDeleted() {
     var partner =
         new Partner(
-            ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, PartnerStatus.DELETED, ANY_TIME);
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            PartnerStatus.DELETED,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isDeleted()).isTrue();
   }
 
@@ -178,7 +232,15 @@ class PartnerTest {
   @DisplayName("isDeleted is false if Partner is not labelled as deleted")
   void isDeletedIsFalseIfPartnerIsNotLabelledAsDeleted(PartnerStatus status) {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            status,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isDeleted()).isFalse();
   }
 
@@ -187,7 +249,14 @@ class PartnerTest {
   void isEditTrueWhenPartnerIsInEditMode() {
     var partner =
         new Partner(
-            ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, PartnerStatus.EDIT, ANY_TIME);
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            PartnerStatus.EDIT,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isEdit()).isTrue();
   }
 
@@ -198,7 +267,15 @@ class PartnerTest {
   @DisplayName("isEdit false when Partner is not in Edit mode")
   void isEditFalseWhenPartnerIsNotInEditMode(PartnerStatus status) {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            status,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isEdit()).isFalse();
   }
 
@@ -213,7 +290,8 @@ class PartnerTest {
             ANY_COUNTRY,
             ANY_ISO_CODE,
             PartnerStatus.DEACTIVATED,
-            ANY_TIME);
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isDeactivated()).isTrue();
   }
 
@@ -224,7 +302,15 @@ class PartnerTest {
   @DisplayName("isDeactivated false when Partner is not in Deactivated mode")
   void isDeactivatedFalseWhenPartnerIsNotInDeactivatedMode(PartnerStatus status) {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            status,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.isDeactivated()).isFalse();
   }
 
@@ -233,7 +319,14 @@ class PartnerTest {
   void canBeEditIsTrueForPartnerWithActiveStatus() {
     Partner partner =
         new Partner(
-            ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, PartnerStatus.ACTIVE, ANY_TIME);
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            PartnerStatus.ACTIVE,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.canBeEdit()).isTrue();
   }
 
@@ -244,7 +337,15 @@ class PartnerTest {
   @DisplayName("canBeEdit is false for Partner with status other than ACTIVE or EDIT")
   void canBeEditIsFalseForPartnerWithStatusOtherThanActiveOrEdit(PartnerStatus status) {
     Partner partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, status, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            status,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
     assertThat(partner.canBeEdit()).isFalse();
   }
 
@@ -264,38 +365,50 @@ class PartnerTest {
       var country = new PartnerCountry("DE");
       var iso = new PartnerIsoCode("DEU");
       var now = PartnerCreatedAt.createNow();
+      var nowUpdate = new PartnerUpdateAt(Instant.now().minus(30, ChronoUnit.SECONDS));
 
-      draft = new Partner(id, name, city, country, iso, PartnerStatus.EDIT, now);
-      active = new Partner(id, name, city, country, iso, PartnerStatus.ACTIVE, now);
-      deactivated = new Partner(id, name, city, country, iso, PartnerStatus.DEACTIVATED, now);
-      deleted = new Partner(id, name, city, country, iso, PartnerStatus.DELETED, now);
+      draft = new Partner(id, name, city, country, iso, PartnerStatus.EDIT, now, nowUpdate);
+      active = new Partner(id, name, city, country, iso, PartnerStatus.ACTIVE, now, nowUpdate);
+      deactivated =
+          new Partner(id, name, city, country, iso, PartnerStatus.DEACTIVATED, now, nowUpdate);
+      deleted = new Partner(id, name, city, country, iso, PartnerStatus.DELETED, now, nowUpdate);
     }
 
     private static Stream<Arguments> happyPathTransitions() {
       return Stream.of(
           Arguments.of(
               (Function<PartnerStateTest, Partner>) t -> t.draft.toActivate(),
-              PartnerStatus.ACTIVE),
+              PartnerStatus.ACTIVE,
+              (Function<PartnerStateTest, Instant>) t -> t.draft.updateAt().updatedAt()),
           Arguments.of(
-              (Function<PartnerStateTest, Partner>) t -> t.active.toEdit(), PartnerStatus.EDIT),
+              (Function<PartnerStateTest, Partner>) t -> t.active.toEdit(),
+              PartnerStatus.EDIT,
+              (Function<PartnerStateTest, Instant>) t -> t.active.updateAt().updatedAt()),
           Arguments.of(
               (Function<PartnerStateTest, Partner>) t -> t.active.toDeactivate(),
-              PartnerStatus.DEACTIVATED),
+              PartnerStatus.DEACTIVATED,
+              (Function<PartnerStateTest, Instant>) t -> t.active.updateAt().updatedAt()),
           Arguments.of(
               (Function<PartnerStateTest, Partner>) t -> t.deactivated.toActivate(),
-              PartnerStatus.ACTIVE),
+              PartnerStatus.ACTIVE,
+              (Function<PartnerStateTest, Instant>) t -> t.deactivated.updateAt().updatedAt()),
           Arguments.of(
               (Function<PartnerStateTest, Partner>) t -> t.deactivated.toDelete(),
-              PartnerStatus.DELETED));
+              PartnerStatus.DELETED,
+              (Function<PartnerStateTest, Instant>) t -> t.deactivated.updateAt().updatedAt()));
     }
 
     @ParameterizedTest
     @MethodSource("happyPathTransitions")
     @DisplayName("Partner state transition works")
     void partnerStateTransitionWorks(
-        Function<PartnerStateTest, Partner> transition, PartnerStatus expectedStatus) {
+        Function<PartnerStateTest, Partner> transition,
+        PartnerStatus expectedStatus,
+        Function<PartnerStateTest, Instant> expectedUpdatedAt) {
+      Instant expectedUpdatedAtValue = expectedUpdatedAt.apply(this);
       Partner result = transition.apply(this);
       assertThat(result.status()).isEqualTo(expectedStatus);
+      assertThat(result.updateAt().updatedAt()).isAfter(expectedUpdatedAtValue);
     }
 
     private static Stream<Arguments> deactivatedStatusTransitionThatFail() {
@@ -438,7 +551,15 @@ class PartnerTest {
   @DisplayName("updatePartner returns the same object if all values are null")
   void updatePartnerReturnsTheSameObjectIfAllValuesAreNull() {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, ANY_STATUS, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            ANY_STATUS,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
 
     var updatedPartner = partner.updatePartner(null, null, null, null);
     assertThat(updatedPartner).isNotSameAs(partner);
@@ -455,7 +576,15 @@ class PartnerTest {
   @DisplayName("updatePartner returns a valid new update object when args are passed")
   void updatePartnerReturnsAValidNewUpdateObjectWhenArgsArePassed() {
     var partner =
-        new Partner(ANY_ID, ANY_NAME, ANY_CITY, ANY_COUNTRY, ANY_ISO_CODE, ANY_STATUS, ANY_TIME);
+        new Partner(
+            ANY_ID,
+            ANY_NAME,
+            ANY_CITY,
+            ANY_COUNTRY,
+            ANY_ISO_CODE,
+            ANY_STATUS,
+            ANY_TIME,
+            ANY_TIME_UPDATE);
 
     var newName = new PartnerName("New Name");
     var newCity = new PartnerCity("New City");
