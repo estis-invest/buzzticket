@@ -14,7 +14,7 @@ public record RegisterPartnerCommand(String name, String city, String country, S
   private void validateRequiredFields(String value, String fieldName) {
     if (value == null || value.isBlank()) {
       throw new InvalidRegisterPartnerCommandArgumentException(
-          fieldName + " is required cannot be null or blank");
+          fieldName + " is required and cannot be null or blank");
     }
   }
 }

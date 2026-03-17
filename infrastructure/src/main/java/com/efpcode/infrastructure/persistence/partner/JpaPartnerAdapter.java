@@ -1,10 +1,10 @@
 package com.efpcode.infrastructure.persistence.partner;
 
+import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundByIdException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
 import com.efpcode.domain.partner.port.PartnerRepository;
-import com.efpcode.infrastructure.persistence.partner.exceptions.PartnerNotFoundByIdException;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
