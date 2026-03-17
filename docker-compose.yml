@@ -4,8 +4,8 @@ services:
     container_name: buzzticket-db
     environment:
       POSTGRES_DB: buzzticket
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_USER: ${DB_USERNAME?Variable DB_USERNAME is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD?Variable DB_PASSWORD is required}
     ports:
       - "5432:5432"
     volumes:
