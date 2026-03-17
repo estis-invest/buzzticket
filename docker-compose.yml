@@ -18,3 +18,26 @@ services:
 
 volumes:
   postgres_data:
+
+
+  # TODO: Integrate Spring Boot App container here once Flyway is ready.
+  # REMINDER: Use internal Docker DNS (jdbc:postgresql://db:5432/...)
+  # and pass the following environment variables to the app:
+  # - DB_HOST=db
+  # - DB_PORT=5432
+  # - DB_NAME=${DB_NAME:-buzzticket}
+  # - DB_USER=${DB_USER:-postgres}
+  # - DB_PASSWORD=${DB_PASSWORD:-postgres}
+  # app:
+  #   build: .
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+
+  # TODO: Verify JDBC URL hostname for containerized deployments.
+  # Currently, app runs on host using localhost:5432.
+  # WHEN CONTAINERIZING APP (with Flyway integration):
+  # 1. Update application.properties to use:
+  #    jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:buzzticket}
+  # 2. In this compose file, set DB_HOST=db for the app service to use Docker DNS.
+  # 3. Ensure DB_PORT is passed as 5432.
