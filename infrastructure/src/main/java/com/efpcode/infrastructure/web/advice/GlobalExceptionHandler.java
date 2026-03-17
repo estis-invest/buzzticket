@@ -1,7 +1,6 @@
 package com.efpcode.infrastructure.web.advice;
 
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
-import com.efpcode.application.usecase.partner.exceptions.PartnerApplicationException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundByIdException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
 import org.springframework.http.HttpStatus;
@@ -16,13 +15,13 @@ public class GlobalExceptionHandler {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
   }
 
-  @ExceptionHandler(PartnerApplicationException.class)
+  @ExceptionHandler(PartnerNotFoundByIdException.class)
   public ProblemDetail handleApplicationError(PartnerNotFoundByIdException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
   @ExceptionHandler(PartnerDomainException.class)
   public ProblemDetail handleDomainError(PartnerDomainException ex) {
-    return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
 }

@@ -35,5 +35,5 @@ public class LayerRulesTest {
           .should()
           .dependOnClassesThat()
           .resideInAnyPackage("org.springframework..", "jakarta.persistence..")
-          .because("The domain layer must be plain old java to avoid infrastructure leakage.");
+          .because("The domain layer must be plain old Java to avoid infrastructure leakage.");
 }
