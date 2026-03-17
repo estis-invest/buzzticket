@@ -1,9 +1,10 @@
 package com.efpcode.infrastructure.persistence.partner;
 
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundByIdException;
+import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
+import com.efpcode.domain.partner.model.PartnerStatus;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import java.util.List;
 import java.util.Optional;
@@ -28,9 +29,7 @@ public class JpaPartnerAdapter implements PartnerRepository {
     Partner partnerDelete =
         findById(id)
             .orElseThrow(
-                () ->
-                    new PartnerNotFoundByIdException(
-                        "Partner not found with id: " + id.partnerId()));
+                () -> new PartnerNotFoundException("Partner not found with id: " + id.partnerId()));
     Partner deleted = partnerDelete.toDelete();
 
     partnerRepository.save(PartnerMapper.toEntity(deleted));
@@ -38,21 +37,27 @@ public class JpaPartnerAdapter implements PartnerRepository {
 
   @Override
   public boolean existsById(PartnerId id) {
-    return partnerRepository.existsById(id.partnerId());
+    return partnerRepository.existsByPartnerIdAndPartnerStatusNot(
+        id.partnerId(), PartnerStatus.DELETED.name());
   }
 
   @Override
   public boolean existsByName(PartnerName name) {
-    return partnerRepository.existsByPartnerName(name.partnerName());
+    return partnerRepository.existsByPartnerNameAndPartnerStatusNot(
+        name.partnerName(), PartnerStatus.DELETED.name());
   }
 
   @Override
   public Optional<Partner> findById(PartnerId id) {
-    return partnerRepository.findById(id.partnerId()).map(PartnerMapper::toDomain);
+    return partnerRepository
+        .findByPartnerIdAndPartnerStatusNot(id.partnerId(), PartnerStatus.DELETED.name())
+        .map(PartnerMapper::toDomain);
   }
 
   @Override
   public List<Partner> findAll() {
-    return partnerRepository.findAll().stream().map(PartnerMapper::toDomain).toList();
+    return partnerRepository.findAllByPartnerStatusNot(PartnerStatus.DELETED.name()).stream()
+        .map(PartnerMapper::toDomain)
+        .toList();
   }
 }

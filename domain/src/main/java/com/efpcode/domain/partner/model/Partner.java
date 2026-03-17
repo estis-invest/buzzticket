@@ -94,10 +94,10 @@ public record Partner(
   }
 
   public static Partner createDraftPartner(
-      String name, String city, String country, String isoCode) {
+      PartnerId id, String name, String city, String country, String isoCode) {
 
     return new Partner(
-        PartnerId.generate(),
+        id,
         new PartnerName(name),
         new PartnerCity(city),
         new PartnerCountry(country),

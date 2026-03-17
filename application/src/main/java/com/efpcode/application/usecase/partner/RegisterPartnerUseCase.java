@@ -3,13 +3,18 @@ package com.efpcode.application.usecase.partner;
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.domain.partner.model.Partner;
+import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
+import com.efpcode.domain.partner.port.IdGenerator;
 import com.efpcode.domain.partner.port.PartnerRepository;
 
 public class RegisterPartnerUseCase {
   private final PartnerRepository partnerRepository;
+  private final IdGenerator partnerIdGenerator;
 
-  public RegisterPartnerUseCase(PartnerRepository partnerRepository) {
+  public RegisterPartnerUseCase(
+      PartnerRepository partnerRepository, IdGenerator partnerIdGenerator) {
+    this.partnerIdGenerator = partnerIdGenerator;
     this.partnerRepository = partnerRepository;
   }
 
@@ -20,10 +25,11 @@ public class RegisterPartnerUseCase {
       throw new PartnerAlreadyExistsException(
           String.format("Partner is already registered with that name: %s", name.partnerName()));
     }
+    PartnerId id = partnerIdGenerator.generate();
 
     Partner newPartner =
         Partner.createDraftPartner(
-            command.name(), command.city(), command.country(), command.isoCode());
+            id, command.name(), command.city(), command.country(), command.isoCode());
 
     partnerRepository.save(newPartner);
     return newPartner;
