@@ -9,7 +9,8 @@ public record Partner(
     PartnerCountry country,
     PartnerIsoCode isoCode,
     PartnerStatus status,
-    PartnerCreatedAt createdAt) {
+    PartnerCreatedAt createdAt,
+    PartnerUpdateAt updateAt) {
 
   public Partner {
     Objects.requireNonNull(id, "Id cannot be null");
@@ -19,6 +20,7 @@ public record Partner(
     Objects.requireNonNull(isoCode, "IsoCode cannot be null");
     Objects.requireNonNull(status, "Status cannot be null");
     Objects.requireNonNull(createdAt, "createdAt cannot be null");
+    Objects.requireNonNull(updateAt, "updateAt cannot be null");
   }
 
   public boolean isActive() {
@@ -42,20 +44,20 @@ public record Partner(
   }
 
   public Partner toDeactivate() {
-    return withStatus(this.status.toDeactivate());
+    return withStatus(this.status.toDeactivate(), PartnerUpdateAt.createNow());
   }
 
   public Partner toActivate() {
-    return withStatus(this.status.toActivate());
+    return withStatus(this.status.toActivate(), PartnerUpdateAt.createNow());
   }
 
   public Partner toEdit() {
     this.status.partnerStatusEditGuard();
-    return withStatus(this.status.toEdit());
+    return withStatus(this.status.toEdit(), PartnerUpdateAt.createNow());
   }
 
   public Partner toDelete() {
-    return withStatus(this.status.toDelete());
+    return withStatus(this.status.toDelete(), PartnerUpdateAt.createNow());
   }
 
   public Partner updatePartner(
@@ -73,14 +75,22 @@ public record Partner(
             newCountry != null ? newCountry : editPartner.country(),
             newIsoCode != null ? newIsoCode : editPartner.isoCode(),
             editPartner.status(),
-            editPartner.createdAt());
+            editPartner.createdAt(),
+            PartnerUpdateAt.createNow());
 
     return updatedPartner.toActivate();
   }
 
-  private Partner withStatus(PartnerStatus status) {
+  private Partner withStatus(PartnerStatus status, PartnerUpdateAt updateAt) {
     return new Partner(
-        this.id, this.name, this.city, this.country, this.isoCode, status, this.createdAt);
+        this.id,
+        this.name,
+        this.city,
+        this.country,
+        this.isoCode,
+        status,
+        this.createdAt,
+        updateAt);
   }
 
   public static Partner createDraftPartner(
@@ -93,6 +103,7 @@ public record Partner(
         new PartnerCountry(country),
         new PartnerIsoCode(isoCode),
         PartnerStatus.EDIT,
-        PartnerCreatedAt.createNow());
+        PartnerCreatedAt.createNow(),
+        PartnerUpdateAt.createNow());
   }
 }
