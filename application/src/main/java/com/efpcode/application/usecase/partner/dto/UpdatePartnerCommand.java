@@ -2,9 +2,8 @@ package com.efpcode.application.usecase.partner.dto;
 
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 
-public record RegisterPartnerCommand(String name, String city, String country, String isoCode) {
-
-  public RegisterPartnerCommand {
+public record UpdatePartnerCommand(String name, String city, String country, String isoCode) {
+  public UpdatePartnerCommand {
     validateRequiredFields(name, "Name");
     validateRequiredFields(city, "City");
     validateRequiredFields(country, "Country");

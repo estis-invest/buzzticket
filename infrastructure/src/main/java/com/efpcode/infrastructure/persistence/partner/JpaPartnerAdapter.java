@@ -1,6 +1,5 @@
 package com.efpcode.infrastructure.persistence.partner;
 
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
@@ -22,17 +21,6 @@ public class JpaPartnerAdapter implements PartnerRepository {
   public void save(Partner partner) {
     PartnerEntity entity = PartnerMapper.toEntity(partner);
     partnerRepository.save(entity);
-  }
-
-  @Override
-  public void delete(PartnerId id) {
-    Partner partnerDelete =
-        findById(id)
-            .orElseThrow(
-                () -> new PartnerNotFoundException("Partner not found with id: " + id.partnerId()));
-    Partner deleted = partnerDelete.toDelete();
-
-    partnerRepository.save(PartnerMapper.toEntity(deleted));
   }
 
   @Override
