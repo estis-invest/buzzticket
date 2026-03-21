@@ -1,14 +1,17 @@
 package com.efpcode.infrastructure.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 
 import com.efpcode.BaseIntegrationTest;
+import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
 import com.efpcode.infrastructure.web.dto.RegisterPartnerRequest;
 import com.efpcode.infrastructure.web.dto.UpdatePartnerRequest;
 import java.time.Duration;
+import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +38,11 @@ class PartnerControllerIT extends BaseIntegrationTest {
     }
   }
 
+  @BeforeEach
+  void clearDatabase() {
+    partnerRepository.deleteAllInBatch();
+  }
+
   @Nested
   @DisplayName("When database is empty")
   class EmptyDB {
@@ -51,7 +59,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .contentType("application/problem+json")
           .expectBody()
           .jsonPath("$.detail")
-          .isEqualTo("No partners found, database empty")
+          .isEqualTo("No active partners found")
           .jsonPath("$.status")
           .isEqualTo(404);
     }
@@ -64,7 +72,6 @@ class PartnerControllerIT extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-      partnerRepository.deleteAllInBatch();
       var seedRequest =
           new RegisterPartnerRequest("Initial Partner", "Gothenburg", "SWEDEN", "SWE");
       partnerId =
@@ -325,7 +332,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Update Partner: Should fail when name is blank")
+    @DisplayName("Update Partner: Should fail if id is not found")
     void shouldFailToUpdateWithInvalidData() {
       UUID someId = UUID.randomUUID();
       var invalidRequest = new UpdatePartnerRequest("", "Stockholm", "SWEDEN", "SWE");
@@ -336,8 +343,39 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .bodyValue(invalidRequest)
           .exchange()
           .expectStatus()
-          .isEqualTo(
-              HttpStatus.UNPROCESSABLE_CONTENT); // This triggers your Exception Handling advice!
+          .isEqualTo(HttpStatus.NOT_FOUND); // This triggers your Exception Handling advice!
     }
+
+    @Test
+    @DisplayName("Update Partner needs at least one value proceed")
+    void updatePartnerNeedsAtLeastOneValueProceed() {
+      var emptyData =
+          Map.of(
+              "name", "",
+              "city", "",
+              "country", "",
+              "isoCode", "");
+      webTestClient
+          .patch()
+          .uri("/api/v1/partners/{id}", partnerId)
+          .bodyValue(emptyData)
+          .exchange()
+          .expectStatus()
+          .isEqualTo(HttpStatus.UNPROCESSABLE_CONTENT)
+          .expectBody()
+          .jsonPath("$.detail")
+          .value(
+              detail ->
+                  assertThat(detail.toString())
+                      .contains("At least one field must be provided for an update."));
+    }
+  }
+
+  @Test
+  @DisplayName("Update Partner: Constructor should throw if all fields are blank")
+  void shouldThrowExceptionWhenAllFieldsAreBlank() {
+    assertThatThrownBy(() -> new UpdatePartnerRequest("", "", "", ""))
+        .isInstanceOf(InvalidPartnerCommandArgumentException.class)
+        .hasMessageContaining("At least one field must be provided");
   }
 }

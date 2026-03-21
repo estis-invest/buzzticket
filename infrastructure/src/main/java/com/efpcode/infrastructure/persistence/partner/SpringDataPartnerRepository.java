@@ -6,7 +6,9 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface SpringDataPartnerRepository extends JpaRepository<PartnerEntity, UUID> {
-  boolean existsByPartnerNameAndPartnerStatusNot(String partnerName, String partnerStatus);
+
+  boolean existsByIgnoringCasePartnerNameAndPartnerStatusNot(
+      String partnerName, String partnerStatus);
 
   boolean existsByPartnerIdAndPartnerStatusNot(UUID partnerId, String partnerStatus);
 

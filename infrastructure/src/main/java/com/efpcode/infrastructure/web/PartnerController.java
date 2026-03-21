@@ -103,11 +103,14 @@ class PartnerController {
 
   @PatchMapping("/{id}")
   public ResponseEntity<PartnerResponse> editPartner(
-      @Valid @RequestBody UpdatePartnerRequest request, @PathVariable UUID id) {
+      @RequestBody UpdatePartnerRequest request, @PathVariable UUID id) {
     log.info("REST: Editing request for partner: {}", id);
     var command =
         new UpdatePartnerCommand(
-            request.name(), request.city(), request.country(), request.isoCode());
+            request.getNormalizedName(),
+            request.getNormalizedCity(),
+            request.getNormalizedCountry(),
+            request.getNormalizedIsoCode());
     PartnerId partnerId = new PartnerId(id);
     Partner editPartner = editPartnerUseCase.execute(partnerId, command);
     log.info(

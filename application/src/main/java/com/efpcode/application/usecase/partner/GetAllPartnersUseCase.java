@@ -16,7 +16,7 @@ public class GetAllPartnersUseCase {
     List<Partner> partners = partnerRepository.findAll();
 
     if (partners.isEmpty()) {
-      throw new PartnerNotFoundException("No partners found, database empty");
+      throw new PartnerNotFoundException("No active partners found");
     }
     return partners;
   }

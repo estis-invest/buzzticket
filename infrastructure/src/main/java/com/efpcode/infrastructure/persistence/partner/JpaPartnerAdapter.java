@@ -31,7 +31,7 @@ public class JpaPartnerAdapter implements PartnerRepository {
 
   @Override
   public boolean existsByName(PartnerName name) {
-    return partnerRepository.existsByPartnerNameAndPartnerStatusNot(
+    return partnerRepository.existsByIgnoringCasePartnerNameAndPartnerStatusNot(
         name.partnerName(), PartnerStatus.DELETED.name());
   }
 

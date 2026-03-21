@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${DB_USERNAME?Variable DB_USERNAME is required}
       POSTGRES_PASSWORD: ${DB_PASSWORD?Variable DB_PASSWORD is required}
     ports:
-      - "${DB_PORT}:5432"
+      - "${DB_PORT?Variable DB_PORT is required}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
