@@ -89,7 +89,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Registering the same partner will cause conflict error 403")
+    @DisplayName("Registering the same partner will cause conflict error 409")
     void registeringTheSamePartnerWillCauseConflictError403() {
       var request = new RegisterPartnerRequest("Initial Partner", "Gothenburg", "SWEDEN", "SWE");
       webTestClient
