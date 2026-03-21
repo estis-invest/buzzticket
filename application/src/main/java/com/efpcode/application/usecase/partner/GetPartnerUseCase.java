@@ -1,6 +1,6 @@
 package com.efpcode.application.usecase.partner;
 
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundByIdException;
+import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.port.PartnerRepository;
@@ -17,7 +17,7 @@ public class GetPartnerUseCase {
         .findById(partnerId)
         .orElseThrow(
             () ->
-                new PartnerNotFoundByIdException(
+                new PartnerNotFoundException(
                     "Partner was not found: " + partnerId.partnerId().toString()));
   }
 }

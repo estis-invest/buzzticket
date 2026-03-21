@@ -1,6 +1,6 @@
 package com.efpcode.application.usecase.partner.dto;
 
-import com.efpcode.application.usecase.partner.exceptions.InvalidRegisterPartnerCommandArgumentException;
+import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 
 public record RegisterPartnerCommand(String name, String city, String country, String isoCode) {
 
@@ -13,7 +13,7 @@ public record RegisterPartnerCommand(String name, String city, String country, S
 
   private void validateRequiredFields(String value, String fieldName) {
     if (value == null || value.isBlank()) {
-      throw new InvalidRegisterPartnerCommandArgumentException(
+      throw new InvalidPartnerCommandArgumentException(
           fieldName + " is required and cannot be null or blank");
     }
   }

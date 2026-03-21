@@ -1,7 +1,8 @@
 package com.efpcode.infrastructure.web.advice;
 
+import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundByIdException;
+import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -15,8 +16,8 @@ public class GlobalExceptionHandler {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
   }
 
-  @ExceptionHandler(PartnerNotFoundByIdException.class)
-  public ProblemDetail handleApplicationError(PartnerNotFoundByIdException ex) {
+  @ExceptionHandler(PartnerNotFoundException.class)
+  public ProblemDetail handleApplicationError(PartnerNotFoundException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
   }
 
@@ -24,4 +25,21 @@ public class GlobalExceptionHandler {
   public ProblemDetail handleDomainError(PartnerDomainException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
+
+  @ExceptionHandler(InvalidPartnerCommandArgumentException.class)
+  public ProblemDetail handleDomainValidation(InvalidPartnerCommandArgumentException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+  }
+
+  //  @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+  //  public ProblemDetail handleMessageNotReadable(
+  //      org.springframework.http.converter.HttpMessageNotReadableException ex) {
+  //    // We check if the ROOT cause is your Domain Exception
+  //    Throwable rootCause = ex.getRootCause();
+  //    if (rootCause instanceof PartnerDomainException) {
+  //      return ProblemDetail.forStatusAndDetail(
+  //          HttpStatus.UNPROCESSABLE_CONTENT, rootCause.getMessage());
+  //    }
+  //    return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+  //  }
 }

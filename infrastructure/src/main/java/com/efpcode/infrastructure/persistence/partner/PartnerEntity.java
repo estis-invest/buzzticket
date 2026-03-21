@@ -6,16 +6,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(
-    name = "partner",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"partnerId", "partnerName"}))
+@Table(name = "partner")
 public class PartnerEntity {
 
   @Id
   @Column(name = "partnerId", unique = true, nullable = false)
   private UUID partnerId;
 
-  @Column(name = "partnerName", unique = true, nullable = false)
+  @Column(name = "partnerName", unique = false, nullable = false)
   private String partnerName;
 
   @Column(name = "partnerCity", nullable = false)
