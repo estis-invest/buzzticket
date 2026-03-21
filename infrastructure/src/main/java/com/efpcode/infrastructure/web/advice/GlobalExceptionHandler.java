@@ -30,4 +30,16 @@ public class GlobalExceptionHandler {
   public ProblemDetail handleDomainValidation(InvalidPartnerCommandArgumentException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
+
+  //  @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
+  //  public ProblemDetail handleMessageNotReadable(
+  //      org.springframework.http.converter.HttpMessageNotReadableException ex) {
+  //    // We check if the ROOT cause is your Domain Exception
+  //    Throwable rootCause = ex.getRootCause();
+  //    if (rootCause instanceof PartnerDomainException) {
+  //      return ProblemDetail.forStatusAndDetail(
+  //          HttpStatus.UNPROCESSABLE_CONTENT, rootCause.getMessage());
+  //    }
+  //    return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
+  //  }
 }

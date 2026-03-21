@@ -333,7 +333,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Update Partner: Should fail if id is not found")
-    void shouldFailToUpdateWithInvalidData() {
+    void updatePartnerShouldFailIfIdIsNotFound() {
       UUID someId = UUID.randomUUID();
       var invalidRequest = new UpdatePartnerRequest("", "Stockholm", "SWEDEN", "SWE");
 
@@ -343,7 +343,8 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .bodyValue(invalidRequest)
           .exchange()
           .expectStatus()
-          .isEqualTo(HttpStatus.NOT_FOUND); // This triggers your Exception Handling advice!
+          .isEqualTo(
+              HttpStatus.UNPROCESSABLE_CONTENT); // This triggers your Exception Handling advice!
     }
 
     @Test

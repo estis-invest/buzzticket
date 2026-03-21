@@ -1,8 +1,8 @@
 package com.efpcode.application.usecase.partner;
 
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
+import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.model.*;
 import com.efpcode.domain.partner.port.PartnerRepository;
 
@@ -20,17 +20,17 @@ public class EditPartnerUseCase {
             .findById(partnerId)
             .orElseThrow(
                 () ->
-                    new PartnerNotFoundException(
+                    new InvalidPartnerCommandArgumentException(
                         "Partner not found with id:" + partnerId.partnerId()));
 
-    PartnerName newName = (command.name() == null) ? null : (new PartnerName(command.name()));
-    PartnerCity newCity = (command.city() == null) ? null : (new PartnerCity(command.city()));
-    PartnerCountry newCountry =
-        (command.country() == null) ? null : (new PartnerCountry(command.country()));
-    PartnerIsoCode newIsoCode =
-        (command.isoCode() == null) ? null : (new PartnerIsoCode(command.isoCode()));
+    UpdatePartnerCommand fullcommand = UpdatePartnerCommand.merge(command, partner);
 
-    if (newName != null && !partner.name().equals(newName)) {
+    PartnerName newName = new PartnerName(fullcommand.name());
+    PartnerCity newCity = new PartnerCity(fullcommand.city());
+    PartnerCountry newCountry = new PartnerCountry(fullcommand.country());
+    PartnerIsoCode newIsoCode = new PartnerIsoCode(fullcommand.isoCode());
+
+    if (!partner.name().partnerName().equals(newName.partnerName())) {
       if (partnerRepository.existsByName(newName))
         throw new PartnerAlreadyExistsException(
             "Partner name already exists: " + newName.partnerName());
