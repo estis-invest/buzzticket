@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
+import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerStatus;
@@ -52,6 +53,24 @@ class ActivatePartnerUseCaseTest {
     assertThatThrownBy(() -> activatePartnerUseCase.execute(id))
         .isInstanceOf(PartnerNotFoundException.class)
         .hasMessageContaining("Partner not found with id:" + id.partnerId());
+
+    verify(partnerRepository, never()).save(any());
+  }
+
+  @Test
+  @DisplayName("Cannot activate partner in deleted  status")
+  void cannotActivatePartnerInDeletedStatus() {
+    var id = PartnerId.generate();
+    var testPartner = Partner.createDraftPartner(id, "Test", "TEST", "TEST", "TST");
+
+    testPartner = testPartner.toActivate().toDeactivate().toDelete();
+
+    when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
+
+    assertThatThrownBy(() -> activatePartnerUseCase.execute(id))
+        .isInstanceOf(IllegalPartnerStatusTransitionException.class)
+        .hasMessageContaining(
+            "PartnerStatus DELETED cannot be activated. Only DEACTIVATED and EDIT PartnerStatus can transition to ACTIVE");
 
     verify(partnerRepository, never()).save(any());
   }
