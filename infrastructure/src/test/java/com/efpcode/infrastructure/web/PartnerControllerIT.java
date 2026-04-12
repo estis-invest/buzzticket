@@ -90,7 +90,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Registering the same partner will cause conflict error 409")
-    void registeringTheSamePartnerWillCauseConflictError403() {
+    void registeringTheSamePartnerWillCauseConflictError409() {
       var request = new RegisterPartnerRequest("Initial Partner", "Gothenburg", "SWEDEN", "SWE");
       webTestClient
           .post()
@@ -372,6 +372,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
     }
   }
 
+  // TODO: move to dto test file for unit testing.
   @Test
   @DisplayName("Update Partner: Constructor should throw if all fields are blank")
   void shouldThrowExceptionWhenAllFieldsAreBlank() {
