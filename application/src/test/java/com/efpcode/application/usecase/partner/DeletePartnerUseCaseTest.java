@@ -69,6 +69,6 @@ class DeletePartnerUseCaseTest {
 
     deletePartnerUseCase.execute(id);
 
-    verify(partnerRepository, atLeastOnce()).save(any());
+    verify(partnerRepository, times(1)).save(any());
   }
 }

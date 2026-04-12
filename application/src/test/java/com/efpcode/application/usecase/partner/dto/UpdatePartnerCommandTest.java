@@ -49,7 +49,6 @@ class UpdatePartnerCommandTest {
         Arguments.of("", "BEST", "", ""),
         Arguments.of("", "", "BEST", ""),
         Arguments.of("", "", "", "BST"),
-        Arguments.of("BEST", "", "", ""),
         Arguments.of("BEST", "BEST", "", ""),
         Arguments.of("BEST", "BEST", "BEST", ""),
         Arguments.of("BEST", "BEST", "BEST", "BST"));

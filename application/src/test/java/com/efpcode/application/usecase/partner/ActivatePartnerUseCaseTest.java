@@ -39,7 +39,7 @@ class ActivatePartnerUseCaseTest {
     Partner result = activatePartnerUseCase.execute(id);
     assertThat(result.status()).isEqualTo(PartnerStatus.ACTIVE);
 
-    verify(partnerRepository, atLeastOnce()).save(result);
+    verify(partnerRepository, times(1)).save(result);
   }
 
   @Test

@@ -71,6 +71,6 @@ class DeactivatePartnerUseCaseTest {
 
     assertThat(result.status()).isEqualTo(PartnerStatus.DEACTIVATED);
 
-    verify(partnerRepository, atLeastOnce()).save(result);
+    verify(partnerRepository, times(1)).save(result);
   }
 }
