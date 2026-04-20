@@ -24,8 +24,8 @@ public record User(
     Objects.requireNonNull(password, "Password cannot be null");
     Objects.requireNonNull(role, "User role cannot be null");
     Objects.requireNonNull(status, "User status cannot be null");
-    Objects.requireNonNull(userCreatedAt, "Time cannot be null");
-    Objects.requireNonNull(userUpdateAt, "Time cannot be null");
+    Objects.requireNonNull(userCreatedAt, "userCreatedAt cannot be null");
+    Objects.requireNonNull(userUpdateAt, "userUpdateAt cannot be null");
     Objects.requireNonNull(partnerId, "Optional <Partner> cannot be null");
 
     if (role.requiresPartner() && partnerId.isEmpty())

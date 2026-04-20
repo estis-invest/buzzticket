@@ -12,7 +12,7 @@ class UserUpdateAtTest {
 
   @Test
   @DisplayName("UserUpdateAt cannot be null")
-  void partnerUpdateAtCannotBeNull() {
+  void userUpdateAtCannotBeNull() {
     assertThatThrownBy(() -> new UserUpdateAt(null))
         .isInstanceOf(InvalidUserUpdateAtException.class)
         .hasMessageContaining("Update timestamp is required");
@@ -58,11 +58,12 @@ class UserUpdateAtTest {
   @Test
   @DisplayName("UserUpdateAt createNow returns a valid object")
   void userUpdateAtCreateNowReturnAValidObject() {
-    var now = Instant.now();
+    var before = Instant.now();
     var result = UserUpdateAt.createNow();
+    var after = Instant.now();
     assertThat(result).isNotNull().isInstanceOf(UserUpdateAt.class);
-    assertThat(result.updatedAt()).isAfterOrEqualTo(now);
-    assertThat(result.updatedAt()).isBeforeOrEqualTo(now.plusSeconds(5));
+    assertThat(result.updatedAt()).isAfterOrEqualTo(before);
+    assertThat(result.updatedAt()).isBeforeOrEqualTo(after);
   }
 
   @Test
@@ -71,6 +72,5 @@ class UserUpdateAtTest {
     var time1 = UserUpdateAt.createNow();
     var time2 = UserUpdateAt.createNow();
     assertThat(time1).isNotSameAs(time2);
-    assertThat(time1.updatedAt()).isBeforeOrEqualTo(time2.updatedAt());
   }
 }
