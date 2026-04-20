@@ -13,7 +13,7 @@ public class LayerRulesTest {
   @ArchTest
   static final ArchRule layersShouldRespectHexagonalBoundaries =
       layeredArchitecture()
-          .consideringAllDependencies()
+          .consideringOnlyDependenciesInAnyPackage("com.efpcode..")
           .layer("Domain")
           .definedBy("com.efpcode.domain..")
           .layer("Application")
@@ -36,4 +36,24 @@ public class LayerRulesTest {
           .dependOnClassesThat()
           .resideInAnyPackage("org.springframework..", "jakarta.persistence..")
           .because("The domain layer must be plain old Java to avoid infrastructure leakage.");
+
+  @ArchTest
+  static final ArchRule domainMustNotDependOnOuterLayers =
+      noClasses()
+          .that()
+          .resideInAPackage("com.efpcode.domain..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAnyPackage("com.efpcode.application..", "com.efpcode.infrastructure..")
+          .because("The domain (core) must not depend on application or infrastructure.");
+
+  @ArchTest
+  static final ArchRule applicationMustNotDependOnInfrastructure =
+      noClasses()
+          .that()
+          .resideInAPackage("com.efpcode.application..")
+          .should()
+          .dependOnClassesThat()
+          .resideInAPackage("com.efpcode.infrastructure..")
+          .because("Application must not depend on infrastructure.");
 }
