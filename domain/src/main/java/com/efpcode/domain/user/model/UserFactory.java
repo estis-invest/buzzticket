@@ -40,6 +40,7 @@ public class UserFactory {
         role,
         UserAccountStatus.ACTIVATED,
         UserCreatedAt.createNow(),
+        UserUpdateAt.createNow(),
         partnerId);
   }
 }

@@ -8,6 +8,7 @@ import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
 import com.efpcode.domain.user.exceptions.UserStatusChangeException;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +26,7 @@ class UserTest {
   private static final UserEmail ANY_EMAIL = new UserEmail("test@example.com");
   private static final UserPassword ANY_PASS = new UserPassword("secure123");
   private static final UserCreatedAt ANY_TIME = UserCreatedAt.createNow();
+  private static final UserUpdateAt ANY_UPDATE = UserUpdateAt.createNow();
   private static final PartnerId ANY_PARTNER = PartnerId.generate();
 
   private static Stream<Arguments> provideInvalidConstructorArgs() {
@@ -35,20 +37,55 @@ class UserTest {
     var role = UserRole.CUSTOMER;
     var status = UserAccountStatus.ACTIVATED;
     var time = ANY_TIME;
+    var update = ANY_UPDATE;
     var partner = Optional.of(ANY_PARTNER);
 
     return Stream.of(
-        Arguments.of(null, name, email, pass, role, status, time, partner, "Id cannot be null"),
-        Arguments.of(id, null, email, pass, role, status, time, partner, "Name cannot be null"),
-        Arguments.of(id, name, null, pass, role, status, time, partner, "Email cannot be null"),
-        Arguments.of(id, name, email, null, role, status, time, partner, "Password cannot be null"),
         Arguments.of(
-            id, name, email, pass, null, status, time, partner, "User role cannot be null"),
+            null, name, email, pass, role, status, time, update, partner, "Id cannot be null"),
         Arguments.of(
-            id, name, email, pass, role, null, time, partner, "User status cannot be null"),
-        Arguments.of(id, name, email, pass, role, status, null, partner, "Time cannot be null"),
+            id, null, email, pass, role, status, time, update, partner, "Name cannot be null"),
         Arguments.of(
-            id, name, email, pass, role, status, time, null, "Optional <Partner> cannot be null"));
+            id, name, null, pass, role, status, time, update, partner, "Email cannot be null"),
+        Arguments.of(
+            id, name, email, null, role, status, time, update, partner, "Password cannot be null"),
+        Arguments.of(
+            id, name, email, pass, null, status, time, update, partner, "User role cannot be null"),
+        Arguments.of(
+            id, name, email, pass, role, null, time, update, partner, "User status cannot be null"),
+        Arguments.of(
+            id,
+            name,
+            email,
+            pass,
+            role,
+            status,
+            null,
+            update,
+            partner,
+            "userCreatedAt cannot be null"),
+        Arguments.of(
+            id,
+            name,
+            email,
+            pass,
+            role,
+            status,
+            time,
+            null,
+            partner,
+            "userUpdateAt cannot be null"),
+        Arguments.of(
+            id,
+            name,
+            email,
+            pass,
+            role,
+            status,
+            time,
+            update,
+            null,
+            "Optional <Partner> cannot be null"));
   }
 
   @ParameterizedTest
@@ -62,9 +99,11 @@ class UserTest {
       UserRole role,
       UserAccountStatus status,
       UserCreatedAt time,
+      UserUpdateAt update,
       Optional<PartnerId> partner,
       String expectedMessage) {
-    assertThatThrownBy(() -> new User(id, name, email, password, role, status, time, partner))
+    assertThatThrownBy(
+            () -> new User(id, name, email, password, role, status, time, update, partner))
         .isInstanceOf(NullPointerException.class)
         .hasMessageContaining(expectedMessage);
   }
@@ -83,6 +122,7 @@ class UserTest {
             UserRole.CUSTOMER,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             noPartner);
     assertThat(customer.role()).isEqualTo(UserRole.CUSTOMER);
     assertThat(customer.partnerId()).isEmpty();
@@ -103,6 +143,7 @@ class UserTest {
                     UserRole.SUPPORT,
                     UserAccountStatus.ACTIVATED,
                     ANY_TIME,
+                    ANY_UPDATE,
                     partnerId))
         .isInstanceOf(InvalidUserRolePartnerMissingException.class)
         .hasMessageContaining("User role must have a partnerId");
@@ -123,6 +164,7 @@ class UserTest {
                     UserRole.ADMIN,
                     UserAccountStatus.ACTIVATED,
                     ANY_TIME,
+                    ANY_UPDATE,
                     partnerId))
         .isInstanceOf(InvalidUserRolePartnerMissingException.class)
         .hasMessageContaining("User role must have a partnerId");
@@ -141,6 +183,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.DEACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(deactivedUser::deactivate)
@@ -162,6 +205,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            new UserUpdateAt(Instant.now().minusSeconds(5)),
             Optional.of(ANY_PARTNER));
 
     var deactivatedUser = user.deactivate();
@@ -170,6 +214,7 @@ class UserTest {
 
     assertThat(deactivatedUser.isActive()).isFalse();
     assertThat(deactivatedUser.status()).isEqualTo(UserAccountStatus.DEACTIVATED);
+    assertThat(deactivatedUser.userUpdateAt().updatedAt()).isAfter(user.userUpdateAt().updatedAt());
   }
 
   @Test
@@ -185,6 +230,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(activedUser::activate)
@@ -205,6 +251,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.DEACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     var activeUser = user.activate();
@@ -227,6 +274,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.DEACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(user::promoteToAdmin)
@@ -246,6 +294,7 @@ class UserTest {
             UserRole.ADMIN,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(user::promoteToAdmin)
@@ -265,6 +314,7 @@ class UserTest {
             UserRole.CUSTOMER,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(user::promoteToAdmin)
@@ -284,13 +334,15 @@ class UserTest {
             ANY_PASS,
             UserRole.SUPPORT,
             UserAccountStatus.ACTIVATED,
-            ANY_TIME,
+            new UserCreatedAt(Instant.now().minusSeconds(3)),
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     var promptedUser = user.promoteToAdmin();
 
     assertThat(promptedUser).isNotNull().isInstanceOf(User.class).isNotSameAs(user);
     assertThat(promptedUser.role()).isNotEqualTo(user.role());
+    assertThat(promptedUser.userUpdateAt()).isNotEqualTo(user.userUpdateAt());
   }
 
   @Test
@@ -306,6 +358,7 @@ class UserTest {
             UserRole.ADMIN,
             UserAccountStatus.DEACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(user::demoteToSupport)
@@ -325,6 +378,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(user::demoteToSupport)
@@ -344,6 +398,7 @@ class UserTest {
             UserRole.CUSTOMER,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(user::demoteToSupport)
@@ -364,6 +419,7 @@ class UserTest {
             UserRole.ADMIN,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     var demotedUser = user.demoteToSupport();
@@ -384,6 +440,7 @@ class UserTest {
             UserRole.CUSTOMER,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
     assertThat(user.canAssignTickets()).isFalse();
   }
@@ -401,6 +458,7 @@ class UserTest {
             UserRole.ADMIN,
             UserAccountStatus.DEACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
     assertThat(user.canAssignTickets()).isFalse();
   }
@@ -418,6 +476,7 @@ class UserTest {
             UserRole.ADMIN,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
 
     var user2 =
@@ -429,6 +488,7 @@ class UserTest {
             UserRole.SUPPORT,
             UserAccountStatus.ACTIVATED,
             ANY_TIME,
+            ANY_UPDATE,
             Optional.of(ANY_PARTNER));
     assertThat(user.canAssignTickets()).isTrue();
     assertThat(user2.canAssignTickets()).isTrue();
@@ -547,6 +607,7 @@ class UserTest {
     assertThat(demoted.password()).isEqualTo(user.password());
     assertThat(demoted.status()).isEqualTo(user.status());
     assertThat(demoted.userCreatedAt()).isEqualTo(user.userCreatedAt());
+    assertThat(demoted.userUpdateAt()).isNotEqualTo(user.userUpdateAt());
     assertThat(demoted.partnerId()).isEqualTo(user.partnerId());
   }
 

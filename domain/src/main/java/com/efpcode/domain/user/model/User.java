@@ -14,6 +14,7 @@ public record User(
     UserRole role,
     UserAccountStatus status,
     UserCreatedAt userCreatedAt,
+    UserUpdateAt userUpdateAt,
     Optional<PartnerId> partnerId) {
 
   public User {
@@ -23,7 +24,8 @@ public record User(
     Objects.requireNonNull(password, "Password cannot be null");
     Objects.requireNonNull(role, "User role cannot be null");
     Objects.requireNonNull(status, "User status cannot be null");
-    Objects.requireNonNull(userCreatedAt, "Time cannot be null");
+    Objects.requireNonNull(userCreatedAt, "userCreatedAt cannot be null");
+    Objects.requireNonNull(userUpdateAt, "userUpdateAt cannot be null");
     Objects.requireNonNull(partnerId, "Optional <Partner> cannot be null");
 
     if (role.requiresPartner() && partnerId.isEmpty())
@@ -35,7 +37,15 @@ public record User(
       throw new UserStatusChangeException(
           String.format("User is already %s. Cannot be deactivated", this.status));
     return new User(
-        id, name, email, password, role, UserAccountStatus.DEACTIVATED, userCreatedAt, partnerId);
+        id,
+        name,
+        email,
+        password,
+        role,
+        UserAccountStatus.DEACTIVATED,
+        userCreatedAt,
+        UserUpdateAt.createNow(),
+        partnerId);
   }
 
   public User activate() {
@@ -43,7 +53,15 @@ public record User(
       throw new UserStatusChangeException(
           String.format("User is already %s. Cannot be activated", this.status));
     return new User(
-        id, name, email, password, role, UserAccountStatus.ACTIVATED, userCreatedAt, partnerId);
+        id,
+        name,
+        email,
+        password,
+        role,
+        UserAccountStatus.ACTIVATED,
+        userCreatedAt,
+        UserUpdateAt.createNow(),
+        partnerId);
   }
 
   public User promoteToAdmin() {
@@ -82,11 +100,21 @@ public record User(
         staffRole,
         UserAccountStatus.ACTIVATED,
         UserCreatedAt.createNow(),
+        UserUpdateAt.createNow(),
         Optional.of(partnerId));
   }
 
   private User withRole(UserRole newRole) {
-    return new User(id, name, email, password, newRole, status, userCreatedAt, partnerId);
+    return new User(
+        id,
+        name,
+        email,
+        password,
+        newRole,
+        status,
+        userCreatedAt,
+        UserUpdateAt.createNow(),
+        partnerId);
   }
 
   private void ensureActiveUser() {
