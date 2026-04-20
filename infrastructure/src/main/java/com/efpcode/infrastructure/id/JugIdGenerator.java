@@ -1,17 +1,22 @@
 package com.efpcode.infrastructure.id;
 
-import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.partner.port.IdGenerator;
+import com.efpcode.domain.common.port.IdGenerator;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.NoArgGenerator;
-import org.springframework.stereotype.Component;
+import java.util.UUID;
+import java.util.function.Function;
 
-@Component
-public class JugIdGenerator implements IdGenerator {
+public class JugIdGenerator<T> implements IdGenerator<T> {
+
   private final NoArgGenerator v7Generator = Generators.timeBasedEpochGenerator();
+  private final Function<UUID, T> mapper;
+
+  public JugIdGenerator(Function<UUID, T> mapper) {
+    this.mapper = mapper;
+  }
 
   @Override
-  public PartnerId generate() {
-    return new PartnerId(v7Generator.generate());
+  public T generate() {
+    return mapper.apply(v7Generator.generate());
   }
 }

@@ -1,7 +1,8 @@
 package com.efpcode.infrastructure.config;
 
 import com.efpcode.application.usecase.partner.*;
-import com.efpcode.domain.partner.port.IdGenerator;
+import com.efpcode.domain.common.port.IdGenerator;
+import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +12,7 @@ class PartnerConfig {
 
   @Bean
   public RegisterPartnerUseCase registerPartnerUseCase(
-      PartnerRepository partnerRepository, IdGenerator idGenerator) {
+      PartnerRepository partnerRepository, IdGenerator<PartnerId> idGenerator) {
     return new RegisterPartnerUseCase(partnerRepository, idGenerator);
   }
 
