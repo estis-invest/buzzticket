@@ -14,7 +14,8 @@ public interface UserRepository {
 
   Optional<User> findUserByEmail(UserEmail email);
 
-  List<User> findByUserCreatedAtRange(UserCreatedAt startDate, UserCreatedAt endDate);
+  List<User> findByUserCreatedAtRange(
+      PartnerId partnerId, UserCreatedAt startDate, UserCreatedAt endDate);
 
   List<User> findAll();
 
