@@ -11,14 +11,18 @@ import com.efpcode.infrastructure.persistence.partner.PartnerEntity;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
 import java.util.List;
 import java.util.Optional;
+import org.jspecify.annotations.NonNull;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JpaUserAdapter implements UserRepository {
   private final SpringDataUserRepository userRepository;
   private final SpringDataPartnerRepository partnerRepository;
+
+  private static final int DEFAULT_PAGE_SIZE = 25;
 
   public JpaUserAdapter(
       SpringDataUserRepository userRepository, SpringDataPartnerRepository partnerRepository) {
@@ -28,18 +32,18 @@ public class JpaUserAdapter implements UserRepository {
 
   @Override
   public Optional<User> findUserById(UserId id) {
-    return Optional.empty();
+    return userRepository.findByUserId(id.id()).map(UserMapper::toDomain);
   }
 
   @Override
   public Optional<User> findUserByEmail(UserEmail email) {
-    return Optional.empty();
+    return userRepository.findByUserEmail(email.email()).map(UserMapper::toDomain);
   }
 
   @Override
   public List<User> findByUserCreatedAtRange(
       PartnerId partnerId, UserCreatedAt startDate, UserCreatedAt endDate) {
-    Pageable pageable = PageRequest.of(0, 25);
+    Pageable pageable = getPageable();
 
     return userRepository
         .findByPartner_PartnerIdAndUserCreatedAtBetween(
@@ -51,7 +55,7 @@ public class JpaUserAdapter implements UserRepository {
 
   @Override
   public List<User> findAll() {
-    Pageable pageable = PageRequest.of(0, 25);
+    Pageable pageable = getPageable();
     return userRepository.findAll(pageable).getContent().stream()
         .map(UserMapper::toDomain)
         .toList();
@@ -59,12 +63,15 @@ public class JpaUserAdapter implements UserRepository {
 
   @Override
   public List<User> findByPartnerId(PartnerId id) {
-    return List.of();
+    Pageable pageable = getPageable();
+    return userRepository.findByPartner_PartnerId(id.partnerId(), pageable).stream()
+        .map(UserMapper::toDomain)
+        .toList();
   }
 
   @Override
   public boolean existsByEmail(UserEmail email) {
-    return false;
+    return userRepository.existsByUserEmailIgnoreCase(email.email());
   }
 
   @Override
@@ -86,5 +93,11 @@ public class JpaUserAdapter implements UserRepository {
   @Override
   public void deleteByUserId(UserId id) {
     userRepository.deleteById(id.id());
+  }
+
+  // Helper methods
+  private static @NonNull Pageable getPageable() {
+    Sort sort = Sort.by("userCreatedAt").descending();
+    return PageRequest.of(0, DEFAULT_PAGE_SIZE, sort);
   }
 }
