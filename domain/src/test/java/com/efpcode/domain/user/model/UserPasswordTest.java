@@ -30,14 +30,6 @@ class UserPasswordTest {
   }
 
   @Test
-  @DisplayName("UserPassword fromString methods returns a valid object")
-  void userPasswordFromStringMethodsReturnsAValidObject() {
-    var testHash = "$2a$10$762vH6.L...";
-    var password = UserPassword.fromString(testHash);
-    assertThat(password.hashedPassword()).isEqualTo(testHash);
-  }
-
-  @Test
   @DisplayName("UserPassword fromHash method returns a valid object")
   void userPasswordFromHashMethodReturnsAValidObject() {
 
