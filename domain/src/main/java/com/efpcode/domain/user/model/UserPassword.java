@@ -9,10 +9,6 @@ public record UserPassword(String hashedPassword) {
       throw new InvalidUserPasswordException("UserPassword cannot be null or blank");
   }
 
-  public static UserPassword fromString(String hashedValue) {
-    return new UserPassword(hashedValue);
-  }
-
   public static UserPassword fromHash(String newHash) {
     return new UserPassword(newHash);
   }

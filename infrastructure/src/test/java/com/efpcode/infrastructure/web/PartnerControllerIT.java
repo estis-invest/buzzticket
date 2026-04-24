@@ -7,6 +7,7 @@ import static org.awaitility.Awaitility.await;
 import com.efpcode.BaseIntegrationTest;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
+import com.efpcode.infrastructure.security.TestSecurityConfiguration;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
 import com.efpcode.infrastructure.web.dto.RegisterPartnerRequest;
 import com.efpcode.infrastructure.web.dto.UpdatePartnerRequest;
@@ -19,10 +20,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @AutoConfigureWebTestClient
+@Import(TestSecurityConfiguration.class)
 class PartnerControllerIT extends BaseIntegrationTest {
 
   @Autowired private WebTestClient webTestClient;
@@ -308,14 +311,14 @@ class PartnerControllerIT extends BaseIntegrationTest {
               .returnResult()
               .getResponseBody();
 
-      UUID partnerId = partnerResponse.id();
+      UUID partnerIdLookUp = partnerResponse.id();
 
       var updateRequest =
           new UpdatePartnerRequest("New Amazing Name", "Stockholm", "SWEDEN", "SWE");
 
       webTestClient
           .patch()
-          .uri("/api/v1/partners/{id}", partnerId)
+          .uri("/api/v1/partners/{id}", partnerIdLookUp)
           .bodyValue(updateRequest)
           .exchange()
           .expectStatus()
@@ -326,7 +329,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .jsonPath("$.city")
           .isEqualTo("Stockholm");
 
-      var updatedEntity = partnerRepository.findById(partnerId).orElseThrow();
+      var updatedEntity = partnerRepository.findById(partnerIdLookUp).orElseThrow();
       assertThat(updatedEntity.getPartnerName()).isEqualTo("New Amazing Name");
       assertThat(updatedEntity.getPartnerCity()).isEqualTo("Stockholm");
     }

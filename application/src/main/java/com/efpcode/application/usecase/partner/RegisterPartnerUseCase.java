@@ -2,18 +2,18 @@ package com.efpcode.application.usecase.partner;
 
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
+import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
-import com.efpcode.domain.partner.port.IdGenerator;
 import com.efpcode.domain.partner.port.PartnerRepository;
 
 public class RegisterPartnerUseCase {
   private final PartnerRepository partnerRepository;
-  private final IdGenerator partnerIdGenerator;
+  private final IdGenerator<PartnerId> partnerIdGenerator;
 
   public RegisterPartnerUseCase(
-      PartnerRepository partnerRepository, IdGenerator partnerIdGenerator) {
+      PartnerRepository partnerRepository, IdGenerator<PartnerId> partnerIdGenerator) {
     this.partnerIdGenerator = partnerIdGenerator;
     this.partnerRepository = partnerRepository;
   }

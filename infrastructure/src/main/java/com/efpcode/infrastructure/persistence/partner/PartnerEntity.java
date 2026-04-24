@@ -10,28 +10,28 @@ import java.util.UUID;
 public class PartnerEntity {
 
   @Id
-  @Column(name = "partnerId", unique = true, nullable = false)
+  @Column(name = "partner_id", unique = true, nullable = false)
   private UUID partnerId;
 
-  @Column(name = "partnerName", unique = false, nullable = false)
+  @Column(name = "partner_name", unique = false, nullable = false)
   private String partnerName;
 
-  @Column(name = "partnerCity", nullable = false)
+  @Column(name = "partner_city", nullable = false)
   private String partnerCity;
 
-  @Column(name = "partnerCountry", nullable = false)
+  @Column(name = "partner_country", nullable = false)
   private String partnerCountry;
 
-  @Column(name = "partnerIsoCode", nullable = false, length = 3)
+  @Column(name = "partner_iso_code", nullable = false, length = 3)
   private String partnerIsoCode;
 
-  @Column(name = "partnerStatus", nullable = false)
+  @Column(name = "partner_status", nullable = false)
   private String partnerStatus;
 
-  @Column(name = "partnerCreatedAt", nullable = false)
+  @Column(name = "partner_created_at", nullable = false)
   private Instant partnerCreatedAt;
 
-  @Column(name = "partnerUpdatedAt", nullable = false)
+  @Column(name = "partner_updated_at", nullable = false)
   private Instant partnerUpdatedAt;
 
   protected PartnerEntity() {}
@@ -128,6 +128,9 @@ public class PartnerEntity {
         + '\''
         + ", partnerIsoCode='"
         + partnerIsoCode
+        + '\''
+        + ", partnerStatus='"
+        + partnerStatus
         + '\''
         + ", partnerCreatedAt="
         + partnerCreatedAt

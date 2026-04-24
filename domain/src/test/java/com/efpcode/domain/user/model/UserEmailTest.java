@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.*;
 import com.efpcode.domain.user.exceptions.InvalidUserEmailException;
 import com.efpcode.domain.user.exceptions.UserEmailFormatException;
 import com.efpcode.domain.user.exceptions.UserEmailLengthException;
+import java.util.Locale;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -104,5 +105,35 @@ class UserEmailTest {
     String total254 = "a".repeat(64) + "@" + "d".repeat(185) + ".com";
     assertThat(total254.length()).isEqualTo(254);
     assertThatCode(() -> new UserEmail(total254)).doesNotThrowAnyException();
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "TEST@TEST.COM",
+        "test@TEST.COM",
+        "TEST@test.com",
+        "Test@test.com",
+        "test@Test.com"
+      })
+  @DisplayName("UserEmail is normalized to lowercase")
+  void userEmailIsNormalizedToLowercase(String upperCaseEmail) {
+
+    var expected = upperCaseEmail.toLowerCase(Locale.ROOT);
+
+    var result = new UserEmail(upperCaseEmail);
+
+    assertThat(result.email()).isEqualTo(expected);
+  }
+
+  @Test
+  @DisplayName("UserEmail normalization is idempotent")
+  void userEmailNormalizationIsIdempotent() {
+    var expected = "test@test.com";
+
+    var email = new UserEmail("Test@Test.COM");
+    var again = new UserEmail(email.email());
+
+    assertThat(again.email()).isEqualTo(expected);
   }
 }

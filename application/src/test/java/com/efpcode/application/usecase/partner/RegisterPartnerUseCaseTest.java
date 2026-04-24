@@ -5,9 +5,9 @@ import static org.mockito.Mockito.*;
 
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
+import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
-import com.efpcode.domain.partner.port.IdGenerator;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class RegisterPartnerUseCaseTest {
 
   @Mock private PartnerRepository partnerRepository;
-  @Mock private IdGenerator idGenerator;
+  @Mock private IdGenerator<PartnerId> idGenerator;
 
   private RegisterPartnerUseCase registerPartnerUseCase;
 
