@@ -127,8 +127,8 @@ class UserEmailTest {
   }
 
   @Test
-  @DisplayName("UserEmail normilization is idempotent")
-  void userEmailNormilizationIsIdempotent() {
+  @DisplayName("UserEmail normalization is idempotent")
+  void userEmailNormalizationIsIdempotent() {
     var expected = "test@test.com";
 
     var email = new UserEmail("Test@Test.COM");

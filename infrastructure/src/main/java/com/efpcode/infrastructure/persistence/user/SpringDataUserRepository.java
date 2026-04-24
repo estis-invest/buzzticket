@@ -16,7 +16,7 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, UUID
 
   Optional<UserEntity> findByUserId(UUID userId);
 
-  Optional<UserEntity> findByUserEmail(String userEmail);
+  Optional<UserEntity> findByUserEmailIgnoreCase(String userEmail);
 
   boolean existsByUserEmailIgnoreCase(String userEmail);
 }

@@ -35,7 +35,7 @@ public class JpaUserAdapter implements UserRepository {
 
   @Override
   public Optional<User> findUserByEmail(UserEmail email) {
-    return userRepository.findByUserEmail(email.email()).map(UserMapper::toDomain);
+    return userRepository.findByUserEmailIgnoreCase(email.email()).map(UserMapper::toDomain);
   }
 
   @Override

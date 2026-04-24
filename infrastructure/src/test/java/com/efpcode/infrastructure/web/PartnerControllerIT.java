@@ -7,7 +7,7 @@ import static org.awaitility.Awaitility.await;
 import com.efpcode.BaseIntegrationTest;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
-import com.efpcode.infrastructure.security.SecurityConfigurationTest;
+import com.efpcode.infrastructure.security.TestSecurityConfiguration;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
 import com.efpcode.infrastructure.web.dto.RegisterPartnerRequest;
 import com.efpcode.infrastructure.web.dto.UpdatePartnerRequest;
@@ -25,7 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @AutoConfigureWebTestClient
-@Import(SecurityConfigurationTest.class)
+@Import(TestSecurityConfiguration.class)
 class PartnerControllerIT extends BaseIntegrationTest {
 
   @Autowired private WebTestClient webTestClient;
