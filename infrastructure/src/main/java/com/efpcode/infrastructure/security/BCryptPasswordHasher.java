@@ -8,8 +8,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class BCryptPasswordHasher implements PasswordHasher {
+  private static final int BCRYPT_STRENGTH = 12;
 
-  private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(16);
+  private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(BCRYPT_STRENGTH);
 
   @Override
   public UserPassword hash(PlainPassword plainPassword) {

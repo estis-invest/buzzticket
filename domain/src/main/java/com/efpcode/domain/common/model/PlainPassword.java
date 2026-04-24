@@ -1,12 +1,17 @@
 package com.efpcode.domain.common.model;
 
-import com.efpcode.domain.user.exceptions.InvalidUserPasswordException;
+import com.efpcode.domain.common.exceptions.InvalidCommonPasswordException;
 
 public record PlainPassword(String plainPassword) {
 
   public PlainPassword {
     if (plainPassword == null || plainPassword.isBlank()) {
-      throw new InvalidUserPasswordException("Plain password cannot be null or blank");
+      throw new InvalidCommonPasswordException("Plain password cannot be null or blank");
     }
+  }
+
+  @Override
+  public String toString() {
+    return "PlainPassword{" + "plainPassword='" + "*".repeat(16) + '\'' + '}';
   }
 }

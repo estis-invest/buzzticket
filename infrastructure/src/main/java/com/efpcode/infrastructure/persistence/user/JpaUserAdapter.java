@@ -1,6 +1,7 @@
 package com.efpcode.infrastructure.persistence.user;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.partner.model.PartnerStatus;
 import com.efpcode.domain.user.model.User;
 import com.efpcode.domain.user.model.UserCreatedAt;
 import com.efpcode.domain.user.model.UserEmail;
@@ -12,17 +13,14 @@ import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepositor
 import java.util.List;
 import java.util.Optional;
 import org.jspecify.annotations.NonNull;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JpaUserAdapter implements UserRepository {
   private final SpringDataUserRepository userRepository;
   private final SpringDataPartnerRepository partnerRepository;
-
-  private static final int DEFAULT_PAGE_SIZE = 25;
 
   public JpaUserAdapter(
       SpringDataUserRepository userRepository, SpringDataPartnerRepository partnerRepository) {
@@ -43,11 +41,11 @@ public class JpaUserAdapter implements UserRepository {
   @Override
   public List<User> findByUserCreatedAtRange(
       PartnerId partnerId, UserCreatedAt startDate, UserCreatedAt endDate) {
-    Pageable pageable = getPageable();
+    Sort sort = getSort();
 
     return userRepository
         .findByPartner_PartnerIdAndUserCreatedAtBetween(
-            partnerId.partnerId(), startDate.time(), endDate.time(), pageable)
+            partnerId.partnerId(), startDate.time(), endDate.time(), sort)
         .stream()
         .map(UserMapper::toDomain)
         .toList();
@@ -55,16 +53,14 @@ public class JpaUserAdapter implements UserRepository {
 
   @Override
   public List<User> findAll() {
-    Pageable pageable = getPageable();
-    return userRepository.findAll(pageable).getContent().stream()
-        .map(UserMapper::toDomain)
-        .toList();
+    Sort sort = getSort();
+    return userRepository.findAll(sort).stream().map(UserMapper::toDomain).toList();
   }
 
   @Override
   public List<User> findByPartnerId(PartnerId id) {
-    Pageable pageable = getPageable();
-    return userRepository.findByPartner_PartnerId(id.partnerId(), pageable).stream()
+    Sort sort = getSort();
+    return userRepository.findByPartner_PartnerId(id.partnerId(), sort).stream()
         .map(UserMapper::toDomain)
         .toList();
   }
@@ -75,6 +71,7 @@ public class JpaUserAdapter implements UserRepository {
   }
 
   @Override
+  @Transactional
   public void save(User user) {
     PartnerEntity partnerEntity =
         user.partnerId()
@@ -82,7 +79,7 @@ public class JpaUserAdapter implements UserRepository {
             .map(
                 id ->
                     partnerRepository
-                        .findByPartnerId(id)
+                        .findByPartnerIdAndPartnerStatusNot(id, PartnerStatus.DELETED.name())
                         .orElseThrow(() -> new MissingReferenceEntityException("Partner", id)))
             .orElse(null);
 
@@ -96,8 +93,7 @@ public class JpaUserAdapter implements UserRepository {
   }
 
   // Helper methods
-  private static @NonNull Pageable getPageable() {
-    Sort sort = Sort.by("userCreatedAt").descending();
-    return PageRequest.of(0, DEFAULT_PAGE_SIZE, sort);
+  private static @NonNull Sort getSort() {
+    return Sort.by("userCreatedAt").descending();
   }
 }

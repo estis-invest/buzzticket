@@ -129,6 +129,9 @@ public class PartnerEntity {
         + ", partnerIsoCode='"
         + partnerIsoCode
         + '\''
+        + ", partnerStatus='"
+        + partnerStatus
+        + '\''
         + ", partnerCreatedAt="
         + partnerCreatedAt
         + ", partnerUpdatedAt="
