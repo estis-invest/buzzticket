@@ -311,14 +311,14 @@ class PartnerControllerIT extends BaseIntegrationTest {
               .returnResult()
               .getResponseBody();
 
-      UUID partnerId = partnerResponse.id();
+      UUID partnerIdLookUp = partnerResponse.id();
 
       var updateRequest =
           new UpdatePartnerRequest("New Amazing Name", "Stockholm", "SWEDEN", "SWE");
 
       webTestClient
           .patch()
-          .uri("/api/v1/partners/{id}", partnerId)
+          .uri("/api/v1/partners/{id}", partnerIdLookUp)
           .bodyValue(updateRequest)
           .exchange()
           .expectStatus()
@@ -329,7 +329,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .jsonPath("$.city")
           .isEqualTo("Stockholm");
 
-      var updatedEntity = partnerRepository.findById(partnerId).orElseThrow();
+      var updatedEntity = partnerRepository.findById(partnerIdLookUp).orElseThrow();
       assertThat(updatedEntity.getPartnerName()).isEqualTo("New Amazing Name");
       assertThat(updatedEntity.getPartnerCity()).isEqualTo("Stockholm");
     }
