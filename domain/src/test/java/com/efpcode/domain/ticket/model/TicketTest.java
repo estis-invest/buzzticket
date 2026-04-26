@@ -2,6 +2,7 @@ package com.efpcode.domain.ticket.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusAssignmentException;
@@ -28,7 +29,7 @@ class TicketTest {
   private final TicketCreatedAt anyTime = TicketCreatedAt.createNow();
   private final TicketAssignees anyWorker =
       new TicketAssignees(Set.of(new UserId(UUID.randomUUID())));
-  private final UserId anyCustomer = UserId.generate();
+  private final UserId anyCustomer = TestUUIDIds.userId();
 
   @Test
   @DisplayName("Opening a ticket that is not PENDING throws error")
@@ -201,7 +202,7 @@ class TicketTest {
 
   private static Stream<Arguments> provideNullArgumentsToPassInTicketAssignMethod() {
 
-    UserId anyStaffId = UserId.generate();
+    UserId anyStaffId = TestUUIDIds.userId();
 
     return Stream.of(
         Arguments.of(null, null),
@@ -311,7 +312,7 @@ class TicketTest {
             TicketAssignees.empty(),
             anyCustomer);
 
-    var staffId = UserId.generate();
+    var staffId = TestUUIDIds.userId();
     var result = ticket.assign(staffId, UserRole.SUPPORT);
     assertThat(result).isNotSameAs(ticket).isInstanceOf(Ticket.class);
     assertThat(result.workers().workers()).hasSize(1);
@@ -341,7 +342,7 @@ class TicketTest {
             TicketAssignees.empty(),
             anyCustomer);
 
-    var staffId = UserId.generate();
+    var staffId = TestUUIDIds.userId();
     var result = ticket.assign(staffId, role);
 
     assertThat(result).isNotSameAs(ticket);

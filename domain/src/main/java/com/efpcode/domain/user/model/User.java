@@ -84,7 +84,7 @@ public record User(
   }
 
   public User createStaffMember(
-      UserName name, UserEmail email, UserPassword password, UserRole staffRole) {
+      UserId id, UserName name, UserEmail email, UserPassword password, UserRole staffRole) {
     ensureActiveUser();
     this.role.roleGuardIsAdmin();
     Objects.requireNonNull(staffRole, "User role cannot be null");
@@ -93,7 +93,7 @@ public record User(
         this.partnerId.orElseThrow(
             () -> new InvalidUserRolePartnerMissingException("User role must have a partnerId"));
     return new User(
-        UserId.generate(),
+        id,
         name,
         email,
         password,

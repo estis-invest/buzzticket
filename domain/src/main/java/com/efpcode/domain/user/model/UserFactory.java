@@ -7,33 +7,34 @@ public class UserFactory {
   private UserFactory() {}
 
   public static User createAdminUserWithPartner(
-      UserName name, UserEmail email, UserPassword password, PartnerId partnerId) {
-    return createUser(name, email, password, UserRole.ADMIN, Optional.of(partnerId));
+      UserId id, UserName name, UserEmail email, UserPassword password, PartnerId partnerId) {
+    return createUser(id, name, email, password, UserRole.ADMIN, Optional.of(partnerId));
   }
 
   public static User createSupportUserWithPartner(
-      UserName name, UserEmail email, UserPassword password, PartnerId partnerId) {
-    return createUser(name, email, password, UserRole.SUPPORT, Optional.of(partnerId));
+      UserId id, UserName name, UserEmail email, UserPassword password, PartnerId partnerId) {
+    return createUser(id, name, email, password, UserRole.SUPPORT, Optional.of(partnerId));
   }
 
   public static User createCustomerUserWithPartner(
-      UserName name, UserEmail email, UserPassword password, PartnerId partnerId) {
-    return createUser(name, email, password, UserRole.CUSTOMER, Optional.of(partnerId));
+      UserId id, UserName name, UserEmail email, UserPassword password, PartnerId partnerId) {
+    return createUser(id, name, email, password, UserRole.CUSTOMER, Optional.of(partnerId));
   }
 
   public static User createCustomerUserWithoutPartner(
-      UserName name, UserEmail email, UserPassword password) {
-    return createUser(name, email, password, UserRole.CUSTOMER, Optional.empty());
+      UserId id, UserName name, UserEmail email, UserPassword password) {
+    return createUser(id, name, email, password, UserRole.CUSTOMER, Optional.empty());
   }
 
   private static User createUser(
+      UserId id,
       UserName name,
       UserEmail email,
       UserPassword password,
       UserRole role,
       Optional<PartnerId> partnerId) {
     return new User(
-        UserId.generate(),
+        id,
         name,
         email,
         password,

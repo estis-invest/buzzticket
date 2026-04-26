@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 
 class UserFactoryTest {
 
+  private static final UserId ANY_ID = TestUUIDIds.userId();
   private static final UserName ANY_NAME = new UserName("John Doe");
   private static final UserEmail ANY_EMAIL = new UserEmail("test@example.com");
   private static final UserPassword ANY_PASS = new UserPassword("secure123");
@@ -17,7 +18,8 @@ class UserFactoryTest {
   @Test
   @DisplayName("createAdminUserWithPartner creates a user with an Admin with a Partner")
   void createAdminUserWithPartnerCreatesAUserWithAnAdminWithAPartner() {
-    var user = UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+    var user =
+        UserFactory.createAdminUserWithPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
     assertThat(user).isNotNull().isInstanceOf(User.class);
     assertThat(user.role()).isEqualTo(UserRole.ADMIN);
     assertThat(user.partnerId()).contains(ANY_PARTNER);
@@ -26,7 +28,9 @@ class UserFactoryTest {
   @Test
   @DisplayName("createSupportUserWithPartner creates a user with a Support with a Partner")
   void createSupportUserWithPartnerCreatesAUserWithASupportWithAPartner() {
-    var user = UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+    var user =
+        UserFactory.createSupportUserWithPartner(
+            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
     assertThat(user).isNotNull().isInstanceOf(User.class);
     assertThat(user.role()).isEqualTo(UserRole.SUPPORT);
     assertThat(user.partnerId()).contains(ANY_PARTNER);
@@ -37,7 +41,8 @@ class UserFactoryTest {
   void createCustomerWithPartnerCreatesAUserWithCustomerWithAPartner() {
 
     var user =
-        UserFactory.createCustomerUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+        UserFactory.createCustomerUserWithPartner(
+            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
     assertThat(user).isNotNull().isInstanceOf(User.class);
     assertThat(user.role()).isEqualTo(UserRole.CUSTOMER);
     assertThat(user.partnerId()).contains(ANY_PARTNER);
@@ -47,7 +52,7 @@ class UserFactoryTest {
   @DisplayName("createCustomerWithoutPartner creates a user with Customer with no Partner")
   void createCustomerWithoutPartnerCreatesAUserWithCustomerWithNoPartner() {
 
-    var user = UserFactory.createCustomerUserWithoutPartner(ANY_NAME, ANY_EMAIL, ANY_PASS);
+    var user = UserFactory.createCustomerUserWithoutPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS);
     assertThat(user).isNotNull().isInstanceOf(User.class);
     assertThat(user.role()).isEqualTo(UserRole.CUSTOMER);
     assertThat(user.partnerId()).isEmpty();

@@ -1,5 +1,6 @@
 package com.efpcode.domain.user.model;
 
+import com.efpcode.domain.user.exceptions.IllegalUserIdArgumentException;
 import com.efpcode.domain.user.exceptions.InvalidUserIdException;
 import java.util.UUID;
 
@@ -11,12 +12,14 @@ public record UserId(UUID id) {
     }
   }
 
-  public static UserId generate() {
-
-    return new UserId(UUID.randomUUID());
+  public static UserId of(UUID value) {
+    return new UserId(value);
   }
 
   public static UserId fromString(String uuid) {
+    if (uuid == null || uuid.trim().isBlank()) {
+      throw new IllegalUserIdArgumentException("fromString method cannot pass null or blank");
+    }
     return new UserId(UUID.fromString(uuid));
   }
 }
