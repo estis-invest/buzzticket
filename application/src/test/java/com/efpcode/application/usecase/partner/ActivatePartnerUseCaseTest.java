@@ -3,10 +3,10 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
 import com.efpcode.domain.partner.model.Partner;
-import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerStatus;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import java.util.Optional;
@@ -31,7 +31,7 @@ class ActivatePartnerUseCaseTest {
   @Test
   @DisplayName("should successfully activate an existing partner from EDIT to ACITVE")
   void shouldSuccessfullyActivateAnExistingPartnerFromEditToActive() {
-    var id = PartnerId.generate();
+    var id = TestUUIDIds.partnerId();
     var testPartner = Partner.createDraftPartner(id, "Test", "TEST", "TEST", "TST");
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
@@ -46,7 +46,7 @@ class ActivatePartnerUseCaseTest {
   @DisplayName("not found partnerId throws error")
   void notFoundPartnerIdThrowsError() {
 
-    var id = PartnerId.generate();
+    var id = TestUUIDIds.partnerId();
 
     when(partnerRepository.findById(id)).thenReturn(Optional.empty());
 
@@ -60,7 +60,7 @@ class ActivatePartnerUseCaseTest {
   @Test
   @DisplayName("Cannot activate partner in deleted  status")
   void cannotActivatePartnerInDeletedStatus() {
-    var id = PartnerId.generate();
+    var id = TestUUIDIds.partnerId();
     var testPartner = Partner.createDraftPartner(id, "Test", "TEST", "TEST", "TST");
 
     testPartner = testPartner.toActivate().toDeactivate().toDelete();

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
@@ -27,7 +28,7 @@ class UserTest {
   private static final UserPassword ANY_PASS = new UserPassword("secure123");
   private static final UserCreatedAt ANY_TIME = UserCreatedAt.createNow();
   private static final UserUpdateAt ANY_UPDATE = UserUpdateAt.createNow();
-  private static final PartnerId ANY_PARTNER = PartnerId.generate();
+  private static final PartnerId ANY_PARTNER = TestUUIDIds.partnerId();
 
   private static Stream<Arguments> provideInvalidConstructorArgs() {
     var id = ANY_ID;
@@ -500,7 +501,7 @@ class UserTest {
       names = {"SUPPORT", "ADMIN"})
   @DisplayName("Admin can create Support and Admin staff member that inherits the same PartnerId ")
   void adminCanCreateSupportStaffMemberThatInheritsTheSamePartnerId(UserRole userRole) {
-    PartnerId adminPartnerId = PartnerId.generate();
+    PartnerId adminPartnerId = TestUUIDIds.partnerId();
     User adminUser =
         UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
 
@@ -517,7 +518,7 @@ class UserTest {
   @Test
   @DisplayName("Admin cannot create Customer user throws error")
   void adminCannotCreateCustomerUserThrowsError() {
-    PartnerId adminPartnerId = PartnerId.generate();
+    PartnerId adminPartnerId = TestUUIDIds.partnerId();
     User adminUser =
         UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
     UserName userName = new UserName("Customer");
@@ -533,7 +534,7 @@ class UserTest {
   @Test
   @DisplayName("Admin cannot create Null role user throws Null Point Exception error")
   void adminCannotCreateNullRoleUserThrowsNullPointExceptionError() {
-    PartnerId adminPartnerId = PartnerId.generate();
+    PartnerId adminPartnerId = TestUUIDIds.partnerId();
     User adminUser =
         UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
 
@@ -551,7 +552,7 @@ class UserTest {
       names = {"SUPPORT", "ADMIN"})
   @DisplayName("Support user cannot use createStaffMember throws error")
   void supportUserCannotUseCreateStaffMemberThrowsError(UserRole userRole) {
-    PartnerId supportPartnerId = PartnerId.generate();
+    PartnerId supportPartnerId = TestUUIDIds.partnerId();
 
     User supportUser =
         UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, supportPartnerId);

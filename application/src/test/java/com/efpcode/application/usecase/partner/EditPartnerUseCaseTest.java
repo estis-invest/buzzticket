@@ -3,6 +3,7 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
@@ -33,7 +34,7 @@ class EditPartnerUseCaseTest {
   @BeforeEach
   void setUp() {
     editPartnerUseCase = new EditPartnerUseCase(partnerRepository);
-    id = PartnerId.generate();
+    id = TestUUIDIds.partnerId();
     testPartner = Partner.createDraftPartner(id, "TEST", "TEST", "TEST", "TST");
   }
 

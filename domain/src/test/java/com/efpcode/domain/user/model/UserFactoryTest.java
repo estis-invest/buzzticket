@@ -3,6 +3,7 @@ package com.efpcode.domain.user.model;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,7 @@ class UserFactoryTest {
   private static final UserName ANY_NAME = new UserName("John Doe");
   private static final UserEmail ANY_EMAIL = new UserEmail("test@example.com");
   private static final UserPassword ANY_PASS = new UserPassword("secure123");
-  private static final PartnerId ANY_PARTNER = PartnerId.generate();
+  private static final PartnerId ANY_PARTNER = TestUUIDIds.partnerId();
 
   @Test
   @DisplayName("createAdminUserWithPartner creates a user with an Admin with a Partner")

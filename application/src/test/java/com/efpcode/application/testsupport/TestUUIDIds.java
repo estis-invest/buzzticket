@@ -1,4 +1,4 @@
-package com.efpcode.domain.testsupport;
+package com.efpcode.application.testsupport;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.ticket.model.TicketId;

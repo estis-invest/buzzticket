@@ -10,8 +10,8 @@ public record PartnerId(UUID partnerId) {
     if (partnerId == null) throw new InvalidPartnerIdException("Partner cannot be null");
   }
 
-  public static PartnerId generate() {
-    return new PartnerId(UUID.randomUUID());
+  public static PartnerId of(UUID value) {
+    return new PartnerId(value);
   }
 
   public static PartnerId fromString(String uuid) {

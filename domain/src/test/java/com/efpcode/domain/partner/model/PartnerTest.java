@@ -3,6 +3,7 @@ package com.efpcode.domain.partner.model;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.function.Function;
@@ -18,7 +19,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class PartnerTest {
 
-  private static final PartnerId ANY_ID = PartnerId.generate();
+  private static final PartnerId ANY_ID = TestUUIDIds.partnerId();
   private static final PartnerName ANY_NAME = new PartnerName("Test Partner");
   private static final PartnerCity ANY_CITY = new PartnerCity("Test City");
   private static final PartnerCountry ANY_COUNTRY = new PartnerCountry("TEST COUNTRY");
@@ -28,7 +29,7 @@ class PartnerTest {
   public static final PartnerUpdateAt ANY_TIME_UPDATE = PartnerUpdateAt.createNow();
 
   private static Stream<Arguments> invalidArgumentsThatFail() {
-    var testPartnerId = PartnerId.generate();
+    var testPartnerId = TestUUIDIds.partnerId();
     var testPartnerName = new PartnerName("Test Partner");
     var testPartnerCity = new PartnerCity("Test City");
     var testPartnerCountry = new PartnerCountry("TEST COUNTRY");
@@ -359,7 +360,7 @@ class PartnerTest {
 
     @BeforeEach
     void setUp() {
-      var id = PartnerId.generate();
+      var id = TestUUIDIds.partnerId();
       var name = new PartnerName("EFP");
       var city = new PartnerCity("Berlin");
       var country = new PartnerCountry("DE");
