@@ -4,9 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.testsupport.TestUUIDIds;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketIdArgumentException;
 import com.efpcode.domain.ticket.exceptions.InvalidTicketIdException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 class TicketIdTest {
   @Test
@@ -41,5 +45,16 @@ class TicketIdTest {
     assertThat(result).isNotNull().isInstanceOf(TicketId.class);
     assertThat(result.value().toString()).hasToString(stringUUID);
     assertThat(result).isEqualTo(expected);
+  }
+
+  @ParameterizedTest
+  @NullAndEmptySource
+  @ValueSource(strings = {" ", "   ", "\t", "\n"})
+  @DisplayName("fromString method throws error if null or blank is passed")
+  void fromStringMethodThrowsErrorIfNullOrBlankIsPassed(String invalidArgs) {
+
+    assertThatThrownBy(() -> TicketId.fromString(invalidArgs))
+        .isInstanceOf(IllegalTicketIdArgumentException.class)
+        .hasMessageContaining("fromString method cannot pass null or blank");
   }
 }

@@ -15,7 +15,7 @@ public record PartnerId(UUID partnerId) {
   }
 
   public static PartnerId fromString(String uuid) {
-    if (uuid == null || uuid.isBlank())
+    if (uuid == null || uuid.trim().isBlank())
       throw new IllegalPartnerIdArgumentException("fromString method cannot pass null or blank");
 
     return new PartnerId(UUID.fromString(uuid));
