@@ -20,7 +20,7 @@ public record Partner(
     Objects.requireNonNull(isoCode, "IsoCode cannot be null");
     Objects.requireNonNull(status, "Status cannot be null");
     Objects.requireNonNull(createdAt, "createdAt cannot be null");
-    Objects.requireNonNull(updateAt, "updateAt cannot be null");
+    Objects.requireNonNull(updateAt, "updatedAt cannot be null");
   }
 
   public boolean isActive() {

@@ -117,7 +117,7 @@ class PartnerTest {
             testPartnerStatus,
             testPartnerCreatedAt,
             null,
-            "updateAt cannot be null"));
+            "updatedAt cannot be null"));
   }
 
   @ParameterizedTest

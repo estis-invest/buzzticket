@@ -19,7 +19,7 @@ class PartnerCreatedAtTest {
   }
 
   @Test
-  @DisplayName("PartnerCreatedAt cannot pass zero time as argument")
+  @DisplayName("PartnerCreatedAt cannot pass zero createdAt as argument")
   void partnerCreatedAtCannotPassZeroTimeAsArgument() {
     var timeZero = Instant.ofEpochMilli(0);
     assertThatThrownBy(() -> new PartnerCreatedAt(timeZero))
@@ -29,7 +29,7 @@ class PartnerCreatedAtTest {
 
   @Test
   @DisplayName(
-      "PartnerCreatedAt cannot create Partner in the future if time exceed margin of error throws error")
+      "PartnerCreatedAt cannot create Partner in the future if createdAt exceed margin of error throws error")
   void partnerCreatedAtCannotCreatePartnerInTheFutureIfTimeExceedMarginOfErrorThrowsError() {
     var futureTime = Instant.now().plusSeconds(90);
     assertThatThrownBy(() -> new PartnerCreatedAt(futureTime))

@@ -2,16 +2,14 @@ package com.efpcode.domain.ticket.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.testsupport.TestUUIDIds;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusAssignmentException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
+import com.efpcode.domain.ticket.exceptions.*;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
+import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,14 +20,236 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class TicketTest {
 
-  private final TicketId anyId = TicketId.of(UUID.randomUUID());
-  private final TicketSlug anySlug = new TicketSlug("BZT-00001");
-  private final TicketTitle anyTitle = new TicketTitle("Fix broken build");
-  private final TicketDescription anyDescription = new TicketDescription("This ticket is broken");
-  private final TicketCreatedAt anyTime = TicketCreatedAt.createNow();
-  private final TicketAssignees anyWorker =
-      new TicketAssignees(Set.of(new UserId(UUID.randomUUID())));
-  private final UserId anyCustomer = TestUUIDIds.userId();
+  private static final TicketId anyId = TestUUIDIds.ticketId();
+  private static final TicketSlug anySlug = new TicketSlug("BZT-00001");
+  private static final TicketTitle anyTitle = new TicketTitle("Fix broken build");
+  private static final TicketDescription anyDescription =
+      new TicketDescription("This ticket is broken");
+  private static final TicketCreatedAt anyTime = TicketCreatedAt.createNow();
+  private static final TicketUpdateAt anyUpdateTime = TicketUpdateAt.createNow();
+  private static final TicketAssignees anyWorker =
+      new TicketAssignees(Set.of(TestUUIDIds.userId()));
+  private static final UserId anyCustomer = TestUUIDIds.userId();
+  private static final Optional<PartnerId> anyPartnerId = Optional.of(TestUUIDIds.partnerId());
+
+  private static Stream<Arguments> providesInvalidConstructorArgs() {
+
+    var id = anyId;
+    var slug = anySlug;
+    var title = anyTitle;
+    var description = anyDescription;
+    var status = TicketStatus.PENDING;
+    var prio = TicketPriority.LOW;
+    var createdAt = anyTime;
+    var updatedAt = anyUpdateTime;
+    var worker = anyWorker;
+    var customer = anyCustomer;
+    var owner = anyPartnerId;
+
+    return Stream.of(
+        Arguments.of(
+            null,
+            slug,
+            title,
+            description,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketId cannot be null"),
+        Arguments.of(
+            id,
+            null,
+            title,
+            description,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketSlug cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            null,
+            description,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketTitle cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            null,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketDescription cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            null,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketStatus cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            status,
+            null,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketPriority cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            status,
+            prio,
+            null,
+            updatedAt,
+            worker,
+            customer,
+            owner,
+            "TicketCreatedAt cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            status,
+            prio,
+            createdAt,
+            null,
+            worker,
+            customer,
+            owner,
+            "TicketUpdateAt cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            null,
+            customer,
+            owner,
+            "TicketAssignees cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            null,
+            owner,
+            "UserId cannot be null"),
+        Arguments.of(
+            id,
+            slug,
+            title,
+            description,
+            status,
+            prio,
+            createdAt,
+            updatedAt,
+            worker,
+            customer,
+            null,
+            "PartnerId cannot be null"));
+  }
+
+  @ParameterizedTest
+  @MethodSource("providesInvalidConstructorArgs")
+  @DisplayName("TicketConstructor throws NullPointException if any field is null")
+  void ticketConstructorThrowsNullPointExceptionIfAnyFieldIsNull(
+      TicketId id,
+      TicketSlug slug,
+      TicketTitle title,
+      TicketDescription description,
+      TicketStatus status,
+      TicketPriority priority,
+      TicketCreatedAt createdAt,
+      TicketUpdateAt updatedAt,
+      TicketAssignees worker,
+      UserId customer,
+      Optional<PartnerId> owner,
+      String expectedMessage) {
+
+    assertThatThrownBy(
+            () ->
+                new Ticket(
+                    id,
+                    slug,
+                    title,
+                    description,
+                    status,
+                    priority,
+                    createdAt,
+                    updatedAt,
+                    worker,
+                    customer,
+                    owner))
+        .isInstanceOf(NullPointerException.class)
+        .hasMessageContaining(expectedMessage);
+  }
+
+  @Test
+  @DisplayName("Ticket throws error if PartnerId is empty")
+  void ticketThrowsErrorIfPartnerIdIsEmpty() {
+
+    Optional<PartnerId> partnerId = Optional.empty();
+
+    assertThatThrownBy(
+            () ->
+                new Ticket(
+                    anyId,
+                    anySlug,
+                    anyTitle,
+                    anyDescription,
+                    TicketStatus.PENDING,
+                    TicketPriority.LOW,
+                    anyTime,
+                    anyUpdateTime,
+                    anyWorker,
+                    anyCustomer,
+                    partnerId))
+        .isInstanceOf(InvalidTicketException.class)
+        .hasMessageContaining("Ticket must have an owner partner");
+  }
 
   @Test
   @DisplayName("Opening a ticket that is not PENDING throws error")
@@ -44,8 +264,10 @@ class TicketTest {
             TicketStatus.CLOSED,
             TicketPriority.LOW,
             anyTime,
+            TicketUpdateAt.createNow(),
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(closedTicket::open)
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
@@ -65,8 +287,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
     var result = pendingTicket.open();
 
     assertThat(pendingTicket).isNotEqualTo(result);
@@ -90,8 +314,10 @@ class TicketTest {
             TicketStatus.OPEN,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     var result = openTicket.close();
 
@@ -115,8 +341,10 @@ class TicketTest {
             TicketStatus.CLOSED,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
     var result = closedTicket.archive();
 
     assertThat(closedTicket).isNotEqualTo(result);
@@ -129,10 +357,18 @@ class TicketTest {
   @Test
   @DisplayName("New ticket has status Pending and no workers")
   void newTicketHasStatusPendingAndNoWorkers() {
+    PartnerId partnerId = TestUUIDIds.partnerId();
 
     var ticket =
         Ticket.createPending(
-            anyId, anySlug, anyTitle, anyDescription, TicketPriority.LOW, anyTime, anyCustomer);
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketPriority.LOW,
+            anyTime,
+            anyCustomer,
+            partnerId);
     assertThat(ticket.status()).isEqualTo(TicketStatus.PENDING);
     assertThat(ticket.workers().workers()).isEmpty();
   }
@@ -149,8 +385,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(pendingTicket::close)
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
@@ -170,8 +408,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(pendingTicket::archive)
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
@@ -190,8 +430,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             anyWorker,
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     var result = pendingTicket.withPriority(TicketPriority.HIGH);
     assertThat(pendingTicket).isNotEqualTo(result);
@@ -224,8 +466,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(() -> ticket.assign(staffId, actorRole))
         .isInstanceOf(IllegalTicketAssignmentException.class)
@@ -244,8 +488,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     var userRole = UserRole.CUSTOMER;
 
@@ -266,8 +512,10 @@ class TicketTest {
             TicketStatus.CLOSED,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
     assertThatThrownBy(() -> ticketClosed.assign(anyCustomer, UserRole.SUPPORT))
         .isInstanceOf(IllegalTicketStatusAssignmentException.class)
         .hasMessageContaining("TicketStatus: " + TicketStatus.CLOSED + " cannot assign users");
@@ -285,8 +533,10 @@ class TicketTest {
             TicketStatus.ARCHIVED,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(() -> ticketArchived.assign(anyCustomer, UserRole.SUPPORT))
         .isInstanceOf(IllegalTicketStatusAssignmentException.class)
@@ -309,8 +559,10 @@ class TicketTest {
             status,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     var staffId = TestUUIDIds.userId();
     var result = ticket.assign(staffId, UserRole.SUPPORT);
@@ -339,8 +591,10 @@ class TicketTest {
             status,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     var staffId = TestUUIDIds.userId();
     var result = ticket.assign(staffId, role);
@@ -361,8 +615,10 @@ class TicketTest {
             TicketStatus.PENDING,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(() -> ticket.withPriority(null))
         .isInstanceOf(IllegalTicketPriorityException.class)
@@ -385,8 +641,10 @@ class TicketTest {
             status,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatThrownBy(() -> ticket.withPriority(TicketPriority.HIGH))
         .isInstanceOf(IllegalTicketStatusAssignmentException.class)
@@ -409,8 +667,10 @@ class TicketTest {
             status,
             TicketPriority.LOW,
             anyTime,
+            anyUpdateTime,
             TicketAssignees.empty(),
-            anyCustomer);
+            anyCustomer,
+            anyPartnerId);
 
     assertThatCode(() -> ticket.withPriority(TicketPriority.HIGH)).doesNotThrowAnyException();
   }

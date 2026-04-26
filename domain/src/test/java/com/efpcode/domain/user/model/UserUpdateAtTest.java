@@ -19,7 +19,7 @@ class UserUpdateAtTest {
   }
 
   @Test
-  @DisplayName("UserUpdateAt cannot pass zero time as argument")
+  @DisplayName("UserUpdateAt cannot pass zero createdAt as argument")
   void userUpdateAtCannotPassZeroTimeAsArgument() {
     var timeZero = Instant.ofEpochMilli(0);
     assertThatThrownBy(() -> new UserUpdateAt(timeZero))
@@ -46,7 +46,7 @@ class UserUpdateAtTest {
   }
 
   @Test
-  @DisplayName("UserUpdateAt created with current time returns a valid object")
+  @DisplayName("UserUpdateAt created with current createdAt returns a valid object")
   void userUpdateAtWithInstantNewMethodReturnsAValidObject() {
     var now = Instant.now();
     var result = new UserUpdateAt(now);

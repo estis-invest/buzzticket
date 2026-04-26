@@ -18,7 +18,7 @@ class PartnerUpdateAtTest {
   }
 
   @Test
-  @DisplayName("PartnerUpdateAt cannot pass zero time as argument")
+  @DisplayName("PartnerUpdateAt cannot pass zero createdAt as argument")
   void partnerUpdateAtCannotPassZeroTimeAsArgument() {
     var timeZero = Instant.ofEpochMilli(0);
     assertThatThrownBy(() -> new PartnerUpdateAt(timeZero))
@@ -45,7 +45,7 @@ class PartnerUpdateAtTest {
   }
 
   @Test
-  @DisplayName("PartnerUpdateAt created with current time returns a valid object")
+  @DisplayName("PartnerUpdateAt created with current createdAt returns a valid object")
   void partnerUpdateAtWithInstantNewMethodReturnsAValidObject() {
     var now = Instant.now();
     var result = new PartnerUpdateAt(now);
