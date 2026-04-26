@@ -21,7 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 
 class TicketTest {
 
-  private final TicketId anyId = TicketId.generate();
+  private final TicketId anyId = TicketId.of(UUID.randomUUID());
   private final TicketSlug anySlug = new TicketSlug("BZT-00001");
   private final TicketTitle anyTitle = new TicketTitle("Fix broken build");
   private final TicketDescription anyDescription = new TicketDescription("This ticket is broken");

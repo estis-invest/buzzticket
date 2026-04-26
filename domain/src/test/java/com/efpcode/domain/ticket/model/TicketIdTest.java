@@ -3,8 +3,8 @@ package com.efpcode.domain.ticket.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import com.efpcode.domain.ticket.exceptions.InvalidTicketIdException;
-import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -19,21 +19,27 @@ class TicketIdTest {
   }
 
   @Test
-  @DisplayName("TicketId generate method returns valid UUID object")
-  void ticketIdGenerateMethodReturnsValidUuidObject() {
-    var result = TicketId.generate();
+  @DisplayName("TicketId of method returns valid UUID object")
+  void ticketIdOfMethodReturnsValidUuidObject() {
+    var expected = TestUUIDIds.ticketId();
+    var result = TicketId.of(expected.value());
+
     assertThat(result).isNotNull().isInstanceOf(TicketId.class);
+    assertThat(result.value()).isEqualTo(expected.value());
   }
 
   @Test
   @DisplayName("TicketId fromString method returns a valid TicketID object")
   void ticketIdFromStringMethodReturnsAValidTicketIdObject() {
 
-    var stringUUID = UUID.randomUUID().toString();
+    var stringUUID = "00000000-0000-0000-0000-000000000001";
+
+    var expected = TestUUIDIds.ticketId(stringUUID);
 
     TicketId result = TicketId.fromString(stringUUID);
 
     assertThat(result).isNotNull().isInstanceOf(TicketId.class);
     assertThat(result.value().toString()).hasToString(stringUUID);
+    assertThat(result).isEqualTo(expected);
   }
 }

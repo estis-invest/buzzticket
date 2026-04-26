@@ -11,8 +11,8 @@ public record TicketId(UUID value) {
     }
   }
 
-  public static TicketId generate() {
-    return new TicketId(UUID.randomUUID());
+  public static TicketId of(UUID value) {
+    return new TicketId(value);
   }
 
   public static TicketId fromString(String uuid) {
