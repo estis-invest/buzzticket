@@ -657,6 +657,7 @@ class UserTest {
     assertThat(userUpdateName.name().name()).isEqualTo(expected);
     assertThat(userUpdateName.name()).isNotEqualTo(user.name());
     assertThat(userUpdateName).isNotSameAs(user);
+    assertThat(userUpdateName.userUpdateAt().updatedAt()).isAfter(user.userUpdateAt().updatedAt());
   }
 
   @Test
@@ -722,6 +723,8 @@ class UserTest {
     assertThat(userWithNewPassword.password().hashedPassword())
         .isNotEqualTo(user.password().hashedPassword());
     assertThat(userWithNewPassword.password().hashedPassword()).isEqualTo(expected);
+    assertThat(userWithNewPassword.userUpdateAt().updatedAt())
+        .isAfter(user.userUpdateAt().updatedAt());
   }
 
   @Test
@@ -787,6 +790,7 @@ class UserTest {
 
     assertThat(user).isNotSameAs(userUpdateEmail);
     assertThat(userUpdateEmail.email().email()).isEqualTo(expected);
+    assertThat(userUpdateEmail.userUpdateAt().updatedAt()).isAfter(user.userUpdateAt().updatedAt());
   }
 
   @Test

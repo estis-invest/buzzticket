@@ -126,10 +126,10 @@ public record User(
   }
 
   public User changeName(UserName userName) {
-    ensureActiveUser();
     if (userName == null) {
       throw new IllegalUserArgumentException("UserName cannot be null");
     }
+    ensureActiveUser();
 
     return new User(
         id,
@@ -144,10 +144,10 @@ public record User(
   }
 
   public User changePassword(UserPassword newPassword) {
-    ensureActiveUser();
     if (newPassword == null) {
       throw new IllegalUserArgumentException("UserPassword cannot be null");
     }
+    ensureActiveUser();
     return new User(
         id,
         name,
@@ -161,10 +161,10 @@ public record User(
   }
 
   public User changeEmail(UserEmail newEmail) {
-    ensureActiveUser();
     if (newEmail == null) {
       throw new IllegalUserArgumentException("UserEmail cannot be null");
     }
+    ensureActiveUser();
 
     return new User(
         id,
