@@ -3,6 +3,7 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
 import com.efpcode.domain.partner.model.Partner;
@@ -28,7 +29,7 @@ class DeactivatePartnerUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    id = PartnerId.generate();
+    id = TestUUIDIds.partnerId();
     deactivatePartnerUseCase = new DeactivatePartnerUseCase(partnerRepository);
     testPartner = Partner.createDraftPartner(id, "Test", "Test", "TEST", "TST");
   }

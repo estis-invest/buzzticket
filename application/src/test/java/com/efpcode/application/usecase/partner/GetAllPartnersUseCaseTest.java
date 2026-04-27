@@ -3,9 +3,9 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.model.Partner;
-import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,8 +40,8 @@ class GetAllPartnersUseCaseTest {
   @Test
   @DisplayName("Should return a list of partners when they exist")
   void shouldReturnListOfPartners() {
-    var id1 = PartnerId.generate();
-    var id2 = PartnerId.generate();
+    var id1 = TestUUIDIds.partnerId();
+    var id2 = TestUUIDIds.partnerId();
 
     var partner1 = Partner.createDraftPartner(id1, "Partner A", "Stockholm", "SWEDEN", "SWE");
     var partner2 = Partner.createDraftPartner(id2, "Partner B", "Gothenburg", "SWEDEN", "SWE");

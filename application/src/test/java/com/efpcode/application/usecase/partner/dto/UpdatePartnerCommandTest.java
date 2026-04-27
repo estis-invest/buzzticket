@@ -2,6 +2,7 @@ package com.efpcode.application.usecase.partner.dto;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import java.util.stream.Stream;
@@ -18,7 +19,7 @@ class UpdatePartnerCommandTest {
 
   @BeforeEach
   void setUp() {
-    id = PartnerId.generate();
+    id = TestUUIDIds.partnerId();
     testPartner = Partner.createDraftPartner(id, "TEST", "TEST", "TEST", "TST");
   }
 

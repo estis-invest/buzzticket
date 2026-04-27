@@ -1,5 +1,6 @@
 package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
 import com.efpcode.domain.user.model.UserId;
@@ -13,9 +14,11 @@ public record Ticket(
     TicketDescription description,
     TicketStatus status,
     TicketPriority priority,
-    TicketCreatedAt time,
+    TicketCreatedAt createdAt,
+    TicketUpdateAt updatedAt,
     TicketAssignees workers,
-    UserId reportedBy) {
+    UserId reportedBy,
+    PartnerId ownerPartner) {
 
   public Ticket {
     Objects.requireNonNull(id, "TicketId cannot be null");
@@ -24,9 +27,11 @@ public record Ticket(
     Objects.requireNonNull(description, "TicketDescription cannot be null");
     Objects.requireNonNull(status, "TicketStatus cannot be null");
     Objects.requireNonNull(priority, "TicketPriority cannot be null");
-    Objects.requireNonNull(time, "TicketCreatedAt cannot be null");
+    Objects.requireNonNull(createdAt, "TicketCreatedAt cannot be null");
+    Objects.requireNonNull(updatedAt, "TicketUpdateAt cannot be null");
     Objects.requireNonNull(workers, "TicketAssignees cannot be null");
     Objects.requireNonNull(reportedBy, "UserId cannot be null");
+    Objects.requireNonNull(ownerPartner, "PartnerId cannot be null");
   }
 
   public Ticket open() {
@@ -48,7 +53,8 @@ public record Ticket(
       TicketDescription description,
       TicketPriority priority,
       TicketCreatedAt time,
-      UserId reportedBy) {
+      UserId reportedBy,
+      PartnerId ownerPartner) {
 
     return new Ticket(
         id,
@@ -58,8 +64,10 @@ public record Ticket(
         TicketStatus.PENDING,
         priority,
         time,
+        TicketUpdateAt.createNow(),
         TicketAssignees.empty(),
-        reportedBy);
+        reportedBy,
+        ownerPartner);
   }
 
   public Ticket assign(UserId staffId, UserRole actorRole) {
@@ -70,7 +78,17 @@ public record Ticket(
     this.status.ticketStatusAssignGuard();
 
     return new Ticket(
-        id, slug, title, description, status, priority, time, workers.add(staffId), reportedBy);
+        id,
+        slug,
+        title,
+        description,
+        status,
+        priority,
+        createdAt,
+        TicketUpdateAt.createNow(),
+        workers.add(staffId),
+        reportedBy,
+        ownerPartner);
   }
 
   public Ticket withPriority(TicketPriority ticketPriority) {
@@ -78,10 +96,31 @@ public record Ticket(
       throw new IllegalTicketPriorityException("Ticket priority passed cannot be null");
     this.status().ticketChangeStatusPriorityGuard();
     return new Ticket(
-        id, slug, title, description, status, ticketPriority, time, workers, reportedBy);
+        id,
+        slug,
+        title,
+        description,
+        status,
+        ticketPriority,
+        createdAt,
+        TicketUpdateAt.createNow(),
+        workers,
+        reportedBy,
+        ownerPartner);
   }
 
   private Ticket withStatus(TicketStatus newStatus) {
-    return new Ticket(id, slug, title, description, newStatus, priority, time, workers, reportedBy);
+    return new Ticket(
+        id,
+        slug,
+        title,
+        description,
+        newStatus,
+        priority,
+        createdAt,
+        TicketUpdateAt.createNow(),
+        workers,
+        reportedBy,
+        ownerPartner);
   }
 }

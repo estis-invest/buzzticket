@@ -5,9 +5,12 @@ import com.efpcode.domain.common.exceptions.InvalidCommonPasswordException;
 public record PlainPassword(String plainPassword) {
 
   public PlainPassword {
-    if (plainPassword == null || plainPassword.isBlank()) {
-      throw new InvalidCommonPasswordException("Plain password cannot be null or blank");
+    if (plainPassword == null || plainPassword.trim().isBlank()) {
+      throw new InvalidCommonPasswordException(
+          "PlainPassword cannot pass null or blank as argument");
     }
+
+    plainPassword = plainPassword.trim();
   }
 
   @Override

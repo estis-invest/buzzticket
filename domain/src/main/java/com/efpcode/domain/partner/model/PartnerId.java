@@ -10,14 +10,19 @@ public record PartnerId(UUID partnerId) {
     if (partnerId == null) throw new InvalidPartnerIdException("Partner cannot be null");
   }
 
-  public static PartnerId generate() {
-    return new PartnerId(UUID.randomUUID());
+  public static PartnerId of(UUID value) {
+    return new PartnerId(value);
   }
 
   public static PartnerId fromString(String uuid) {
-    if (uuid == null || uuid.isBlank())
+    if (uuid == null || uuid.trim().isBlank())
       throw new IllegalPartnerIdArgumentException("fromString method cannot pass null or blank");
 
-    return new PartnerId(UUID.fromString(uuid));
+    try {
+      return new PartnerId(UUID.fromString(uuid.trim()));
+
+    } catch (IllegalArgumentException e) {
+      throw new IllegalPartnerIdArgumentException("Invalid or malformatted uuid");
+    }
   }
 }

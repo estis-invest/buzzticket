@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
@@ -21,13 +22,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 class UserTest {
 
   // Easy setup things
-  private static final UserId ANY_ID = UserId.generate();
+  private static final UserId ANY_ID = TestUUIDIds.userId();
   private static final UserName ANY_NAME = new UserName("John Doe");
   private static final UserEmail ANY_EMAIL = new UserEmail("test@example.com");
   private static final UserPassword ANY_PASS = new UserPassword("secure123");
   private static final UserCreatedAt ANY_TIME = UserCreatedAt.createNow();
   private static final UserUpdateAt ANY_UPDATE = UserUpdateAt.createNow();
-  private static final PartnerId ANY_PARTNER = PartnerId.generate();
+  private static final PartnerId ANY_PARTNER = TestUUIDIds.partnerId();
 
   private static Stream<Arguments> provideInvalidConstructorArgs() {
     var id = ANY_ID;
@@ -481,7 +482,7 @@ class UserTest {
 
     var user2 =
         new User(
-            ANY_ID,
+            TestUUIDIds.userId(),
             ANY_NAME,
             ANY_EMAIL,
             ANY_PASS,
@@ -500,14 +501,18 @@ class UserTest {
       names = {"SUPPORT", "ADMIN"})
   @DisplayName("Admin can create Support and Admin staff member that inherits the same PartnerId ")
   void adminCanCreateSupportStaffMemberThatInheritsTheSamePartnerId(UserRole userRole) {
-    PartnerId adminPartnerId = PartnerId.generate();
+    PartnerId adminPartnerId = TestUUIDIds.partnerId();
+    UserId userId = TestUUIDIds.userId();
     User adminUser =
-        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+        UserFactory.createAdminUserWithPartner(
+            userId, ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
 
+    UserId staffId = TestUUIDIds.userId();
     UserName staffName = new UserName("Support Staff");
     UserEmail staffEmail = new UserEmail("staff@partner.com");
 
-    User staffMember = adminUser.createStaffMember(staffName, staffEmail, ANY_PASS, userRole);
+    User staffMember =
+        adminUser.createStaffMember(staffId, staffName, staffEmail, ANY_PASS, userRole);
     assertThat(staffMember.partnerId()).contains(adminPartnerId);
     assertThat(staffMember.role()).isEqualTo(userRole);
     assertThat(staffMember.status()).isEqualTo(UserAccountStatus.ACTIVATED);
@@ -517,14 +522,18 @@ class UserTest {
   @Test
   @DisplayName("Admin cannot create Customer user throws error")
   void adminCannotCreateCustomerUserThrowsError() {
-    PartnerId adminPartnerId = PartnerId.generate();
+    PartnerId adminPartnerId = TestUUIDIds.partnerId();
     User adminUser =
-        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+        UserFactory.createAdminUserWithPartner(
+            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+    UserId staffId = TestUUIDIds.userId();
     UserName userName = new UserName("Customer");
     UserEmail userEmail = new UserEmail("user@domain.com");
 
     assertThatThrownBy(
-            () -> adminUser.createStaffMember(userName, userEmail, ANY_PASS, UserRole.CUSTOMER))
+            () ->
+                adminUser.createStaffMember(
+                    staffId, userName, userEmail, ANY_PASS, UserRole.CUSTOMER))
         .isInstanceOf(IllegalUserRolePrivilegeException.class)
         .hasMessageContaining(
             "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
@@ -533,14 +542,17 @@ class UserTest {
   @Test
   @DisplayName("Admin cannot create Null role user throws Null Point Exception error")
   void adminCannotCreateNullRoleUserThrowsNullPointExceptionError() {
-    PartnerId adminPartnerId = PartnerId.generate();
+    PartnerId adminPartnerId = TestUUIDIds.partnerId();
     User adminUser =
-        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
+        UserFactory.createAdminUserWithPartner(
+            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
 
+    UserId staffId = TestUUIDIds.userId();
     UserName userName = new UserName("Customer");
     UserEmail userEmail = new UserEmail("user@domain.com");
 
-    assertThatThrownBy(() -> adminUser.createStaffMember(userName, userEmail, ANY_PASS, null))
+    assertThatThrownBy(
+            () -> adminUser.createStaffMember(staffId, userName, userEmail, ANY_PASS, null))
         .isInstanceOf(NullPointerException.class)
         .hasMessageContaining("User role cannot be null");
   }
@@ -551,15 +563,19 @@ class UserTest {
       names = {"SUPPORT", "ADMIN"})
   @DisplayName("Support user cannot use createStaffMember throws error")
   void supportUserCannotUseCreateStaffMemberThrowsError(UserRole userRole) {
-    PartnerId supportPartnerId = PartnerId.generate();
+    PartnerId supportPartnerId = TestUUIDIds.partnerId();
 
     User supportUser =
-        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, supportPartnerId);
+        UserFactory.createSupportUserWithPartner(
+            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, supportPartnerId);
+    var supportId = TestUUIDIds.userId();
     var supportName = new UserName("Support Staff");
     var supportEmail = new UserEmail("support@domain.com");
 
     assertThatThrownBy(
-            () -> supportUser.createStaffMember(supportName, supportEmail, ANY_PASS, userRole))
+            () ->
+                supportUser.createStaffMember(
+                    supportId, supportName, supportEmail, ANY_PASS, userRole))
         .isInstanceOf(IllegalUserRolePrivilegeException.class)
         .hasMessageContaining(
             "Action requires ADMIN role, but current role is " + supportUser.role());
@@ -569,11 +585,13 @@ class UserTest {
   @DisplayName("Deactivated Admin cannot create staff member")
   void deactivatedAdminCannotCreateStaffMember() {
     User admin =
-        UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
+        UserFactory.createAdminUserWithPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
             .deactivate();
 
+    var staffId = TestUUIDIds.userId();
+
     assertThatThrownBy(
-            () -> admin.createStaffMember(ANY_NAME, ANY_EMAIL, ANY_PASS, UserRole.SUPPORT))
+            () -> admin.createStaffMember(staffId, ANY_NAME, ANY_EMAIL, ANY_PASS, UserRole.SUPPORT))
         .isInstanceOf(UserStatusChangeException.class)
         .hasMessageContaining("User must have activated status");
   }
@@ -582,7 +600,8 @@ class UserTest {
   @DisplayName("Promotion should preserve all user data except role")
   void promotionPreservesUserData() {
     User user =
-        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+        UserFactory.createSupportUserWithPartner(
+            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
 
     User promoted = user.promoteToAdmin();
 
@@ -598,7 +617,8 @@ class UserTest {
   @Test
   @DisplayName("Demotion should preserve all user data except role")
   void demotionShouldPreserveAllUserDataExceptRole() {
-    User user = UserFactory.createAdminUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
+    User user =
+        UserFactory.createAdminUserWithPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER);
     User demoted = user.demoteToSupport();
 
     assertThat(demoted.id()).isEqualTo(user.id());
@@ -615,7 +635,7 @@ class UserTest {
   @DisplayName("Deactivated Support user cannot assign tickets")
   void deactivatedSupportCannotAssignTickets() {
     User support =
-        UserFactory.createSupportUserWithPartner(ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
+        UserFactory.createSupportUserWithPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
             .deactivate();
     assertThat(support.canAssignTickets()).isFalse();
   }

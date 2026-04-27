@@ -3,6 +3,7 @@ package com.efpcode.domain.ticket.model;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.efpcode.domain.testsupport.TestUUIDIds;
 import com.efpcode.domain.ticket.exceptions.MissingUserAssignmentException;
 import com.efpcode.domain.ticket.exceptions.TicketAssigmentLimitException;
 import com.efpcode.domain.user.model.UserId;
@@ -14,10 +15,10 @@ class TicketAssigneesTest {
   @Test
   @DisplayName("TicketAssignees throws error if more size is greater than three")
   void ticketAssigneesThrowsErrorIfMoreSizeIsGreaterThanThree() {
-    var worker1 = UserId.generate();
-    var worker2 = UserId.generate();
-    var worker3 = UserId.generate();
-    var worker4 = UserId.generate();
+    var worker1 = TestUUIDIds.userId();
+    var worker2 = TestUUIDIds.userId();
+    var worker3 = TestUUIDIds.userId();
+    var worker4 = TestUUIDIds.userId();
 
     Set<UserId> overLimit = Set.of(worker1, worker2, worker3, worker4);
     Set<UserId> underLimit = Set.of(worker1, worker2, worker3);
@@ -44,8 +45,8 @@ class TicketAssigneesTest {
   @Test
   @DisplayName("TicketAssignees has add method that returns a new object")
   void ticketAssigneesHasAddMethodThatReturnsANewObject() {
-    var ticketWorkers = new TicketAssignees(Set.of(UserId.generate()));
-    var newWorker = UserId.generate();
+    var ticketWorkers = new TicketAssignees(Set.of(TestUUIDIds.userId()));
+    var newWorker = TestUUIDIds.userId();
 
     var result = ticketWorkers.add(newWorker);
     assertThat(result).isNotNull();
@@ -58,7 +59,7 @@ class TicketAssigneesTest {
   @DisplayName("TicketAssignees cannot assignee the same user with add")
   void ticketAssigneesCannotAssigneeTheSameUserWithAdd() {
 
-    var newWorker = UserId.generate();
+    var newWorker = TestUUIDIds.userId();
     var ticketWorker = new TicketAssignees(Set.of(newWorker));
 
     var tempWorker = ticketWorker.add(newWorker);
@@ -72,8 +73,8 @@ class TicketAssigneesTest {
   @Test
   @DisplayName("TicketAssignees has remove method that returns new object")
   void ticketAssigneesHasRemoveMethodThatReturnsNewObject() {
-    var worker1 = UserId.generate();
-    var worker2 = UserId.generate();
+    var worker1 = TestUUIDIds.userId();
+    var worker2 = TestUUIDIds.userId();
 
     var ticketWorkers = new TicketAssignees(Set.of(worker1, worker2));
 
@@ -88,8 +89,8 @@ class TicketAssigneesTest {
   @DisplayName("TicketAssignees cannot remove user that is not present returns valid object")
   void ticketAssigneesCannotRemoveUserThatIsNotPresentReturnsValidObject() {
 
-    var worker1 = UserId.generate();
-    var worker2 = UserId.generate();
+    var worker1 = TestUUIDIds.userId();
+    var worker2 = TestUUIDIds.userId();
 
     var ticketWorkers = new TicketAssignees(Set.of(worker1));
     var result = ticketWorkers.remove(worker2);
@@ -103,7 +104,7 @@ class TicketAssigneesTest {
   @DisplayName("TicketAssignees add method cannot pass null throws error")
   void ticketAssigneesAddMethodCannotPassNullThrowsError() {
 
-    var worker1 = UserId.generate();
+    var worker1 = TestUUIDIds.userId();
 
     var ticketWorkers = new TicketAssignees(Set.of(worker1));
     assertThatThrownBy(() -> ticketWorkers.add(null))
@@ -115,7 +116,7 @@ class TicketAssigneesTest {
   @DisplayName("TicketAssignees remove method cannot pass null throws error")
   void ticketAssigneesRemoveMethodCannotPassNullThrowsError() {
 
-    var worker1 = UserId.generate();
+    var worker1 = TestUUIDIds.userId();
 
     var ticketWorkers = new TicketAssignees(Set.of(worker1));
     assertThatThrownBy(() -> ticketWorkers.remove(null))

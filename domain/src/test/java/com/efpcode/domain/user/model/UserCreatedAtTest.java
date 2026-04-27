@@ -33,8 +33,8 @@ class UserCreatedAtTest {
 
   @Test
   @DisplayName(
-      "UserCreatedAt cannot create users in the future if time exceed margin of error throws error")
-  void userCreatedAtCannotCreateUsersInTheFutureIfTimeExceedMarginOfErrorThrowsError() {
+      "UserCreatedAt cannot create users in the future if createdAt exceeds margin of error throws error")
+  void userCreatedAtCannotCreateUsersInTheFutureIfCreatedAtExceedsMarginOfErrorThrowsError() {
     var futureTime = Instant.now().plusSeconds(90);
 
     assertThatThrownBy(() -> new UserCreatedAt(futureTime))

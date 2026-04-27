@@ -11,8 +11,8 @@ import org.junit.jupiter.api.Test;
 
 class TicketCreatedAtTest {
   @Test
-  @DisplayName("TicketCreateAt cannot pass null value or zero time")
-  void ticketCreateAtCannotPassNullValueOrZeroTime() {
+  @DisplayName("TicketCreateAt cannot pass null value or zero createdAt")
+  void ticketCreateAtCannotPassNullValueOrZeroCreatedAt() {
 
     assertThatThrownBy(() -> new TicketCreatedAt(null))
         .isInstanceOf(InvalidCreatedAtException.class)
