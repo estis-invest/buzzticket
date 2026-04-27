@@ -29,8 +29,8 @@ class PartnerCreatedAtTest {
 
   @Test
   @DisplayName(
-      "PartnerCreatedAt cannot create Partner in the future if createdAt exceed margin of error throws error")
-  void partnerCreatedAtCannotCreatePartnerInTheFutureIfTimeExceedMarginOfErrorThrowsError() {
+      "PartnerCreatedAt cannot create Partner in the future if createdAt exceeds margin of error throws error")
+  void partnerCreatedAtCannotCreatePartnerInTheFutureIfCreatedAtExceedsMarginOfErrorThrowsError() {
     var futureTime = Instant.now().plusSeconds(90);
     assertThatThrownBy(() -> new PartnerCreatedAt(futureTime))
         .isInstanceOf(PartnerCreatedAtDateException.class)

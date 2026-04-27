@@ -20,6 +20,11 @@ public record TicketId(UUID value) {
     if (uuid == null || uuid.trim().isBlank()) {
       throw new IllegalTicketIdArgumentException("fromString method cannot pass null or blank");
     }
-    return new TicketId(UUID.fromString(uuid));
+    try {
+      return new TicketId(UUID.fromString(uuid.trim()));
+
+    } catch (IllegalArgumentException e) {
+      throw new InvalidTicketIdException("Invalid or malformatted uuid");
+    }
   }
 }

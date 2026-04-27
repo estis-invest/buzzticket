@@ -24,8 +24,8 @@ class PartnerIdTest {
   }
 
   @Test
-  @DisplayName("PartnerId method generate returns a valid object")
-  void partnerIdMethodGenerateReturnsAValidObject() {
+  @DisplayName("PartnerId method of returns a valid object")
+  void partnerIdMethodOfReturnsAValidObject() {
     var expected = TestUUIDIds.partnerId();
 
     var result = PartnerId.of(expected.partnerId());
@@ -39,7 +39,7 @@ class PartnerIdTest {
     var expected = TestUUIDIds.partnerId(uuidString);
     PartnerId result = PartnerId.fromString(uuidString);
     assertThat(result).isNotNull().isInstanceOf(PartnerId.class);
-    assertThat(result.partnerId().toString()).hasToString(expected.partnerId().toString());
+    assertThat(result.partnerId()).isEqualTo(expected.partnerId());
   }
 
   private static Stream<Arguments> provideBlankAndNull() {

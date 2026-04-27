@@ -8,7 +8,6 @@ import com.efpcode.domain.ticket.exceptions.*;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -30,7 +29,7 @@ class TicketTest {
   private static final TicketAssignees anyWorker =
       new TicketAssignees(Set.of(TestUUIDIds.userId()));
   private static final UserId anyCustomer = TestUUIDIds.userId();
-  private static final Optional<PartnerId> anyPartnerId = Optional.of(TestUUIDIds.partnerId());
+  private static final PartnerId anyPartnerId = TestUUIDIds.partnerId();
 
   private static Stream<Arguments> providesInvalidConstructorArgs() {
 
@@ -194,7 +193,7 @@ class TicketTest {
 
   @ParameterizedTest
   @MethodSource("providesInvalidConstructorArgs")
-  @DisplayName("TicketConstructor throws NullPointException if any field is null")
+  @DisplayName("TicketConstructor throws NullPointerException if any field is null")
   void ticketConstructorThrowsNullPointExceptionIfAnyFieldIsNull(
       TicketId id,
       TicketSlug slug,
@@ -206,7 +205,7 @@ class TicketTest {
       TicketUpdateAt updatedAt,
       TicketAssignees worker,
       UserId customer,
-      Optional<PartnerId> owner,
+      PartnerId owner,
       String expectedMessage) {
 
     assertThatThrownBy(
@@ -225,30 +224,6 @@ class TicketTest {
                     owner))
         .isInstanceOf(NullPointerException.class)
         .hasMessageContaining(expectedMessage);
-  }
-
-  @Test
-  @DisplayName("Ticket throws error if PartnerId is empty")
-  void ticketThrowsErrorIfPartnerIdIsEmpty() {
-
-    Optional<PartnerId> partnerId = Optional.empty();
-
-    assertThatThrownBy(
-            () ->
-                new Ticket(
-                    anyId,
-                    anySlug,
-                    anyTitle,
-                    anyDescription,
-                    TicketStatus.PENDING,
-                    TicketPriority.LOW,
-                    anyTime,
-                    anyUpdateTime,
-                    anyWorker,
-                    anyCustomer,
-                    partnerId))
-        .isInstanceOf(InvalidTicketException.class)
-        .hasMessageContaining("Ticket must have an owner partner");
   }
 
   @Test

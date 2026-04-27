@@ -3,11 +3,9 @@ package com.efpcode.domain.ticket.model;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
-import com.efpcode.domain.ticket.exceptions.InvalidTicketException;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.util.Objects;
-import java.util.Optional;
 
 public record Ticket(
     TicketId id,
@@ -20,7 +18,7 @@ public record Ticket(
     TicketUpdateAt updatedAt,
     TicketAssignees workers,
     UserId reportedBy,
-    Optional<PartnerId> ownerPartner) {
+    PartnerId ownerPartner) {
 
   public Ticket {
     Objects.requireNonNull(id, "TicketId cannot be null");
@@ -34,10 +32,6 @@ public record Ticket(
     Objects.requireNonNull(workers, "TicketAssignees cannot be null");
     Objects.requireNonNull(reportedBy, "UserId cannot be null");
     Objects.requireNonNull(ownerPartner, "PartnerId cannot be null");
-
-    if (ownerPartner.isEmpty()) {
-      throw new InvalidTicketException("Ticket must have an owner partner");
-    }
   }
 
   public Ticket open() {
@@ -73,7 +67,7 @@ public record Ticket(
         TicketUpdateAt.createNow(),
         TicketAssignees.empty(),
         reportedBy,
-        Optional.of(ownerPartner));
+        ownerPartner);
   }
 
   public Ticket assign(UserId staffId, UserRole actorRole) {

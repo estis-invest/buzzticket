@@ -9,6 +9,8 @@ public record PlainPassword(String plainPassword) {
       throw new InvalidCommonPasswordException(
           "PlainPassword cannot pass null or blank as argument");
     }
+
+    plainPassword = plainPassword.trim();
   }
 
   @Override

@@ -43,7 +43,7 @@ class TicketIdTest {
     TicketId result = TicketId.fromString(stringUUID);
 
     assertThat(result).isNotNull().isInstanceOf(TicketId.class);
-    assertThat(result.value().toString()).hasToString(stringUUID);
+    assertThat(result.value()).hasToString(stringUUID);
     assertThat(result).isEqualTo(expected);
   }
 

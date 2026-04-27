@@ -67,8 +67,8 @@ class TicketUpdateAtTest {
   }
 
   @Test
-  @DisplayName("TicketUpdateAt objects created from createNow are unique")
-  void ticketUpdateAtObjectCreatedFromCreateNowAreUnique() {
+  @DisplayName("TicketUpdateAt objects created from createNow are new instances each time")
+  void ticketUpdateAtObjectCreatedFromCreateNowAreNewInstanceEachTime() {
     var time1 = TicketUpdateAt.createNow();
     var time2 = TicketUpdateAt.createNow();
     assertThat(time1).isNotSameAs(time2);

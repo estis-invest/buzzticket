@@ -482,7 +482,7 @@ class UserTest {
 
     var user2 =
         new User(
-            ANY_ID,
+            TestUUIDIds.userId(),
             ANY_NAME,
             ANY_EMAIL,
             ANY_PASS,

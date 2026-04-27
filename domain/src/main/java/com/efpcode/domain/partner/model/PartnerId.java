@@ -18,6 +18,11 @@ public record PartnerId(UUID partnerId) {
     if (uuid == null || uuid.trim().isBlank())
       throw new IllegalPartnerIdArgumentException("fromString method cannot pass null or blank");
 
-    return new PartnerId(UUID.fromString(uuid));
+    try {
+      return new PartnerId(UUID.fromString(uuid.trim()));
+
+    } catch (IllegalArgumentException e) {
+      throw new IllegalPartnerIdArgumentException("Invalid or malformatted uuid");
+    }
   }
 }

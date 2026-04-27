@@ -24,7 +24,7 @@ class UserIdTest {
 
   @Test
   @DisplayName("UserId method of returns a valid UserId object")
-  void userIdMethodCreateRandomReturnsAValidUserIdObject() {
+  void userIdMethodOfReturnsAValidUserIdObject() {
     var result = TestUUIDIds.userId();
     assertThat(result).isInstanceOf(UserId.class).isNotNull();
   }

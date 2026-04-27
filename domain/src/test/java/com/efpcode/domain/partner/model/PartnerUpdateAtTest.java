@@ -18,8 +18,8 @@ class PartnerUpdateAtTest {
   }
 
   @Test
-  @DisplayName("PartnerUpdateAt cannot pass zero createdAt as argument")
-  void partnerUpdateAtCannotPassZeroTimeAsArgument() {
+  @DisplayName("PartnerUpdateAt cannot pass zero updatedAt as argument")
+  void partnerUpdateAtCannotPassZeroUpdatedAtAsArgument() {
     var timeZero = Instant.ofEpochMilli(0);
     assertThatThrownBy(() -> new PartnerUpdateAt(timeZero))
         .isInstanceOf(InvalidPartnerUpdateAtException.class)
@@ -45,8 +45,8 @@ class PartnerUpdateAtTest {
   }
 
   @Test
-  @DisplayName("PartnerUpdateAt created with current createdAt returns a valid object")
-  void partnerUpdateAtWithInstantNewMethodReturnsAValidObject() {
+  @DisplayName("PartnerUpdateAt created with current updatedAt returns a valid object")
+  void partnerUpdateAtCreatedWithCurrentUpdatedAtReturnsAValidObject() {
     var now = Instant.now();
     var result = new PartnerUpdateAt(now);
     assertThat(result).isNotNull().isInstanceOf(PartnerUpdateAt.class);

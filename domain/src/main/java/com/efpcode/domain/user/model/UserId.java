@@ -20,6 +20,12 @@ public record UserId(UUID id) {
     if (uuid == null || uuid.trim().isBlank()) {
       throw new IllegalUserIdArgumentException("fromString method cannot pass null or blank");
     }
-    return new UserId(UUID.fromString(uuid));
+
+    try {
+      return new UserId(UUID.fromString(uuid.trim()));
+
+    } catch (IllegalArgumentException e) {
+      throw new IllegalUserIdArgumentException("Invalid or malformatted uuid");
+    }
   }
 }
