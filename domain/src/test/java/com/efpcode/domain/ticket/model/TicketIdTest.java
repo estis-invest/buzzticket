@@ -57,4 +57,14 @@ class TicketIdTest {
         .isInstanceOf(IllegalTicketIdArgumentException.class)
         .hasMessageContaining("fromString method cannot pass null or blank");
   }
+
+  @Test
+  @DisplayName("Malformatted UUID will throws error")
+  void malformattedUuidWillThrowsError() {
+    var malFormattedUUID = "100-not-valid";
+
+    assertThatThrownBy(() -> TicketId.fromString(malFormattedUUID))
+        .isInstanceOf(InvalidTicketIdException.class)
+        .hasMessageContaining("Invalid or malformatted uuid");
+  }
 }

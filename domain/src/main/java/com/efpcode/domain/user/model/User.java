@@ -1,6 +1,7 @@
 package com.efpcode.domain.user.model;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.user.exceptions.IllegalUserArgumentException;
 import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
 import com.efpcode.domain.user.exceptions.UserStatusChangeException;
 import java.util.Objects;
@@ -122,5 +123,58 @@ public record User(
       throw new UserStatusChangeException(
           String.format("User must have activated status current: %s", this.status()));
     }
+  }
+
+  public User changeName(UserName userName) {
+    if (userName == null) {
+      throw new IllegalUserArgumentException("UserName cannot be null");
+    }
+    ensureActiveUser();
+
+    return new User(
+        id,
+        userName,
+        email,
+        password,
+        role,
+        status,
+        userCreatedAt,
+        UserUpdateAt.createNow(),
+        partnerId);
+  }
+
+  public User changePassword(UserPassword newPassword) {
+    if (newPassword == null) {
+      throw new IllegalUserArgumentException("UserPassword cannot be null");
+    }
+    ensureActiveUser();
+    return new User(
+        id,
+        name,
+        email,
+        newPassword,
+        role,
+        status,
+        userCreatedAt,
+        UserUpdateAt.createNow(),
+        partnerId);
+  }
+
+  public User changeEmail(UserEmail newEmail) {
+    if (newEmail == null) {
+      throw new IllegalUserArgumentException("UserEmail cannot be null");
+    }
+    ensureActiveUser();
+
+    return new User(
+        id,
+        name,
+        newEmail,
+        password,
+        role,
+        status,
+        userCreatedAt,
+        UserUpdateAt.createNow(),
+        partnerId);
   }
 }

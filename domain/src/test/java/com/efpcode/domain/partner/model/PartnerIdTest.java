@@ -56,4 +56,13 @@ class PartnerIdTest {
         .isInstanceOf(IllegalPartnerIdArgumentException.class)
         .hasMessageContaining("fromString method cannot pass null or blank");
   }
+
+  @Test
+  @DisplayName("malformatted uuid will throw error")
+  void malformattedUuidWillThrowError() {
+    var malFormattedUuID = "not-a-valid-uuid";
+    assertThatThrownBy(() -> PartnerId.fromString(malFormattedUuID))
+        .isInstanceOf(IllegalPartnerIdArgumentException.class)
+        .hasMessageContaining("Invalid or malformatted uuid");
+  }
 }

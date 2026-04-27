@@ -52,4 +52,13 @@ class UserIdTest {
         .isInstanceOf(IllegalUserIdArgumentException.class)
         .hasMessageContaining("fromString method cannot pass null or blank");
   }
+
+  @Test
+  @DisplayName("malformatted UUID throws error")
+  void malformattedUuidThrowsError() {
+    var malformattedUuId = "not-valid-uuid";
+    assertThatThrownBy(() -> UserId.fromString(malformattedUuId))
+        .isInstanceOf(IllegalUserIdArgumentException.class)
+        .hasMessageContaining("Invalid or malformatted uuid");
+  }
 }
