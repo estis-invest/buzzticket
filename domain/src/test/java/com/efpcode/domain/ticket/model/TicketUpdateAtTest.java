@@ -19,8 +19,8 @@ class TicketUpdateAtTest {
   }
 
   @Test
-  @DisplayName("TicketUpdateAt cannot pass zero createdAt as argument")
-  void ticketUpdateAtCannotPassZeroTimeAsArgument() {
+  @DisplayName("TicketUpdateAt cannot pass zero updatedAt as argument")
+  void ticketUpdateAtCannotPassZeroUpdatedAtAsArgument() {
     var timeZero = Instant.ofEpochMilli(0);
     assertThatThrownBy(() -> new TicketUpdateAt(timeZero))
         .isInstanceOf(InvalidTicketUpdateAtException.class)
@@ -46,7 +46,7 @@ class TicketUpdateAtTest {
   }
 
   @Test
-  @DisplayName("TicketUpdateAt created with current createdAt returns a valid object")
+  @DisplayName("TicketUpdateAt created with current updatedAt returns a valid object")
   void ticketUpdateAtWithInstantNowReturnsAValidObject() {
     var now = Instant.now();
     var result = new TicketUpdateAt(now);
