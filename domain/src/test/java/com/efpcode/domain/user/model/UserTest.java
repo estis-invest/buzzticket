@@ -5,10 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.testsupport.TestUUIDIds;
-import com.efpcode.domain.user.exceptions.IllegalRoleTransitionException;
-import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
-import com.efpcode.domain.user.exceptions.InvalidUserRolePartnerMissingException;
-import com.efpcode.domain.user.exceptions.UserStatusChangeException;
+import com.efpcode.domain.user.exceptions.*;
 import java.time.Instant;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -638,5 +635,198 @@ class UserTest {
         UserFactory.createSupportUserWithPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
             .deactivate();
     assertThat(support.canAssignTickets()).isFalse();
+  }
+
+  @Test
+  @DisplayName("changeName method update User name field")
+  void changeNameMethodUpdateUserNameField() {
+    var expected = "Jane Doe";
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+    var userUpdateName = user.changeName(new UserName(expected));
+
+    assertThat(userUpdateName.name().name()).isEqualTo(expected);
+    assertThat(userUpdateName.name()).isNotEqualTo(user.name());
+    assertThat(userUpdateName).isNotSameAs(user);
+  }
+
+  @Test
+  @DisplayName("changeName cannot be called if user is not activated")
+  void changeNameCannotBeCalledIfUserIsNotActivated() {
+    var expected = new UserName("Jane Doe");
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+    assertThatThrownBy(() -> user.changeName(expected))
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining(
+            "User must have activated status current: " + UserAccountStatus.DEACTIVATED.name());
+  }
+
+  @Test
+  @DisplayName("changeName cannot pass null as argument")
+  void changeNameCannotPassNullAsArgument() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(() -> user.changeName(null))
+        .isInstanceOf(IllegalUserArgumentException.class)
+        .hasMessageContaining("UserName cannot be null");
+  }
+
+  @Test
+  @DisplayName("changePassword updates current password and returns new instance")
+  void changePasswordUpdatesCurrentPasswordAndReturnsNewInstance() {
+    var expected = "SECRET101";
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+
+    var userWithNewPassword = user.changePassword(new UserPassword(expected));
+
+    assertThat(userWithNewPassword).isNotSameAs(user);
+    assertThat(userWithNewPassword.password().hashedPassword())
+        .isNotEqualTo(user.password().hashedPassword());
+    assertThat(userWithNewPassword.password().hashedPassword()).isEqualTo(expected);
+  }
+
+  @Test
+  @DisplayName("changePassword throws error if user status is not activated")
+  void changePasswordThrowsErrorIfUserStatusIsNotActivated() {
+
+    var expected = new UserPassword("SECRET101");
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(() -> user.changePassword(expected))
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining(
+            "User must have activated status current: " + UserAccountStatus.DEACTIVATED.name());
+  }
+
+  @Test
+  @DisplayName("changePassword throws error if argument passed is null")
+  void changePasswordThrowsErrorIfArgumentPassedIsNull() {
+
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+    assertThatThrownBy(() -> user.changePassword(null))
+        .isInstanceOf(IllegalUserArgumentException.class)
+        .hasMessageContaining("UserPassword cannot be null");
+  }
+
+  @Test
+  @DisplayName("changeEmail updates email and returns new instance object")
+  void changeEmailUpdatesEmailAndReturnsNewInstanceObject() {
+    var expected = "test@domain.io";
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+
+    var userUpdateEmail = user.changeEmail(new UserEmail(expected));
+
+    assertThat(user).isNotSameAs(userUpdateEmail);
+    assertThat(userUpdateEmail.email().email()).isEqualTo(expected);
+  }
+
+  @Test
+  @DisplayName("changeEmail throws error if user is not activated")
+  void changeEmailThrowsErrorIfUserIsNotActivated() {
+    var expected = new UserEmail("test@domain.io");
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.DEACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+
+    assertThatThrownBy(() -> user.changeEmail(expected))
+        .isInstanceOf(UserStatusChangeException.class)
+        .hasMessageContaining(
+            "User must have activated status current: " + UserAccountStatus.DEACTIVATED.name());
+  }
+
+  @Test
+  @DisplayName("changeEmail cannot pass null throws exception")
+  void changeEmailCannotPassNullThrowsException() {
+    var user =
+        new User(
+            ANY_ID,
+            ANY_NAME,
+            ANY_EMAIL,
+            ANY_PASS,
+            UserRole.CUSTOMER,
+            UserAccountStatus.ACTIVATED,
+            ANY_TIME,
+            ANY_UPDATE,
+            Optional.of(ANY_PARTNER));
+    assertThatThrownBy(() -> user.changeEmail(null))
+        .isInstanceOf(IllegalUserArgumentException.class)
+        .hasMessageContaining("UserEmail cannot be null");
   }
 }
