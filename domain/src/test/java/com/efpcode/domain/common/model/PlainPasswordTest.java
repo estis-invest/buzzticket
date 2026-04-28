@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class PlainPasswordTest {
 
-  private static final String ANY_PASSWORD = "SECRET123456";
+  private static final String ANY_PASSWORD = "!SECRET123456";
 
   @ParameterizedTest
   @NullAndEmptySource
@@ -41,5 +41,47 @@ class PlainPasswordTest {
     String result = password.toString();
 
     assertThat(result).isEqualTo("PlainPassword{plainPassword='****************'}");
+  }
+
+  @Test
+  @DisplayName("PlainPassword has minium length and throws error if length is shorter")
+  void plainPasswordHasMiniumLengthAndThrowsErrorIfLengthIsShorter() {
+
+    var tooShortPassword = "!abF567";
+
+    assertThatThrownBy(() -> new PlainPassword(tooShortPassword))
+        .isInstanceOf(InvalidCommonPasswordException.class)
+        .hasMessageContaining("Password needs to be equal or longer than: 8 characters");
+  }
+
+  @Test
+  @DisplayName("PlainPassword requires at lease one uppercase character")
+  void plainPasswordRequiresAtLeaseOneUppercaseCharacter() {
+    var noUppercasePassword = "123secret!";
+
+    assertThatThrownBy(() -> new PlainPassword(noUppercasePassword))
+        .isInstanceOf(InvalidCommonPasswordException.class)
+        .hasMessageContaining("Password must contain at least one uppercase letter");
+  }
+
+  @Test
+  @DisplayName("PlainPassword requires at least one digit")
+  void plainPasswordRequiresAtLeastOneDigit() {
+
+    var noDigitPassword = "Secretabc";
+
+    assertThatThrownBy(() -> new PlainPassword(noDigitPassword))
+        .isInstanceOf(InvalidCommonPasswordException.class)
+        .hasMessageContaining("Password must contain at least one digit");
+  }
+
+  @Test
+  @DisplayName("PlainPassword requires at least on symbol")
+  void plainPasswordRequiresAtLeastOnSymbol() {
+    var noSymbolPassword = "Secret123";
+
+    assertThatThrownBy(() -> new PlainPassword(noSymbolPassword))
+        .isInstanceOf(InvalidCommonPasswordException.class)
+        .hasMessageContaining("Password must contain at least one symbol");
   }
 }
