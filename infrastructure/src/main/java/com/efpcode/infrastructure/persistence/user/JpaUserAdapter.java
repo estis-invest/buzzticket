@@ -2,10 +2,7 @@ package com.efpcode.infrastructure.persistence.user;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerStatus;
-import com.efpcode.domain.user.model.User;
-import com.efpcode.domain.user.model.UserCreatedAt;
-import com.efpcode.domain.user.model.UserEmail;
-import com.efpcode.domain.user.model.UserId;
+import com.efpcode.domain.user.model.*;
 import com.efpcode.domain.user.port.UserRepository;
 import com.efpcode.infrastructure.persistence.exceptions.MissingReferenceEntityException;
 import com.efpcode.infrastructure.persistence.partner.PartnerEntity;
@@ -90,6 +87,12 @@ public class JpaUserAdapter implements UserRepository {
   @Override
   public void deleteByUserId(UserId id) {
     userRepository.deleteById(id.id());
+  }
+
+  @Override
+  public boolean existsAdminForPartner(PartnerId partnerId) {
+    return userRepository.existsByPartnerPartnerIdAndUserRole(
+        partnerId.partnerId(), UserRole.ADMIN.name());
   }
 
   // Helper methods
