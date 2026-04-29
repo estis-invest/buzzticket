@@ -36,6 +36,11 @@ public class JpaPartnerAdapter implements PartnerRepository {
   }
 
   @Override
+  public boolean existsAny() {
+    return partnerRepository.existsBy();
+  }
+
+  @Override
   public Optional<Partner> findById(PartnerId id) {
     return partnerRepository
         .findByPartnerIdAndPartnerStatusNot(id.partnerId(), PartnerStatus.DELETED.name())

@@ -10,7 +10,7 @@ import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
 import com.efpcode.domain.partner.port.PartnerRepository;
-import com.efpcode.domain.user.exceptions.IllegalUserArgumentException;
+import com.efpcode.domain.user.exceptions.UserEmailArgumentDuplicationException;
 import com.efpcode.domain.user.model.*;
 import com.efpcode.domain.user.port.UserRepository;
 
@@ -47,7 +47,7 @@ public class RegisterBootstrapUseCase {
     }
 
     if (userRepository.existsByEmail(adminEmail)) {
-      throw new IllegalUserArgumentException("Email is not unique");
+      throw new UserEmailArgumentDuplicationException("Email is not unique");
     }
 
     PartnerId partnerId = idPartnerGenerator.generate();

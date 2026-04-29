@@ -697,7 +697,7 @@ class UserTest {
             Optional.of(ANY_PARTNER));
 
     assertThatThrownBy(() -> user.changeName(null))
-        .isInstanceOf(IllegalUserArgumentException.class)
+        .isInstanceOf(UserEmailArgumentDuplicationException.class)
         .hasMessageContaining("UserName cannot be null");
   }
 
@@ -766,7 +766,7 @@ class UserTest {
             ANY_UPDATE,
             Optional.of(ANY_PARTNER));
     assertThatThrownBy(() -> user.changePassword(null))
-        .isInstanceOf(IllegalUserArgumentException.class)
+        .isInstanceOf(UserEmailArgumentDuplicationException.class)
         .hasMessageContaining("UserPassword cannot be null");
   }
 
@@ -830,7 +830,7 @@ class UserTest {
             ANY_UPDATE,
             Optional.of(ANY_PARTNER));
     assertThatThrownBy(() -> user.changeEmail(null))
-        .isInstanceOf(IllegalUserArgumentException.class)
+        .isInstanceOf(UserEmailArgumentDuplicationException.class)
         .hasMessageContaining("UserEmail cannot be null");
   }
 }

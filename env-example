@@ -1,6 +1,10 @@
-# Copy this file to .env and fill in the appropriate values instead of the [] brackets
-DB_USERNAME=[postgres]
-DB_PASSWORD=[password]
-DB_HOST=[localhost]
-DB_PORT=[5432]
-DB_NAME=[postgres]
+# Copy this file to .env and fill in the appropriate values.
+DB_USERNAME=
+DB_PASSWORD=
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=buzzticket
+
+# Bootstrap JWT (deployment keys) values are copied after generating RSA Keys
+BUZZTICKET_BOOTSTRAP_PRIVATE_KEY=
+BUZZTICKET_BOOTSTRAP_PUBLIC_KEY=

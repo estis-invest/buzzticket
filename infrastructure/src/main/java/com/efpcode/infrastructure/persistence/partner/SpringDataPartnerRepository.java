@@ -17,4 +17,6 @@ public interface SpringDataPartnerRepository extends JpaRepository<PartnerEntity
   Optional<PartnerEntity> findByPartnerIdAndPartnerStatusNot(UUID partnerId, String partnerStatus);
 
   Optional<PartnerEntity> findByPartnerId(UUID partnerId);
+
+  boolean existsBy();
 }
