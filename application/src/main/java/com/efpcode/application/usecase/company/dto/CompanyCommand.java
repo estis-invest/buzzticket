@@ -1,6 +1,6 @@
-package com.efpcode.application.usecase.bootstrap.dto;
+package com.efpcode.application.usecase.company.dto;
 
-public record BootstrapCommand(
+public record CompanyCommand(
     String name,
     String city,
     String country,

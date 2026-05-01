@@ -3,7 +3,9 @@ package com.efpcode.infrastructure.web.advice;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
+import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
+import com.efpcode.domain.user.exceptions.UserDomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,15 +33,13 @@ public class GlobalExceptionHandler {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
 
-  //  @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
-  //  public ProblemDetail handleMessageNotReadable(
-  //      org.springframework.http.converter.HttpMessageNotReadableException ex) {
-  //    // We check if the ROOT cause is your Domain Exception
-  //    Throwable rootCause = ex.getRootCause();
-  //    if (rootCause instanceof PartnerDomainException) {
-  //      return ProblemDetail.forStatusAndDetail(
-  //          HttpStatus.UNPROCESSABLE_CONTENT, rootCause.getMessage());
-  //    }
-  //    return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
-  //  }
+  @ExceptionHandler(UserDomainException.class)
+  public ProblemDetail handleUserDomain(UserDomainException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
+  @ExceptionHandler(CommonDomainException.class)
+  public ProblemDetail handleCommonDomain(CommonDomainException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+  }
 }

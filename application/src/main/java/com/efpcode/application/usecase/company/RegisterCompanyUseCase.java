@@ -1,8 +1,8 @@
-package com.efpcode.application.usecase.bootstrap;
+package com.efpcode.application.usecase.company;
 
 import com.efpcode.application.port.security.PasswordHasher;
-import com.efpcode.application.usecase.bootstrap.dto.BootstrapCommand;
-import com.efpcode.application.usecase.bootstrap.dto.BootstrapResult;
+import com.efpcode.application.usecase.company.dto.CompanyCommand;
+import com.efpcode.application.usecase.company.dto.CompanyResult;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.domain.common.model.PlainPassword;
 import com.efpcode.domain.common.port.IdGenerator;
@@ -14,7 +14,7 @@ import com.efpcode.domain.user.exceptions.UserEmailArgumentDuplicationException;
 import com.efpcode.domain.user.model.*;
 import com.efpcode.domain.user.port.UserRepository;
 
-public class RegisterBootstrapUseCase {
+public class RegisterCompanyUseCase {
 
   private final IdGenerator<PartnerId> idPartnerGenerator;
   private final IdGenerator<UserId> idUserGenerator;
@@ -22,7 +22,7 @@ public class RegisterBootstrapUseCase {
   private final UserRepository userRepository;
   private final PasswordHasher passwordHasher;
 
-  public RegisterBootstrapUseCase(
+  public RegisterCompanyUseCase(
       IdGenerator<PartnerId> idPartnerGenerator,
       IdGenerator<UserId> idUserGenerator,
       PartnerRepository partnerRepository,
@@ -35,7 +35,7 @@ public class RegisterBootstrapUseCase {
     this.passwordHasher = passwordHasher;
   }
 
-  public BootstrapResult execute(BootstrapCommand command) {
+  public CompanyResult execute(CompanyCommand command) {
 
     PartnerName partnerName = new PartnerName(command.name());
     UserEmail adminEmail = new UserEmail(command.adminEmail());
@@ -74,7 +74,7 @@ public class RegisterBootstrapUseCase {
 
     partnerRepository.save(newPartner);
     userRepository.save(adminUser);
-    BootstrapResult result = new BootstrapResult(newPartner, adminUser);
+    CompanyResult result = new CompanyResult(newPartner, adminUser);
     return result;
   }
 }

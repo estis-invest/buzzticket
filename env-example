@@ -5,6 +5,3 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=buzzticket
 
-# Bootstrap JWT (deployment keys) values are copied after generating RSA Keys
-BUZZTICKET_BOOTSTRAP_PRIVATE_KEY=
-BUZZTICKET_BOOTSTRAP_PUBLIC_KEY=
