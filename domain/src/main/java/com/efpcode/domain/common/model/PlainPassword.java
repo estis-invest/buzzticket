@@ -29,7 +29,7 @@ public record PlainPassword(String plainPassword) {
     }
 
     if (!DIGIT.matcher(plainPassword).matches()) {
-      throw new InvalidCommonPasswordException("Password must contain at least one digits");
+      throw new InvalidCommonPasswordException("Password must contain at least one digit");
     }
 
     if (!SYMBOL.matcher(plainPassword).matches()) {

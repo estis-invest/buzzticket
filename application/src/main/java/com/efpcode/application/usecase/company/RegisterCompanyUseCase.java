@@ -74,7 +74,6 @@ public class RegisterCompanyUseCase {
 
     partnerRepository.save(newPartner);
     userRepository.save(adminUser);
-    CompanyResult result = new CompanyResult(newPartner, adminUser);
-    return result;
+    return new CompanyResult(newPartner, adminUser);
   }
 }

@@ -1,8 +1,8 @@
 package com.efpcode.infrastructure.web;
 
-import com.efpcode.application.usecase.company.RegisterCompanyUseCase;
 import com.efpcode.application.usecase.company.dto.CompanyCommand;
 import com.efpcode.application.usecase.company.dto.CompanyResult;
+import com.efpcode.infrastructure.adapters.CompanyRegistrationTransactionalAdapter;
 import com.efpcode.infrastructure.web.dto.CompanyResponse;
 import com.efpcode.infrastructure.web.dto.RegisterCompanyRequest;
 import jakarta.validation.Valid;
@@ -21,10 +21,10 @@ class CompanyRegistrationController {
 
   private static final Logger log = LoggerFactory.getLogger(CompanyRegistrationController.class);
 
-  private final RegisterCompanyUseCase registerCompanyUseCase;
+  private final CompanyRegistrationTransactionalAdapter registration;
 
-  CompanyRegistrationController(RegisterCompanyUseCase registerCompanyUseCase) {
-    this.registerCompanyUseCase = registerCompanyUseCase;
+  CompanyRegistrationController(CompanyRegistrationTransactionalAdapter registration) {
+    this.registration = registration;
   }
 
   @PostMapping
@@ -42,10 +42,11 @@ class CompanyRegistrationController {
             request.userPassword(),
             request.userEmail());
 
-    CompanyResult result = registerCompanyUseCase.execute(command);
+    CompanyResult result = registration.register(command);
     log.info(
-        "Rest: Company for new partner and new admin user {} successfully registered",
-        CompanyResponse.from(result));
+        "Rest: Company successfully registered. partnerId={}, adminUserId={}",
+        result.partner().id(),
+        result.user().id());
 
     return ResponseEntity.status(HttpStatus.CREATED).body(CompanyResponse.from(result));
   }

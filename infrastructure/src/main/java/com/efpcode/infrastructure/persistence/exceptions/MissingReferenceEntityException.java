@@ -4,6 +4,6 @@ public class MissingReferenceEntityException extends InfrastructureLayerExceptio
   public MissingReferenceEntityException(String entityName, Object identifier) {
     super(
         String.format(
-            "%application.yml not found for id: %application.yml", entityName, identifier));
+            "%s application.yml not found for id: %s application.yml", entityName, identifier));
   }
 }

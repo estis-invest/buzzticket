@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface SpringDataPartnerRepository extends JpaRepository<PartnerEntity, UUID> {
 
@@ -18,5 +19,6 @@ public interface SpringDataPartnerRepository extends JpaRepository<PartnerEntity
 
   Optional<PartnerEntity> findByPartnerId(UUID partnerId);
 
-  boolean existsBy();
+  @Query("select (count(p) > 0) from PartnerEntity p")
+  boolean existsAny();
 }

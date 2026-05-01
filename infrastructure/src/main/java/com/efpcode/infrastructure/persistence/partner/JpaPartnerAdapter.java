@@ -37,7 +37,7 @@ public class JpaPartnerAdapter implements PartnerRepository {
 
   @Override
   public boolean existsAny() {
-    return partnerRepository.existsBy();
+    return partnerRepository.existsAny();
   }
 
   @Override
