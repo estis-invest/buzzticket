@@ -14,6 +14,8 @@ public interface PartnerRepository {
 
   boolean existsByName(PartnerName name);
 
+  boolean existsAny();
+
   Optional<Partner> findById(PartnerId id);
 
   List<Partner> findAll();

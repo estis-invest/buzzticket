@@ -26,4 +26,6 @@ public interface UserRepository {
   void save(User user);
 
   void deleteByUserId(UserId id);
+
+  boolean existsAdminForPartner(PartnerId partnerId);
 }

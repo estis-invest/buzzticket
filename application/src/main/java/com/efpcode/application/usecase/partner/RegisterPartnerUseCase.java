@@ -29,7 +29,7 @@ public class RegisterPartnerUseCase {
 
     Partner newPartner =
         Partner.createDraftPartner(
-            id, command.name(), command.city(), command.country(), command.isoCode());
+            id, name.partnerName(), command.city(), command.country(), command.isoCode());
 
     partnerRepository.save(newPartner);
     return newPartner;

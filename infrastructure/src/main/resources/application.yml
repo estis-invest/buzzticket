@@ -1,0 +1,31 @@
+spring:
+  config:
+    import: optional:file:../.env[.properties]
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:buzzticket}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: ${JPA_SHOW_SQL:false}
+    naming:
+      physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    schemas: public
+    table: flyway_schema_history
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:false}
+
+logging:
+  level:
+    root: INFO
+    org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:TRACE}
+    org.hibernate.orm.jdbc.bind: ${HIBERNATE_BIND_LOG_LEVEL:OFF}
+    org.hibernate.orm.jdbc.extract: ${HIBERNATE_EXTRACT_LEVEL:OFF}
+

@@ -1,6 +1,16 @@
-# Copy this file to .env and fill in the appropriate values instead of the [] brackets
-DB_USERNAME=[postgres]
-DB_PASSWORD=[password]
-DB_HOST=[localhost]
-DB_PORT=[5432]
-DB_NAME=[postgres]
+# Copy this file to .env and fill in the appropriate values.
+DB_USERNAME=
+DB_PASSWORD=
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=buzzticket
+# --- JPA / Hibernate ---
+# Enable SQL logging locally if needed
+JPA_SHOW_SQL=false
+# Enable SQL logging locally if needed
+HIBERNATE_SQL_LOG_LEVEL=DEBUG
+HIBERNATE_BIND_LOG_LEVEL=TRACE
+HIBERNATE_EXTRACT_LEVEL=TRACE
+# --- Flyway ---
+# Enable baseline-on-migrate ONLY for one-time adoption of existing schemas
+FLYWAY_BASELINE_ON_MIGRATE=false
