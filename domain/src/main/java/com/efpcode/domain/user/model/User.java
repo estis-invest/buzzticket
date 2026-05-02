@@ -82,28 +82,6 @@ public record User(
     return this.status().isActive();
   }
 
-  // TODO: needs tobe moved to usecase.
-  public User createStaffMember(
-      UserId id, UserName name, UserEmail email, UserPassword password, UserRole staffRole) {
-    ensureActiveUser();
-    this.role.roleGuardIsAdmin();
-    Objects.requireNonNull(staffRole, "User role cannot be null");
-    staffRole.roleGuardIsStaff();
-    PartnerId partnerId =
-        this.partnerId.orElseThrow(
-            () -> new InvalidUserRolePartnerMissingException("User role must have a partnerId"));
-    return new User(
-        id,
-        name,
-        email,
-        password,
-        staffRole,
-        UserAccountStatus.ACTIVATED,
-        UserCreatedAt.createNow(),
-        UserUpdateAt.createNow(),
-        Optional.of(partnerId));
-  }
-
   private User withRole(UserRole newRole) {
     return new User(
         id,
