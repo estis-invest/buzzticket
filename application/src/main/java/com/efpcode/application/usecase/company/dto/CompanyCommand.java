@@ -27,10 +27,10 @@ public record CompanyCommand(
         + adminName
         + '\''
         + ", adminPassword='"
-        + "REACTED"
+        + "REDACTED"
         + '\''
         + ", adminEmail='"
-        + "REACTED"
+        + "REDACTED"
         + '\''
         + '}';
   }
