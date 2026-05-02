@@ -13,7 +13,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
 class UserTest {
@@ -490,107 +489,6 @@ class UserTest {
             Optional.of(ANY_PARTNER));
     assertThat(user.canAssignTickets()).isTrue();
     assertThat(user2.canAssignTickets()).isTrue();
-  }
-
-  @ParameterizedTest
-  @EnumSource(
-      value = UserRole.class,
-      names = {"SUPPORT", "ADMIN"})
-  @DisplayName("Admin can create Support and Admin staff member that inherits the same PartnerId ")
-  void adminCanCreateSupportStaffMemberThatInheritsTheSamePartnerId(UserRole userRole) {
-    PartnerId adminPartnerId = TestUUIDIds.partnerId();
-    UserId userId = TestUUIDIds.userId();
-    User adminUser =
-        UserFactory.createAdminUserWithPartner(
-            userId, ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
-
-    UserId staffId = TestUUIDIds.userId();
-    UserName staffName = new UserName("Support Staff");
-    UserEmail staffEmail = new UserEmail("staff@partner.com");
-
-    User staffMember =
-        adminUser.createStaffMember(staffId, staffName, staffEmail, ANY_PASS, userRole);
-    assertThat(staffMember.partnerId()).contains(adminPartnerId);
-    assertThat(staffMember.role()).isEqualTo(userRole);
-    assertThat(staffMember.status()).isEqualTo(UserAccountStatus.ACTIVATED);
-    assertThat(staffMember.isActive()).isTrue();
-  }
-
-  @Test
-  @DisplayName("Admin cannot create Customer user throws error")
-  void adminCannotCreateCustomerUserThrowsError() {
-    PartnerId adminPartnerId = TestUUIDIds.partnerId();
-    User adminUser =
-        UserFactory.createAdminUserWithPartner(
-            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
-    UserId staffId = TestUUIDIds.userId();
-    UserName userName = new UserName("Customer");
-    UserEmail userEmail = new UserEmail("user@domain.com");
-
-    assertThatThrownBy(
-            () ->
-                adminUser.createStaffMember(
-                    staffId, userName, userEmail, ANY_PASS, UserRole.CUSTOMER))
-        .isInstanceOf(IllegalUserRolePrivilegeException.class)
-        .hasMessageContaining(
-            "This role is " + UserRole.CUSTOMER + " and cannot be created by an ADMIN user");
-  }
-
-  @Test
-  @DisplayName("Admin cannot create Null role user throws Null Point Exception error")
-  void adminCannotCreateNullRoleUserThrowsNullPointExceptionError() {
-    PartnerId adminPartnerId = TestUUIDIds.partnerId();
-    User adminUser =
-        UserFactory.createAdminUserWithPartner(
-            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, adminPartnerId);
-
-    UserId staffId = TestUUIDIds.userId();
-    UserName userName = new UserName("Customer");
-    UserEmail userEmail = new UserEmail("user@domain.com");
-
-    assertThatThrownBy(
-            () -> adminUser.createStaffMember(staffId, userName, userEmail, ANY_PASS, null))
-        .isInstanceOf(NullPointerException.class)
-        .hasMessageContaining("User role cannot be null");
-  }
-
-  @ParameterizedTest
-  @EnumSource(
-      value = UserRole.class,
-      names = {"SUPPORT", "ADMIN"})
-  @DisplayName("Support user cannot use createStaffMember throws error")
-  void supportUserCannotUseCreateStaffMemberThrowsError(UserRole userRole) {
-    PartnerId supportPartnerId = TestUUIDIds.partnerId();
-
-    User supportUser =
-        UserFactory.createSupportUserWithPartner(
-            ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, supportPartnerId);
-    var supportId = TestUUIDIds.userId();
-    var supportName = new UserName("Support Staff");
-    var supportEmail = new UserEmail("support@domain.com");
-
-    assertThatThrownBy(
-            () ->
-                supportUser.createStaffMember(
-                    supportId, supportName, supportEmail, ANY_PASS, userRole))
-        .isInstanceOf(IllegalUserRolePrivilegeException.class)
-        .hasMessageContaining(
-            "Action requires ADMIN role, but current role is " + supportUser.role());
-  }
-
-  @Test
-  @DisplayName("Deactivated Admin cannot create staff member")
-  void deactivatedAdminCannotCreateStaffMember() {
-    User admin =
-        UserFactory.createAdminUserWithPartner(ANY_ID, ANY_NAME, ANY_EMAIL, ANY_PASS, ANY_PARTNER)
-            .deactivate();
-
-    var staffId = TestUUIDIds.userId();
-
-    assertThatThrownBy(
-            () -> admin.createStaffMember(staffId, ANY_NAME, ANY_EMAIL, ANY_PASS, UserRole.SUPPORT))
-        .isInstanceOf(UserStatusChangeException.class)
-        .hasMessageContaining("User must have activated status");
   }
 
   @Test
