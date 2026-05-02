@@ -15,8 +15,6 @@ public record RegisterCompanyRequest(
     @NotBlank @Email String userEmail) {
 
   public RegisterCompanyRequest {
-    if (country != null) {
-      country = country.toUpperCase(Locale.ROOT);
-    }
+    country = country == null ? null : country.toUpperCase(Locale.ROOT);
   }
 }
