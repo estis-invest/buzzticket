@@ -7,12 +7,30 @@ import jakarta.validation.constraints.Size;
 public record RegisterStaffRequest(
     @NotBlank String name,
     @NotBlank @Email String email,
-    @NotBlank @Size(min = 8) String password,
+    @NotBlank @Size(min = 8, max = 72) String password,
     @NotBlank String role) {
 
   public RegisterStaffRequest {
     if (role != null) {
       role = role.toUpperCase();
     }
+  }
+
+  @Override
+  public String toString() {
+    return "RegisterStaffRequest{"
+        + "name='"
+        + name
+        + '\''
+        + ", email='"
+        + "REDACTED"
+        + '\''
+        + ", password='"
+        + "REDACTED"
+        + '\''
+        + ", role='"
+        + role
+        + '\''
+        + '}';
   }
 }

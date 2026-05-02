@@ -70,15 +70,21 @@ public class RegisterStaffUseCase {
     UserEmail userEmail = new UserEmail(command.email());
 
     if (userRepository.existsByEmail(userEmail)) {
-      throw new IllegalUserEmailDuplicatedException(
-          "Duplicated email is not allowed: " + userEmail.email());
+      throw new IllegalUserEmailDuplicatedException("Duplicated email is not allowed");
     }
 
     PlainPassword password = new PlainPassword(command.password());
     UserPassword hashedPassword = passwordHasher.hash(password);
     UserId userId = userIdGenerator.generate();
     UserName userName = new UserName(command.name());
-    UserRole role = UserRole.valueOf(command.role());
+    UserRole role;
+
+    try {
+      role = UserRole.valueOf(command.role());
+
+    } catch (IllegalArgumentException e) {
+      throw new IllegalUserRoleException("Role assigned not valid: " + command.role());
+    }
 
     User user =
         switch (role) {

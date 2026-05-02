@@ -17,4 +17,31 @@ public record RegisterCompanyRequest(
   public RegisterCompanyRequest {
     country = country == null ? null : country.toUpperCase(Locale.ROOT);
   }
+
+  @Override
+  public String toString() {
+    return "RegisterCompanyRequest{"
+        + "name='"
+        + name
+        + '\''
+        + ", city='"
+        + city
+        + '\''
+        + ", country='"
+        + country
+        + '\''
+        + ", isoCode='"
+        + isoCode
+        + '\''
+        + ", userName='"
+        + userName
+        + '\''
+        + ", userPassword='"
+        + "REDACTED"
+        + '\''
+        + ", userEmail='"
+        + "REDACTED"
+        + '\''
+        + '}';
+  }
 }

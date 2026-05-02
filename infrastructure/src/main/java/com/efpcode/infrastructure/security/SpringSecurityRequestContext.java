@@ -18,7 +18,7 @@ class SpringSecurityRequestContext implements RequestContext {
       throw new IllegalStateException("Authentication cannot be null");
     }
 
-    if (!(authentication.getPrincipal() instanceof JwtAuthenticationToken jwtAuth)) {
+    if (!(authentication instanceof JwtAuthenticationToken jwtAuth)) {
       throw new IllegalStateException("Authentication is not JWT-based");
     }
 
@@ -27,11 +27,22 @@ class SpringSecurityRequestContext implements RequestContext {
 
   @Override
   public UserId userId() {
-    return UserId.fromString(jwt().getClaimAsString("userId"));
+    String userId = jwt().getClaimAsString("userId");
+    if (userId == null) {
+      throw new IllegalStateException("JWT is missing required claim 'userId'");
+    }
+
+    return UserId.fromString(userId);
   }
 
   @Override
   public UserRole role() {
-    return UserRole.valueOf(jwt().getClaimAsString("role"));
+
+    String role = jwt().getClaimAsString("role");
+    if (role == null) {
+      throw new IllegalStateException("JWT is missing required claim 'role'");
+    }
+
+    return UserRole.valueOf(role);
   }
 }
