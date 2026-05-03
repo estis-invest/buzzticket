@@ -1,9 +1,9 @@
 package com.efpcode.infrastructure.config;
 
+import com.efpcode.application.port.policy.AdminActionPolicy;
 import com.efpcode.application.port.security.PasswordHasher;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
 import com.efpcode.domain.common.port.IdGenerator;
-import com.efpcode.domain.partner.port.PartnerRepository;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.port.UserRepository;
 import org.springframework.context.annotation.Bean;
@@ -16,8 +16,8 @@ public class UserConfig {
   public RegisterStaffUseCase registerStaffUseCase(
       IdGenerator<UserId> idGenerator,
       UserRepository userRepository,
-      PartnerRepository partnerRepository,
+      AdminActionPolicy adminActionPolicy,
       PasswordHasher passwordHasher) {
-    return new RegisterStaffUseCase(idGenerator, userRepository, partnerRepository, passwordHasher);
+    return new RegisterStaffUseCase(idGenerator, userRepository, adminActionPolicy, passwordHasher);
   }
 }
