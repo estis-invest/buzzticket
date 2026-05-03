@@ -5,6 +5,7 @@ import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.infrastructure.adapters.PartnerTransactionalAdapter;
 import com.efpcode.infrastructure.web.dto.PartnerListResponse;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
 import com.efpcode.infrastructure.web.dto.RegisterPartnerRequest;
@@ -23,29 +24,17 @@ import org.springframework.web.bind.annotation.*;
 class PartnerController {
   private static final Logger log = LoggerFactory.getLogger(PartnerController.class);
 
-  private final RegisterPartnerUseCase registerPartnerUseCase;
   private final GetPartnerUseCase getPartnerUseCase;
   private final GetAllPartnersUseCase getAllPartnersUseCase;
-  private final DeletePartnerUseCase deletePartnerUseCase;
-  private final DeactivatePartnerUseCase deactivatePartnerUseCase;
-  private final ActivatePartnerUseCase activatePartnerUseCase;
-  private final EditPartnerUseCase editPartnerUseCase;
+  private final PartnerTransactionalAdapter partnerTransactionalAdapter;
 
   PartnerController(
-      RegisterPartnerUseCase registerPartnerUseCase,
       GetPartnerUseCase getPartnerUseCase,
       GetAllPartnersUseCase getAllPartnersUseCase,
-      DeletePartnerUseCase deletePartnerUseCase,
-      DeactivatePartnerUseCase deactivatePartnerUseCase,
-      ActivatePartnerUseCase activatePartnerUseCase,
-      EditPartnerUseCase editPartnerUseCase) {
-    this.registerPartnerUseCase = registerPartnerUseCase;
+      PartnerTransactionalAdapter partnerTransactionalAdapter) {
     this.getPartnerUseCase = getPartnerUseCase;
     this.getAllPartnersUseCase = getAllPartnersUseCase;
-    this.deletePartnerUseCase = deletePartnerUseCase;
-    this.deactivatePartnerUseCase = deactivatePartnerUseCase;
-    this.activatePartnerUseCase = activatePartnerUseCase;
-    this.editPartnerUseCase = editPartnerUseCase;
+    this.partnerTransactionalAdapter = partnerTransactionalAdapter;
   }
 
   @PostMapping
@@ -56,7 +45,7 @@ class PartnerController {
         new RegisterPartnerCommand(
             request.name(), request.city(), request.country(), request.isoCode());
 
-    Partner partner = registerPartnerUseCase.execute(command);
+    Partner partner = partnerTransactionalAdapter.registerPartner(command);
     log.info("REST: Registered new partner: {} successfully", partner);
     return ResponseEntity.status(HttpStatus.CREATED).body(PartnerResponse.fromDomain(partner));
   }
@@ -78,7 +67,7 @@ class PartnerController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletePartner(@PathVariable UUID id) {
     log.info("REST: Deleting request for partner with id: {}", id);
-    deletePartnerUseCase.execute(new PartnerId(id));
+    partnerTransactionalAdapter.deletePartner(new PartnerId(id));
     log.info("REST: Deleted partner with id: {} successfully", id);
     return ResponseEntity.noContent().build();
   }
@@ -87,7 +76,7 @@ class PartnerController {
   public ResponseEntity<PartnerResponse> deactivatePartner(@PathVariable UUID id) {
     log.info("REST: Deactivation request for partner: {}", id);
 
-    Partner partner = deactivatePartnerUseCase.execute(new PartnerId(id));
+    Partner partner = partnerTransactionalAdapter.deactivatePartner(new PartnerId(id));
 
     log.info("REST: Partner {} deactivated", id);
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
@@ -96,7 +85,7 @@ class PartnerController {
   @PatchMapping("/{id}/activate")
   public ResponseEntity<PartnerResponse> activatePartner(@PathVariable UUID id) {
     log.info("REST: Activation request for partner: {}", id);
-    Partner partner = activatePartnerUseCase.execute(new PartnerId(id));
+    Partner partner = partnerTransactionalAdapter.activatePartner(new PartnerId(id));
     log.info("REST: Partner {} activated", id);
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
   }
@@ -112,7 +101,7 @@ class PartnerController {
             request.getNormalizedCountry(),
             request.getNormalizedIsoCode());
     PartnerId partnerId = new PartnerId(id);
-    Partner editPartner = editPartnerUseCase.execute(partnerId, command);
+    Partner editPartner = partnerTransactionalAdapter.editPartner(partnerId, command);
     log.info(
         "REST: Partner with id {} successfully edit to: {}",
         editPartner.id().partnerId(),

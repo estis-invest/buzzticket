@@ -1,11 +1,9 @@
 package com.efpcode.infrastructure.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.awaitility.Awaitility.await;
 
 import com.efpcode.BaseIntegrationTest;
-import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
 import com.efpcode.infrastructure.security.TestSecurityConfiguration;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
@@ -373,14 +371,5 @@ class PartnerControllerIT extends BaseIntegrationTest {
                   assertThat(detail.toString())
                       .contains("At least one field must be provided for an update."));
     }
-  }
-
-  // TODO: move to dto test file for unit testing.
-  @Test
-  @DisplayName("Update Partner: Constructor should throw if all fields are blank")
-  void shouldThrowExceptionWhenAllFieldsAreBlank() {
-    assertThatThrownBy(() -> new UpdatePartnerRequest("", "", "", ""))
-        .isInstanceOf(InvalidPartnerCommandArgumentException.class)
-        .hasMessageContaining("At least one field must be provided");
   }
 }
