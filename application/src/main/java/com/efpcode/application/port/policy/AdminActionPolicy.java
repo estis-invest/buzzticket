@@ -36,7 +36,7 @@ public class AdminActionPolicy {
 
     adminHandler.role().roleGuardIsAdmin();
     if (!adminHandler.status().isActive()) {
-      throw new IllegalUserStatusException("Request handler status other then activated");
+      throw new IllegalUserStatusException("Request handler status other than activate");
     }
 
     PartnerId partnerId =
