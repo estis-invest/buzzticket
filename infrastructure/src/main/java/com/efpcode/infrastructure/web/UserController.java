@@ -1,9 +1,9 @@
 package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.context.RequestContext;
-import com.efpcode.application.usecase.user.RegisterStaffUseCase;
 import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
 import com.efpcode.domain.user.model.User;
+import com.efpcode.infrastructure.adapters.UserTransactionalAdapter;
 import com.efpcode.infrastructure.web.dto.RegisterStaffRequest;
 import com.efpcode.infrastructure.web.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 class UserController {
 
-  private final RegisterStaffUseCase registerStaffUseCase;
   private final RequestContext requestContext;
+  private final UserTransactionalAdapter userTransactionalAdapter;
 
-  public UserController(RequestContext requestContext, RegisterStaffUseCase registerStaffUseCase) {
+  public UserController(
+      RequestContext requestContext, UserTransactionalAdapter userTransactionalAdapter) {
     this.requestContext = requestContext;
-    this.registerStaffUseCase = registerStaffUseCase;
+    this.userTransactionalAdapter = userTransactionalAdapter;
   }
 
   @PostMapping("/staff")
@@ -33,7 +34,7 @@ class UserController {
         new RegisterStaffCommand(
             request.name(), request.email(), request.password(), request.role());
 
-    User staff = registerStaffUseCase.execute(requestContext, command);
+    User staff = userTransactionalAdapter.registerStaff(requestContext, command);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromDomain(staff));
   }
