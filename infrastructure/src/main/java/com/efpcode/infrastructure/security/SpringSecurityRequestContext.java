@@ -27,7 +27,7 @@ class SpringSecurityRequestContext implements RequestContext {
 
   @Override
   public UserId userId() {
-    String userId = jwt().getClaimAsString("userId");
+    String userId = jwt().getSubject();
     if (userId == null) {
       throw new IllegalStateException("JWT is missing required claim 'userId'");
     }
