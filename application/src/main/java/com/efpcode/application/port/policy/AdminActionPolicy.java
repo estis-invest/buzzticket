@@ -34,7 +34,6 @@ public class AdminActionPolicy {
       throw new SecurityException("Token role mismatch");
     }
 
-    adminHandler.role().roleGuardIsAdmin();
     if (!adminHandler.status().isActive()) {
       throw new IllegalUserStatusException("Request handler status other than activated");
     }
