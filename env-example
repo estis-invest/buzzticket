@@ -15,8 +15,8 @@ HIBERNATE_EXTRACT_LEVEL=TRACE
 # Enable baseline-on-migrate ONLY for one-time adoption of existing schemas
 FLYWAY_BASELINE_ON_MIGRATE=false
 # BUZZTICKET SECRET PATH TO PEM FILE
-BUZZTICKET_PRIVATE_KEY_PATH=file:./keys/jwt-private.pem
-BUZZTICKET_PUBLIC_KEY_PATH=file:./keys/jwt-public.pem
+BUZZTICKET_PRIVATE_KEY_PATH=file:../keys/jwt-private.pem
+BUZZTICKET_PUBLIC_KEY_PATH=file:../keys/jwt-public.pem
 # JWT auth configuration
 BUZZTICKET_JWT_ISSUER=buzzticket-prod
 BUZZTICKET_JWT_AUDIENCE=buzzticket-api

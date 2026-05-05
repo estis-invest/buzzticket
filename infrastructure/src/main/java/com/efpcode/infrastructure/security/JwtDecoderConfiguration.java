@@ -26,6 +26,13 @@ class JwtDecoderConfiguration {
     return NimbusJwtDecoder.withPublicKey(publicKey).build();
   }
 
+  @Bean
+  RSAPublicKey jwtPublicKey(
+      @Value("${spring.security.jwt.public-key-path}") Resource publicKeyResource)
+      throws Exception {
+    return loadPublicKey(publicKeyResource);
+  }
+
   private RSAPublicKey loadPublicKey(Resource key) throws Exception {
     String pem;
 

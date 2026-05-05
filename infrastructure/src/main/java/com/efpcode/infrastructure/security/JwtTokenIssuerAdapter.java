@@ -117,6 +117,7 @@ class JwtTokenIssuerAdapter implements JwtTokenIssuer {
     }
 
     if (!key.exists() || !key.isReadable()) {
+      System.out.println("#### ".repeat(12) + key.toString());
 
       throw new JwtTokenRequiredFieldMissingException("JWT private key is missing or unreadable");
     }

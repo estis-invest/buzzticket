@@ -16,9 +16,20 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 @Profile("!test")
 public class SecurityConfiguration {
-
   @Bean
   @Order(1)
+  SecurityFilterChain jwksChain(HttpSecurity http) throws Exception {
+    http.securityMatcher("/.well-known/**")
+        .csrf(AbstractHttpConfigurer::disable)
+        .cors(withDefaults())
+        .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+        .requestCache(AbstractHttpConfigurer::disable)
+        .securityContext(AbstractHttpConfigurer::disable);
+    return http.build();
+  }
+
+  @Bean
+  @Order(2)
   SecurityFilterChain publicChain(HttpSecurity http) throws Exception {
     http.securityMatcher("/public/**")
         .csrf(AbstractHttpConfigurer::disable)
@@ -30,7 +41,7 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  @Order(2)
+  @Order(3)
   SecurityFilterChain authChain(HttpSecurity http) throws Exception {
     http.securityMatcher("/auth/**")
         .csrf(AbstractHttpConfigurer::disable)
@@ -41,7 +52,7 @@ public class SecurityConfiguration {
             auth ->
                 auth.requestMatchers("/auth/login")
                     .permitAll()
-                    .requestMatchers("/auth/token-issuer", "/auth/refresh", "/auth/verify")
+                    .requestMatchers("/auth/logout", "/auth/refresh", "/auth/me")
                     .authenticated()
                     .anyRequest()
                     .denyAll())
@@ -51,7 +62,7 @@ public class SecurityConfiguration {
   }
 
   @Bean
-  @Order(3)
+  @Order(4)
   SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
     http.securityMatcher("/api/**")
         .csrf(AbstractHttpConfigurer::disable)
