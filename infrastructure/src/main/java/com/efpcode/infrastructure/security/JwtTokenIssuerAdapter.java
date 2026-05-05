@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
 
 @Profile("!test")
 @Component
-class JwtTokenIssuerAdapter implements JwtTokenIssuer {
+public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
 
   private final JWSSigner signer;
   private final String issuer;
