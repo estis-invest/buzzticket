@@ -7,8 +7,10 @@ import com.efpcode.application.usecase.auth.GetLoginUseCase;
 import com.efpcode.domain.user.port.UserRepository;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 @Configuration
+@Profile("!test")
 public class AuthConfig {
 
   @Bean
