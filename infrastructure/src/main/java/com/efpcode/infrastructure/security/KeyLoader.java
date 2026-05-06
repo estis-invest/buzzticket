@@ -43,6 +43,9 @@ public final class KeyLoader {
       if (!(publicKey instanceof RSAPublicKey rsaPublicKey)) {
         throw new JwtIllegalFileIOException("Public key is not an RSA key", null);
       }
+      if (rsaPublicKey.getModulus().bitLength() < 2048) {
+        throw new JwtIllegalFileIOException("RSA key must be at least 2048 bits", null);
+      }
 
       return rsaPublicKey;
     } catch (JwtIllegalFileIOException e) {

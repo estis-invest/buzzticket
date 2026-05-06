@@ -12,6 +12,7 @@ import java.security.PrivateKey;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
@@ -28,7 +29,6 @@ public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
   private final String keyId;
   private final long ttlSeconds;
   private final Clock clock;
-  private final KeyLoader keyLoader;
 
   JwtTokenIssuerAdapter(
       @Value("${spring.security.jwt.private-key-path}") Resource privateKeyResource,
@@ -38,7 +38,6 @@ public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
       @Value("${spring.security.jwt.ttl-seconds}") long ttlSeconds,
       Clock clock,
       KeyLoader keyLoader) {
-    this.keyLoader = keyLoader;
 
     configValidator(issuer, audience, keyId, ttlSeconds, privateKeyResource);
 
@@ -71,7 +70,7 @@ public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
               .jwtID(UUID.randomUUID().toString())
               .issueTime(Date.from(now))
               .expirationTime(Date.from(now.plusSeconds(ttlSeconds)))
-              .claim("role", user.role().name())
+              .claim("role", List.of(user.role().name()))
               .build();
 
       JWSHeader header =

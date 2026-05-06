@@ -5,6 +5,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -19,6 +20,20 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 @Profile("!test")
 public class SecurityConfiguration {
+
+  // TODO: CORS will be configured when frontend is enabled not before
+
+  @Bean
+  @Order(Ordered.LOWEST_PRECEDENCE)
+  SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
+    http.csrf(AbstractHttpConfigurer::disable)
+        .cors(withDefaults())
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(auth -> auth.anyRequest().denyAll());
+    return http.build();
+  }
+
   @Bean
   @Order(1)
   SecurityFilterChain jwksChain(HttpSecurity http) throws Exception {
