@@ -8,15 +8,9 @@ import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.RSASSASigner;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyFactory;
 import java.security.PrivateKey;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.spec.PKCS8EncodedKeySpec;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.Date;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +28,7 @@ public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
   private final String keyId;
   private final long ttlSeconds;
   private final Clock clock;
+  private final KeyLoader keyLoader;
 
   JwtTokenIssuerAdapter(
       @Value("${spring.security.jwt.private-key-path}") Resource privateKeyResource,
@@ -41,22 +36,19 @@ public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
       @Value("${spring.security.jwt.audience}") String audience,
       @Value("${spring.security.jwt.key-id}") String keyId,
       @Value("${spring.security.jwt.ttl-seconds}") long ttlSeconds,
-      Clock clock) {
+      Clock clock,
+      KeyLoader keyLoader) {
+    this.keyLoader = keyLoader;
 
     configValidator(issuer, audience, keyId, ttlSeconds, privateKeyResource);
 
     try {
-      PrivateKey privateKey = loadPrivateKey(privateKeyResource);
-
-      RSAPrivateKey rsa = (RSAPrivateKey) privateKey;
-      if (rsa.getModulus().bitLength() < 2048) {
-        throw new JwtIllegalFileIOException("RSA key must be at least 2048 bits", null);
-      }
-
+      PrivateKey privateKey = keyLoader.loadPrivateKey(privateKeyResource);
       this.signer = new RSASSASigner(privateKey);
-
+    } catch (JwtIllegalFileIOException e) {
+      throw e;
     } catch (Exception e) {
-      throw new JwtIllegalFileIOException("Failed to initialize JWT signer", e);
+      throw new JwtIllegalFileIOException("Failed to initialize or load JWT signing", e);
     }
 
     this.issuer = issuer;
@@ -100,50 +92,25 @@ public class JwtTokenIssuerAdapter implements JwtTokenIssuer {
 
     if (issuer == null || issuer.isBlank()) {
       throw new JwtTokenRequiredFieldMissingException(
-          "JWT issuer must be configured (spring.security.jwt.issuer)");
+          "JWT issuer must be configured (spring.security.jwt.issuer)", null);
     }
     if (audience == null || audience.isBlank()) {
       throw new JwtTokenRequiredFieldMissingException(
-          "JWT audience must be configured (spring.security.jwt.audience)");
+          "JWT audience must be configured (spring.security.jwt.audience)", null);
     }
-    if (key == null || keyId.isBlank()) {
+    if (keyId == null || keyId.isBlank()) {
       throw new JwtTokenRequiredFieldMissingException(
-          "JWT key_id must be configured (spring.security.jwt.key-id)");
+          "JWT key_id must be configured (spring.security.jwt.key-id)", null);
     }
 
     if (ttlSeconds <= 0) {
       throw new JwtTokenRequiredFieldMissingException(
-          "JWT ttl-seconds must be configured (spring.security.jwt.ttl-seconds)");
+          "JWT ttl-seconds must be configured (spring.security.jwt.ttl-seconds)", null);
     }
 
-    if (!key.exists() || !key.isReadable()) {
-      System.out.println("#### ".repeat(12) + key.toString());
-
-      throw new JwtTokenRequiredFieldMissingException("JWT private key is missing or unreadable");
+    if (key == null || !key.exists() || !key.isReadable()) {
+      throw new JwtTokenRequiredFieldMissingException(
+          "JWT private key is missing or unreadable", null);
     }
-  }
-
-  private PrivateKey loadPrivateKey(Resource key) throws Exception {
-    String pem;
-
-    try (InputStream keyStream = key.getInputStream()) {
-      pem = new String(keyStream.readAllBytes(), StandardCharsets.UTF_8);
-    }
-
-    if (!pem.contains("BEGIN PRIVATE KEY")) {
-      throw new JwtIllegalFileIOException("Invalid key format: only PKCS#8 is supported", null);
-    }
-
-    String base64Key =
-        pem.replace("-----BEGIN PRIVATE KEY-----", "")
-            .replace("-----END PRIVATE KEY-----", "")
-            .replace("\r", "")
-            .replace("\n", "")
-            .trim();
-
-    byte[] decoded = Base64.getDecoder().decode(base64Key);
-    PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(decoded);
-
-    return KeyFactory.getInstance("RSA").generatePrivate(spec);
   }
 }

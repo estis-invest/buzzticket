@@ -1,9 +1,7 @@
 package com.efpcode.infrastructure.security.exceptions;
 
-import com.efpcode.infrastructure.persistence.exceptions.InfrastructureLayerException;
-
-public class JwtTokenRequiredFieldMissingException extends InfrastructureLayerException {
-  public JwtTokenRequiredFieldMissingException(String message) {
-    super(message);
+public class JwtTokenRequiredFieldMissingException extends InfrastructureSecurityLayerException {
+  public JwtTokenRequiredFieldMissingException(String message, Throwable cause) {
+    super(cause == null ? message : message + ": " + cause.getMessage(), cause);
   }
 }

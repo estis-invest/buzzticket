@@ -9,6 +9,7 @@ import com.efpcode.application.usecase.auth.exceptions.LoginFailException;
 import com.efpcode.domain.common.model.PlainPassword;
 import com.efpcode.domain.user.model.User;
 import com.efpcode.domain.user.model.UserEmail;
+import com.efpcode.domain.user.model.UserPassword;
 import com.efpcode.domain.user.port.UserRepository;
 
 public class GetLoginUseCase {
@@ -37,15 +38,20 @@ public class GetLoginUseCase {
 
     User user = userRepository.findUserByEmail(email).orElse(null);
 
-    if (user == null) {
-      passwordHasher.matches(plainPassword, dummyPasswordHashProvider.dummyHash());
-      throw new LoginFailException(ERROR_MESSAGE);
-    }
-
-    if (!passwordHasher.matches(plainPassword, user.password())) {
+    if (!safeMatches(
+            plainPassword, user == null ? dummyPasswordHashProvider.dummyHash() : user.password())
+        || user == null) {
       throw new LoginFailException(ERROR_MESSAGE);
     }
 
     return new AuthResult(jwtTokenIssuer.issueToken(user));
+  }
+
+  private boolean safeMatches(PlainPassword plainPassword, UserPassword hash) {
+    try {
+      return passwordHasher.matches(plainPassword, hash);
+    } catch (IllegalArgumentException ex) {
+      return false;
+    }
   }
 }
