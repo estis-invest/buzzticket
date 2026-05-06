@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -63,14 +64,19 @@ public class SecurityConfiguration {
 
   @Bean
   @Order(4)
-  SecurityFilterChain apiChain(HttpSecurity http) throws Exception {
+  SecurityFilterChain apiChain(
+      HttpSecurity http, JwtAuthenticationConverter jwtAuthenticationConverter) throws Exception {
     http.securityMatcher("/api/**")
         .csrf(AbstractHttpConfigurer::disable)
         .cors(withDefaults())
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .authorizeHttpRequests(auth -> auth.anyRequest().authenticated())
-        .oauth2ResourceServer(oauth2 -> oauth2.jwt(withDefaults()));
+        .oauth2ResourceServer(
+            oauth2 ->
+                oauth2.jwt(
+                    jwtConfigurer ->
+                        jwtConfigurer.jwtAuthenticationConverter(jwtAuthenticationConverter)));
     return http.build();
   }
 }
