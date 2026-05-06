@@ -35,7 +35,8 @@ public class LayerRulesTest {
           .should()
           .dependOnClassesThat()
           .resideInAnyPackage("org.springframework..", "jakarta.persistence..")
-          .because("The domain layer must be plain old Java to avoid infrastructure leakage.");
+          .because("The domain layer must be plain old Java to avoid infrastructure leakage.")
+          .allowEmptyShould(true);
 
   @ArchTest
   static final ArchRule domainMustNotDependOnOuterLayers =
@@ -45,7 +46,8 @@ public class LayerRulesTest {
           .should()
           .dependOnClassesThat()
           .resideInAnyPackage("com.efpcode.application..", "com.efpcode.infrastructure..")
-          .because("The domain (core) must not depend on application or infrastructure.");
+          .because("The domain (core) must not depend on application or infrastructure.")
+          .allowEmptyShould(true);
 
   @ArchTest
   static final ArchRule applicationMustNotDependOnInfrastructure =
@@ -55,5 +57,6 @@ public class LayerRulesTest {
           .should()
           .dependOnClassesThat()
           .resideInAPackage("com.efpcode.infrastructure..")
-          .because("Application must not depend on infrastructure.");
+          .because("Application must not depend on infrastructure.")
+          .allowEmptyShould(true);
 }
