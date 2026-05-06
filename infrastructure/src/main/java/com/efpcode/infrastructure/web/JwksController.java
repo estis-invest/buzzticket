@@ -29,7 +29,7 @@ class JwksController {
 
     if (keyId == null || keyId.isBlank()) {
       throw new JwtTokenRequiredFieldMissingException(
-          "KeyId is not being loaded or not configured (spring.security.jwt-key-id)", null);
+          "KeyId is not being loaded or not configured (spring.security.jwt.key-id)", null);
     }
     RSAPublicKey publicKey = keyLoader.loadPublicKey(publicKeyResource);
     RSAKey jwk =
