@@ -30,7 +30,7 @@ class SpringSecurityRequestContext implements RequestContext {
   public UserId userId() {
     String userId = jwt().getSubject();
     if (userId == null) {
-      throw new IllegalStateException("JWT is missing required claim 'userId'");
+      throw new IllegalStateException("JWT is missing required claim 'sub'");
     }
 
     return UserId.fromString(userId);
