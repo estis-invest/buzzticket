@@ -25,8 +25,7 @@ public class LayerRulesTest {
           .whereLayer("Application")
           .mayOnlyBeAccessedByLayers("Infrastructure")
           .whereLayer("Infrastructure")
-          .mayNotBeAccessedByAnyLayer()
-          .allowEmptyShould(true);
+          .mayNotBeAccessedByAnyLayer();
 
   @ArchTest
   static final ArchRule domainShouldBeFrameworkFree =
