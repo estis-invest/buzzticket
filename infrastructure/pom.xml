@@ -91,7 +91,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.5.2</version> <configuration>
+                <version>3.5.2</version>
+                <configuration>
+                    <workingDirectory>${project.basedir}</workingDirectory>
                 <argLine>
                     -Xshare:off
                     -XX:+EnableDynamicAgentLoading

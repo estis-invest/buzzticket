@@ -3,6 +3,7 @@ package com.efpcode.infrastructure.security;
 import com.efpcode.application.port.context.RequestContext;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
+import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -27,7 +28,7 @@ class SpringSecurityRequestContext implements RequestContext {
 
   @Override
   public UserId userId() {
-    String userId = jwt().getClaimAsString("userId");
+    String userId = jwt().getSubject();
     if (userId == null) {
       throw new IllegalStateException("JWT is missing required claim 'userId'");
     }
@@ -38,11 +39,11 @@ class SpringSecurityRequestContext implements RequestContext {
   @Override
   public UserRole role() {
 
-    String role = jwt().getClaimAsString("role");
-    if (role == null) {
+    List<String> roles = jwt().getClaimAsStringList("role");
+    if (roles == null || roles.isEmpty()) {
       throw new IllegalStateException("JWT is missing required claim 'role'");
     }
 
-    return UserRole.valueOf(role);
+    return UserRole.valueOf(roles.getFirst());
   }
 }

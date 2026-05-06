@@ -17,7 +17,7 @@ public class PartnerAdminPolicyJpaAdapter implements PartnerAdminPolicy {
   @Override
   public void ensurePartnerHasAdmin(PartnerId partnerId) {
     if (!userRepository.existsAdminForPartner(partnerId)) {
-      throw new PartnerRequiresAdminException("Partner must have at least one admin");
+      throw new PartnerRequiresAdminException("Partner must have at least one admin", null);
     }
   }
 }

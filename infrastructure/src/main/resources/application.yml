@@ -1,6 +1,14 @@
 spring:
   config:
     import: optional:file:../.env[.properties]
+  security:
+    jwt:
+      issuer: ${BUZZTICKET_JWT_ISSUER}
+      ttl-seconds: ${BUZZTICKET_JWT_TTL_SECONDS}
+      private-key-path: ${BUZZTICKET_PRIVATE_KEY_PATH}
+      public-key-path: ${BUZZTICKET_PUBLIC_KEY_PATH}
+      audience: ${BUZZTICKET_JWT_AUDIENCE}
+      key-id: ${BUZZTICKET_JWT_KEY_ID}
 
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:buzzticket}
@@ -28,4 +36,5 @@ logging:
     org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:TRACE}
     org.hibernate.orm.jdbc.bind: ${HIBERNATE_BIND_LOG_LEVEL:OFF}
     org.hibernate.orm.jdbc.extract: ${HIBERNATE_EXTRACT_LEVEL:OFF}
+
 

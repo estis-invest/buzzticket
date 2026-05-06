@@ -77,7 +77,8 @@ public class JpaUserAdapter implements UserRepository {
                 id ->
                     partnerRepository
                         .findByPartnerIdAndPartnerStatusNot(id, PartnerStatus.DELETED.name())
-                        .orElseThrow(() -> new MissingReferenceEntityException("Partner", id)))
+                        .orElseThrow(
+                            () -> new MissingReferenceEntityException("Partner", id, null)))
             .orElse(null);
 
     UserEntity entity = UserMapper.toEntity(user, partnerEntity);

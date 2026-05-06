@@ -1,8 +1,10 @@
 package com.efpcode.infrastructure.web.advice;
 
+import com.efpcode.application.usecase.auth.exceptions.LoginFailException;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
+import com.efpcode.application.usecase.user.exceptions.IllegalUserEmailDuplicatedException;
 import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
 import com.efpcode.domain.user.exceptions.UserDomainException;
@@ -40,6 +42,16 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(CommonDomainException.class)
   public ProblemDetail handleCommonDomain(CommonDomainException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+  }
+
+  @ExceptionHandler(LoginFailException.class)
+  public ProblemDetail handleLoginFailure(LoginFailException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+  }
+
+  @ExceptionHandler(IllegalUserEmailDuplicatedException.class)
+  public ProblemDetail handleDuplicateUserEmail(IllegalUserEmailDuplicatedException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
   }
 }
