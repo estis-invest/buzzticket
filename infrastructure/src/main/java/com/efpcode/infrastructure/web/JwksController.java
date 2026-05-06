@@ -20,9 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Profile("!test")
 class JwksController {
 
-  private final KeyLoader keyLoader;
-  private final String keyId;
-  private final Resource publicKeyResource;
+  private final Map<String, Object> jwkSet;
 
   JwksController(
       KeyLoader keyLoader,
@@ -33,14 +31,6 @@ class JwksController {
       throw new JwtTokenRequiredFieldMissingException(
           "KeyId is not being loaded or not configured (spring.security.jwt-key-id)", null);
     }
-
-    this.keyId = keyId;
-    this.publicKeyResource = publicKeyResource;
-    this.keyLoader = keyLoader;
-  }
-
-  @GetMapping
-  Map<String, Object> jwks() {
     RSAPublicKey publicKey = keyLoader.loadPublicKey(publicKeyResource);
     RSAKey jwk =
         new RSAKey.Builder(publicKey)
@@ -48,6 +38,11 @@ class JwksController {
             .algorithm(JWSAlgorithm.RS256)
             .keyUse(KeyUse.SIGNATURE)
             .build();
-    return new JWKSet(jwk).toJSONObject();
+    this.jwkSet = new JWKSet(jwk).toJSONObject();
+  }
+
+  @GetMapping
+  Map<String, Object> jwks() {
+    return jwkSet;
   }
 }
