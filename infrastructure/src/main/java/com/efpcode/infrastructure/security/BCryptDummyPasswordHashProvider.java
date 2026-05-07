@@ -1,7 +1,7 @@
 package com.efpcode.infrastructure.security;
 
-import com.efpcode.application.port.security.DummyPasswordHashProvider;
-import com.efpcode.application.port.security.PasswordHasher;
+import com.efpcode.application.port.out.security.DummyPasswordHashProvider;
+import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.domain.common.model.PlainPassword;
 import com.efpcode.domain.user.model.UserPassword;
 import org.springframework.stereotype.Component;

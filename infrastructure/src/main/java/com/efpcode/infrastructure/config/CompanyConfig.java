@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.config;
 
-import com.efpcode.application.port.security.PasswordHasher;
+import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.usecase.company.RegisterCompanyUseCase;
 import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.partner.model.PartnerId;

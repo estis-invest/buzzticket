@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.security;
 
-import com.efpcode.application.port.context.RequestContext;
+import com.efpcode.application.context.RequestContext;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.util.List;

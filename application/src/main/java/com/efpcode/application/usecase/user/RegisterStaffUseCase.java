@@ -1,9 +1,9 @@
 package com.efpcode.application.usecase.user;
 
-import com.efpcode.application.port.context.RequestContext;
-import com.efpcode.application.port.policy.AdminActionPolicy;
-import com.efpcode.application.port.policy.dto.AdminContext;
-import com.efpcode.application.port.security.PasswordHasher;
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.admin.AdminActionPolicy;
+import com.efpcode.application.policy.admin.dto.AdminContext;
+import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserEmailDuplicatedException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserRoleException;

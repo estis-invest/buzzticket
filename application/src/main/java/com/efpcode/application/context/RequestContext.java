@@ -1,4 +1,4 @@
-package com.efpcode.application.port.context;
+package com.efpcode.application.context;
 
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;

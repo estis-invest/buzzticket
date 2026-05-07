@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.security;
 
-import com.efpcode.application.port.security.JwtTokenIssuer;
+import com.efpcode.application.port.out.security.JwtTokenIssuer;
 import com.efpcode.domain.user.model.User;
 import com.efpcode.infrastructure.security.exceptions.JwtIllegalFileIOException;
 import com.efpcode.infrastructure.security.exceptions.JwtTokenRequiredFieldMissingException;

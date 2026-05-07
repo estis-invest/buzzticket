@@ -3,8 +3,9 @@ package com.efpcode.application.port.policy;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-import com.efpcode.application.port.context.RequestContext;
-import com.efpcode.application.port.policy.dto.AdminContext;
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.admin.AdminActionPolicy;
+import com.efpcode.application.policy.admin.dto.AdminContext;
 import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
