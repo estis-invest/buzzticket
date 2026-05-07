@@ -1,7 +1,7 @@
-package com.efpcode.application.port.policy;
+package com.efpcode.application.policy.admin;
 
-import com.efpcode.application.port.context.RequestContext;
-import com.efpcode.application.port.policy.dto.AdminContext;
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.admin.dto.AdminContext;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;

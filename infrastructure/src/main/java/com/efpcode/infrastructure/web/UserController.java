@@ -1,9 +1,9 @@
 package com.efpcode.infrastructure.web;
 
-import com.efpcode.application.port.context.RequestContext;
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
 import com.efpcode.domain.user.model.User;
-import com.efpcode.infrastructure.adapters.UserTransactionalAdapter;
 import com.efpcode.infrastructure.web.dto.RegisterStaffRequest;
 import com.efpcode.infrastructure.web.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -20,12 +20,12 @@ import org.springframework.web.bind.annotation.RestController;
 class UserController {
 
   private final RequestContext requestContext;
-  private final UserTransactionalAdapter userTransactionalAdapter;
+  private final StaffRegistrationCommands staffRegistrationCommands;
 
   public UserController(
-      RequestContext requestContext, UserTransactionalAdapter userTransactionalAdapter) {
+      RequestContext requestContext, StaffRegistrationCommands staffRegistrationCommands) {
     this.requestContext = requestContext;
-    this.userTransactionalAdapter = userTransactionalAdapter;
+    this.staffRegistrationCommands = staffRegistrationCommands;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -36,7 +36,7 @@ class UserController {
         new RegisterStaffCommand(
             request.name(), request.email(), request.password(), request.role());
 
-    User staff = userTransactionalAdapter.registerStaff(requestContext, command);
+    User staff = staffRegistrationCommands.register(requestContext, command);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromDomain(staff));
   }

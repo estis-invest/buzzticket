@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.policy;
 
-import com.efpcode.application.port.policy.PartnerAdminPolicy;
+import com.efpcode.application.port.out.policy.PartnerAdminPolicy;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.user.port.UserRepository;
 import com.efpcode.infrastructure.persistence.exceptions.PartnerRequiresAdminException;

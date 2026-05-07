@@ -1,6 +1,6 @@
 package com.efpcode.application.usecase.company;
 
-import com.efpcode.application.port.security.PasswordHasher;
+import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.usecase.company.dto.CompanyCommand;
 import com.efpcode.application.usecase.company.dto.CompanyResult;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;

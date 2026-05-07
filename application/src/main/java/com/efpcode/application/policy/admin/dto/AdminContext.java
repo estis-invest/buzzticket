@@ -1,4 +1,4 @@
-package com.efpcode.application.port.policy.dto;
+package com.efpcode.application.policy.admin.dto;
 
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.user.model.User;

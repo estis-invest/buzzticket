@@ -1,8 +1,8 @@
 package com.efpcode.infrastructure.config;
 
-import com.efpcode.application.port.security.DummyPasswordHashProvider;
-import com.efpcode.application.port.security.JwtTokenIssuer;
-import com.efpcode.application.port.security.PasswordHasher;
+import com.efpcode.application.port.out.security.DummyPasswordHashProvider;
+import com.efpcode.application.port.out.security.JwtTokenIssuer;
+import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.usecase.auth.GetLoginUseCase;
 import com.efpcode.domain.user.port.UserRepository;
 import org.springframework.context.annotation.Bean;
