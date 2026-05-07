@@ -23,6 +23,8 @@ public class SecurityConfiguration {
 
   // TODO: CORS will be configured when frontend is enabled not before
 
+  // TODO: For now auth in memory until jwt is persistent no auth/logout.
+
   @Bean
   @Order(Ordered.LOWEST_PRECEDENCE)
   SecurityFilterChain defaultChain(HttpSecurity http) throws Exception {
@@ -70,7 +72,7 @@ public class SecurityConfiguration {
             auth ->
                 auth.requestMatchers("/auth/login")
                     .permitAll()
-                    .requestMatchers("/auth/logout", "/auth/refresh", "/auth/me")
+                    .requestMatchers("/auth/refresh", "/auth/me")
                     .authenticated()
                     .anyRequest()
                     .denyAll())

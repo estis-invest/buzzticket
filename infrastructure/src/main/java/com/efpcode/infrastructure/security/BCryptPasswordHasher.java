@@ -3,10 +3,12 @@ package com.efpcode.infrastructure.security;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.domain.common.model.PlainPassword;
 import com.efpcode.domain.user.model.UserPassword;
+import org.springframework.context.annotation.Primary;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 @Component
+@Primary
 public class BCryptPasswordHasher implements PasswordHasher {
   private static final int BCRYPT_STRENGTH = 12;
 
