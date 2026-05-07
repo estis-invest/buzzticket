@@ -1,11 +1,11 @@
 package com.efpcode.infrastructure.web;
 
+import com.efpcode.application.port.in.PartnerLifeCycleCommands;
 import com.efpcode.application.usecase.partner.*;
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.infrastructure.adapters.PartnerTransactionalAdapter;
 import com.efpcode.infrastructure.web.dto.PartnerListResponse;
 import com.efpcode.infrastructure.web.dto.PartnerResponse;
 import com.efpcode.infrastructure.web.dto.RegisterPartnerRequest;
@@ -27,15 +27,15 @@ class PartnerController {
 
   private final GetPartnerUseCase getPartnerUseCase;
   private final GetAllPartnersUseCase getAllPartnersUseCase;
-  private final PartnerTransactionalAdapter partnerTransactionalAdapter;
+  private final PartnerLifeCycleCommands partnerLifeCycleCommands;
 
   PartnerController(
       GetPartnerUseCase getPartnerUseCase,
       GetAllPartnersUseCase getAllPartnersUseCase,
-      PartnerTransactionalAdapter partnerTransactionalAdapter) {
+      PartnerLifeCycleCommands partnerLifeCycleCommands) {
     this.getPartnerUseCase = getPartnerUseCase;
     this.getAllPartnersUseCase = getAllPartnersUseCase;
-    this.partnerTransactionalAdapter = partnerTransactionalAdapter;
+    this.partnerLifeCycleCommands = partnerLifeCycleCommands;
   }
 
   @PostMapping
@@ -46,7 +46,7 @@ class PartnerController {
         new RegisterPartnerCommand(
             request.name(), request.city(), request.country(), request.isoCode());
 
-    Partner partner = partnerTransactionalAdapter.registerPartner(command);
+    Partner partner = partnerLifeCycleCommands.register(command);
     log.info("REST: Registered new partner: {} successfully", partner);
     return ResponseEntity.status(HttpStatus.CREATED).body(PartnerResponse.fromDomain(partner));
   }
@@ -69,7 +69,7 @@ class PartnerController {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletePartner(@PathVariable UUID id) {
     log.info("REST: Deleting request for partner with id: {}", id);
-    partnerTransactionalAdapter.deletePartner(new PartnerId(id));
+    partnerLifeCycleCommands.delete(new PartnerId(id));
     log.info("REST: Deleted partner with id: {} successfully", id);
     return ResponseEntity.noContent().build();
   }
@@ -78,7 +78,7 @@ class PartnerController {
   public ResponseEntity<PartnerResponse> deactivatePartner(@PathVariable UUID id) {
     log.info("REST: Deactivation request for partner: {}", id);
 
-    Partner partner = partnerTransactionalAdapter.deactivatePartner(new PartnerId(id));
+    Partner partner = partnerLifeCycleCommands.deactivate(new PartnerId(id));
 
     log.info("REST: Partner {} deactivated", id);
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
@@ -87,7 +87,7 @@ class PartnerController {
   @PatchMapping("/{id}/activate")
   public ResponseEntity<PartnerResponse> activatePartner(@PathVariable UUID id) {
     log.info("REST: Activation request for partner: {}", id);
-    Partner partner = partnerTransactionalAdapter.activatePartner(new PartnerId(id));
+    Partner partner = partnerLifeCycleCommands.activate(new PartnerId(id));
     log.info("REST: Partner {} activated", id);
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
   }
@@ -103,7 +103,7 @@ class PartnerController {
             request.getNormalizedCountry(),
             request.getNormalizedIsoCode());
     PartnerId partnerId = new PartnerId(id);
-    Partner editPartner = partnerTransactionalAdapter.editPartner(partnerId, command);
+    Partner editPartner = partnerLifeCycleCommands.edit(partnerId, command);
     log.info(
         "REST: Partner with id {} successfully edit to: {}",
         editPartner.id().partnerId(),

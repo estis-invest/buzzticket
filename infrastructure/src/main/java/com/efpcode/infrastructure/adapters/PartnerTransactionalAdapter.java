@@ -1,5 +1,6 @@
 package com.efpcode.infrastructure.adapters;
 
+import com.efpcode.application.port.in.PartnerLifeCycleCommands;
 import com.efpcode.application.usecase.partner.*;
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-public class PartnerTransactionalAdapter {
+public class PartnerTransactionalAdapter implements PartnerLifeCycleCommands {
 
   private final RegisterPartnerUseCase registerPartnerUseCase;
   private final DeletePartnerUseCase deletePartnerUseCase;
@@ -32,27 +33,32 @@ public class PartnerTransactionalAdapter {
   }
 
   @Transactional
-  public Partner registerPartner(RegisterPartnerCommand command) {
+  @Override
+  public Partner register(RegisterPartnerCommand command) {
     return registerPartnerUseCase.execute(command);
   }
 
+  @Override
   @Transactional
-  public void deletePartner(PartnerId id) {
+  public void delete(PartnerId id) {
     deletePartnerUseCase.execute(id);
   }
 
+  @Override
   @Transactional
-  public Partner deactivatePartner(PartnerId id) {
+  public Partner deactivate(PartnerId id) {
     return deactivatePartnerUseCase.execute(id);
   }
 
+  @Override
   @Transactional
-  public Partner activatePartner(PartnerId id) {
+  public Partner activate(PartnerId id) {
     return activatePartnerUseCase.execute(id);
   }
 
+  @Override
   @Transactional
-  public Partner editPartner(PartnerId id, UpdatePartnerCommand command) {
+  public Partner edit(PartnerId id, UpdatePartnerCommand command) {
     return editPartnerUseCase.execute(id, command);
   }
 }
