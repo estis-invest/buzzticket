@@ -29,7 +29,7 @@ public class RefreshSessionUseCase {
       throw new AuthenticatedUserStatusException("User not active");
     }
 
-    if (!user.role().toString().equals(requestContext.role().toString())) {
+    if (user.role() != requestContext.role()) {
       throw new AuthenticatedUserStatusException("Claim mismatch");
     }
 
