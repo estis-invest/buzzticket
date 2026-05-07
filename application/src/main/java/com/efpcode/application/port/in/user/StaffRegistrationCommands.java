@@ -5,5 +5,5 @@ import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
 import com.efpcode.domain.user.model.User;
 
 public interface StaffRegistrationCommands {
-    User register(RequestContext requestContext, RegisterStaffCommand command);
+  User register(RequestContext requestContext, RegisterStaffCommand command);
 }
