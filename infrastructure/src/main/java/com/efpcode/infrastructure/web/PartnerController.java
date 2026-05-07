@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.web;
 
-import com.efpcode.application.port.in.PartnerLifeCycleCommands;
+import com.efpcode.application.port.in.partner.PartnerLifeCycleCommands;
 import com.efpcode.application.usecase.partner.*;
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;

@@ -1,8 +1,8 @@
 package com.efpcode.infrastructure.web;
 
+import com.efpcode.application.port.in.company.CompanyRegistrationCommands;
 import com.efpcode.application.usecase.company.dto.CompanyCommand;
 import com.efpcode.application.usecase.company.dto.CompanyResult;
-import com.efpcode.infrastructure.adapters.CompanyRegistrationTransactionalAdapter;
 import com.efpcode.infrastructure.web.dto.CompanyResponse;
 import com.efpcode.infrastructure.web.dto.RegisterCompanyRequest;
 import jakarta.validation.Valid;
@@ -21,9 +21,9 @@ class CompanyRegistrationController {
 
   private static final Logger log = LoggerFactory.getLogger(CompanyRegistrationController.class);
 
-  private final CompanyRegistrationTransactionalAdapter registration;
+  private final CompanyRegistrationCommands registration;
 
-  CompanyRegistrationController(CompanyRegistrationTransactionalAdapter registration) {
+  CompanyRegistrationController(CompanyRegistrationCommands registration) {
     this.registration = registration;
   }
 

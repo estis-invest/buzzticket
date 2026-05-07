@@ -1,4 +1,4 @@
-package com.efpcode.application.port.in;
+package com.efpcode.application.port.in.partner;
 
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
