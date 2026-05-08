@@ -4,10 +4,10 @@ import com.efpcode.domain.ticket.exceptions.IllegalTicketIdArgumentException;
 import com.efpcode.domain.ticket.exceptions.InvalidTicketIdException;
 import java.util.UUID;
 
-public record TicketId(UUID value) {
+public record TicketId(UUID ticketId) {
 
   public TicketId {
-    if (value == null) {
+    if (ticketId == null) {
       throw new InvalidTicketIdException("UUID is required and cannot be null");
     }
   }

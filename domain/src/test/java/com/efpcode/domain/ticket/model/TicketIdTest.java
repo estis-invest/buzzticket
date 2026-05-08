@@ -26,10 +26,10 @@ class TicketIdTest {
   @DisplayName("TicketId of method returns valid UUID object")
   void ticketIdOfMethodReturnsValidUuidObject() {
     var expected = TestUUIDIds.ticketId();
-    var result = TicketId.of(expected.value());
+    var result = TicketId.of(expected.ticketId());
 
     assertThat(result).isNotNull().isInstanceOf(TicketId.class);
-    assertThat(result.value()).isEqualTo(expected.value());
+    assertThat(result.ticketId()).isEqualTo(expected.ticketId());
   }
 
   @Test
@@ -43,7 +43,7 @@ class TicketIdTest {
     TicketId result = TicketId.fromString(stringUUID);
 
     assertThat(result).isNotNull().isInstanceOf(TicketId.class);
-    assertThat(result.value()).hasToString(stringUUID);
+    assertThat(result.ticketId()).hasToString(stringUUID);
     assertThat(result).isEqualTo(expected);
   }
 
