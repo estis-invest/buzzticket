@@ -67,8 +67,8 @@ public record StaffInvitation(
 
   public StaffInvitation expire(Instant currentTime) {
     requireMethodArgument(currentTime, "Current time cannot be null");
-    validateHasExpired(currentTime);
     StaffInvitationStatus staffInvitationStatus = this.invitationStatus.expire();
+    validateHasExpired(currentTime);
 
     return new StaffInvitation(
         this.invitationId,
@@ -118,19 +118,19 @@ public record StaffInvitation(
   }
 
   private static void requireMethodArgument(Object object, String errorMessage) {
-    if (object == null) throw new IllegalStaffInvitationArgumentException(errorMessage);
+    if (object == null) throw new IllegalStaffInvitationArgumentException(errorMessage, null);
   }
 
   private void validateNotExpired(Instant currentTime) {
 
     if (!currentTime.isBefore(this.invitationExpiresAt.time())) {
-      throw new InvalidStaffInvitationDateException("Expiration for invitation has passed");
+      throw new InvalidStaffInvitationDateException("Expiration for invitation has passed", null);
     }
   }
 
   private void validateHasExpired(Instant currentTime) {
     if (currentTime.isBefore(invitationExpiresAt.time())) {
-      throw new InvalidStaffInvitationDateException("Invitation has not expired yet");
+      throw new InvalidStaffInvitationDateException("Invitation has not expired yet", null);
     }
   }
 
@@ -145,13 +145,13 @@ public record StaffInvitation(
     if (invitationStatus == StaffInvitationStatus.ACCEPTED
         && (!hasAcceptedAt || !hasAcceptedUserId)) {
       throw new InvalidStaffInvitationStatusException(
-          "Accepted invitation requires acceptedAt and acceptedUserId");
+          "Accepted invitation requires acceptedAt and acceptedUserId", null);
     }
 
     if (invitationStatus != StaffInvitationStatus.ACCEPTED
         && (hasAcceptedAt || hasAcceptedUserId)) {
       throw new InvalidStaffInvitationStatusException(
-          "Only accepted invitations can have acceptance metadata");
+          "Only accepted invitations can have acceptance metadata", null);
     }
   }
 }

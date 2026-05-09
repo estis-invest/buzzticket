@@ -7,7 +7,7 @@ import java.util.UUID;
 public record StaffInvitationId(UUID invitationId) {
   public StaffInvitationId {
     if (invitationId == null) {
-      throw new InvalidStaffInvitationIdException("UUID is required and cannot be null");
+      throw new InvalidStaffInvitationIdException("UUID is required and cannot be null", null);
     }
   }
 
@@ -18,13 +18,13 @@ public record StaffInvitationId(UUID invitationId) {
   public static StaffInvitationId fromString(String uuid) {
     if (uuid == null || uuid.trim().isBlank()) {
       throw new IllegalStaffInvitationIdArgumentException(
-          "fromString method cannot pass null or blank");
+          "fromString method cannot pass null or blank", null);
     }
     try {
       return new StaffInvitationId(UUID.fromString(uuid.trim()));
 
     } catch (IllegalArgumentException e) {
-      throw new InvalidStaffInvitationIdException("Invalid or malformatted uuid");
+      throw new InvalidStaffInvitationIdException("Invalid or malformatted uuid", null);
     }
   }
 }

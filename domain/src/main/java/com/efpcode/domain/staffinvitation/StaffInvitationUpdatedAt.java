@@ -8,12 +8,12 @@ public record StaffInvitationUpdatedAt(Instant time) {
 
   public StaffInvitationUpdatedAt {
     if (time == null || time.equals(Instant.ofEpochMilli(0))) {
-      throw new InvalidStaffInvitationDateException("Staff invitation requires date");
+      throw new InvalidStaffInvitationDateException("Staff invitation requires date", null);
     }
 
     if (time.isAfter(Instant.now().plusSeconds(GRACE_PERIOD))) {
       throw new InvalidStaffInvitationDateException(
-          "Staff invitation cannot be created in the future");
+          "Staff invitation updated-at cannot be in the future", null);
     }
   }
 }

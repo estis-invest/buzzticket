@@ -19,11 +19,11 @@ public enum StaffInvitationStatus {
 
   public StaffInvitationStatus accept() {
     throw new InvalidStaffInvitationStatusException(
-        "Invitation cannot be accepted when status is " + this);
+        "Invitation cannot be accepted when status is " + this, null);
   }
 
   public StaffInvitationStatus expire() {
     throw new InvalidStaffInvitationStatusException(
-        "Invitation cannot be expired when status is " + this);
+        "Invitation cannot be expired when status is " + this, null);
   }
 }

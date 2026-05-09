@@ -6,7 +6,7 @@ public record StaffInvitationTokenHash(String value) {
 
   public StaffInvitationTokenHash {
     if (value == null || value.trim().isBlank()) {
-      throw new InvalidStaffInvitationTokenException("Invitation token hash is required");
+      throw new InvalidStaffInvitationTokenException("Invitation token hash is required", null);
     }
   }
 

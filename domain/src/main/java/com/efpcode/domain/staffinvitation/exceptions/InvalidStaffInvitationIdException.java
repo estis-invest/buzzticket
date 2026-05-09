@@ -1,7 +1,7 @@
 package com.efpcode.domain.staffinvitation.exceptions;
 
 public class InvalidStaffInvitationIdException extends StaffInvitationDomainException {
-  public InvalidStaffInvitationIdException(String message) {
-    super(message);
+  public InvalidStaffInvitationIdException(String message, Throwable cause) {
+    super(message, cause);
   }
 }

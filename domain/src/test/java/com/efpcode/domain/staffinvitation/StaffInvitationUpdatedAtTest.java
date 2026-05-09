@@ -34,7 +34,7 @@ class StaffInvitationUpdatedAtTest {
 
     assertThatThrownBy(() -> new StaffInvitationUpdatedAt(futureTime))
         .isInstanceOf(InvalidStaffInvitationDateException.class)
-        .hasMessageContaining("Staff invitation cannot be created in the future");
+        .hasMessageContaining("Staff invitation updated-at cannot be in the future");
   }
 
   @Test
