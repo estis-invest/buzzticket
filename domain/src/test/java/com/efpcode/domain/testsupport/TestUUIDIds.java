@@ -1,6 +1,7 @@
 package com.efpcode.domain.testsupport;
 
 import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.staffinvitation.StaffInvitationId;
 import com.efpcode.domain.ticket.model.TicketId;
 import com.efpcode.domain.user.model.UserId;
 import java.util.UUID;
@@ -20,6 +21,10 @@ public class TestUUIDIds {
     return UserId.of(UUID.randomUUID());
   }
 
+  public static StaffInvitationId invitationId() {
+    return StaffInvitationId.of(UUID.randomUUID());
+  }
+
   /* -------- Fixed IDs (deterministic tests) -------- */
 
   public static TicketId ticketId(String uuid) {
@@ -32,5 +37,9 @@ public class TestUUIDIds {
 
   public static UserId userId(String uuid) {
     return UserId.of(UUID.fromString(uuid));
+  }
+
+  public static StaffInvitationId invitationId(String uuid) {
+    return StaffInvitationId.of(UUID.fromString(uuid));
   }
 }
