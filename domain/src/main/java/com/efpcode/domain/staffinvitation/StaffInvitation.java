@@ -14,7 +14,7 @@ import java.util.Optional;
 public record StaffInvitation(
     StaffInvitationId invitationId,
     UserId invitedByUserId,
-    UserEmail email,
+    UserEmail inviteeEmail,
     UserRole role,
     PartnerId partnerId,
     StaffInvitationTokenHash invitationTokenHash,
@@ -28,7 +28,7 @@ public record StaffInvitation(
   public StaffInvitation {
     Objects.requireNonNull(invitationId, "Invitation Id cannot be null");
     Objects.requireNonNull(invitedByUserId, "Invited by user Id cannot be null");
-    Objects.requireNonNull(email, "Invitation email cannot be null");
+    Objects.requireNonNull(inviteeEmail, "Invitation inviteeEmail cannot be null");
     Objects.requireNonNull(role, "Invitation role cannot be null");
     Objects.requireNonNull(partnerId, "Invitation partner cannot be null");
     Objects.requireNonNull(invitationTokenHash, "Invitation token cannot be null");
@@ -38,6 +38,7 @@ public record StaffInvitation(
     Objects.requireNonNull(invitationUpdatedAt, "Update date for invitation cannot be null");
     Objects.requireNonNull(acceptedAt, "Accepts date for invitation cannot be null");
     Objects.requireNonNull(acceptedUserId, "Accepted by user id invitation cannot be null");
+    role.roleGuardIsStaff();
 
     validateAcceptanceMetadata(invitationStatus, acceptedAt, acceptedUserId);
   }
@@ -53,7 +54,7 @@ public record StaffInvitation(
     return new StaffInvitation(
         this.invitationId,
         this.invitedByUserId,
-        this.email,
+        this.inviteeEmail,
         this.role,
         this.partnerId,
         this.invitationTokenHash,
@@ -73,7 +74,7 @@ public record StaffInvitation(
     return new StaffInvitation(
         this.invitationId,
         this.invitedByUserId,
-        this.email,
+        this.inviteeEmail,
         this.role,
         this.partnerId,
         this.invitationTokenHash,
@@ -88,7 +89,7 @@ public record StaffInvitation(
   public static StaffInvitation create(
       StaffInvitationId invitationId,
       UserId invitedByUserId,
-      UserEmail email,
+      UserEmail inviteeEmail,
       UserRole role,
       PartnerId partnerId,
       StaffInvitationTokenHash invitationTokenHash,
@@ -98,14 +99,13 @@ public record StaffInvitation(
     requireMethodArgument(currentTime, "Current time cannot be null");
     requireMethodArgument(expiryTime, "Expires time cannot be null");
     requireMethodArgument(role, "Invitation role cannot be null");
-    role.roleGuardIsStaff();
 
     StaffInvitationExpiresAt expiresAt = StaffInvitationExpiresAt.of(expiryTime, currentTime);
 
     return new StaffInvitation(
         invitationId,
         invitedByUserId,
-        email,
+        inviteeEmail,
         role,
         partnerId,
         invitationTokenHash,

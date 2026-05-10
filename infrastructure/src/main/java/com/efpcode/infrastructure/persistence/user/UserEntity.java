@@ -10,6 +10,8 @@ import java.util.UUID;
 @Table(name = "app_user")
 public class UserEntity {
 
+  protected UserEntity() {}
+
   @Id
   @Column(name = "user_id", unique = true, nullable = false)
   private UUID userId;
