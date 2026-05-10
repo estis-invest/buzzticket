@@ -3,6 +3,7 @@ package com.efpcode.infrastructure.web.dto;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
+import com.efpcode.infrastructure.web.dto.requests.UpdatePartnerRequest;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 

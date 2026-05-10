@@ -1,4 +1,4 @@
-package com.efpcode.infrastructure.web.dto;
+package com.efpcode.infrastructure.web.dto.requests;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

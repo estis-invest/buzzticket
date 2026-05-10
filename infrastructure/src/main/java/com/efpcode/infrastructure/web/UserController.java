@@ -3,8 +3,9 @@ package com.efpcode.infrastructure.web;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
 import com.efpcode.domain.user.model.User;
-import com.efpcode.infrastructure.web.dto.RegisterStaffRequest;
-import com.efpcode.infrastructure.web.dto.UserResponse;
+import com.efpcode.infrastructure.web.dto.requests.RegisterStaffRequest;
+import com.efpcode.infrastructure.web.dto.responses.StaffInvitationResponse;
+import com.efpcode.infrastructure.web.dto.responses.UserResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +36,10 @@ class UserController {
     User staff = staffRegistrationCommands.register(command);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromDomain(staff));
+  }
+
+  @PostMapping("/staff/invitations")
+  public ResponseEntity<StaffInvitationResponse> sendInvite() {
+    return null;
   }
 }
