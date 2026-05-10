@@ -84,7 +84,7 @@ class StaffInvitationTest {
             ANY_UPDATED_AT,
             Optional.empty(),
             Optional.empty(),
-            "Invitation email cannot be null"),
+            "Invitation inviteeEmail cannot be null"),
         Arguments.of(
             ANY_INVITATION_ID,
             ANY_INVITED_BY_USER_ID,
