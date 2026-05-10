@@ -166,8 +166,7 @@ public class StaffInvitationEntity {
         + invitationId
         + ", invitedByUserId="
         + invitedByUserId
-        + ", inviteeEmail='"
-        + inviteeEmail
+        + ", inviteeEmail='<redacted>'"
         + '\''
         + ", role='"
         + role
