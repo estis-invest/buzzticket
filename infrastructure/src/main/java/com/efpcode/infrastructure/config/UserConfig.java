@@ -1,5 +1,6 @@
 package com.efpcode.infrastructure.config;
 
+import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
@@ -14,10 +15,12 @@ public class UserConfig {
 
   @Bean
   public RegisterStaffUseCase registerStaffUseCase(
+      RequestContext requestContext,
       IdGenerator<UserId> idGenerator,
       UserRepository userRepository,
       AdminActionPolicy adminActionPolicy,
       PasswordHasher passwordHasher) {
-    return new RegisterStaffUseCase(idGenerator, userRepository, adminActionPolicy, passwordHasher);
+    return new RegisterStaffUseCase(
+        requestContext, idGenerator, userRepository, adminActionPolicy, passwordHasher);
   }
 }

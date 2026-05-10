@@ -1,6 +1,5 @@
 package com.efpcode.infrastructure.adapters;
 
-import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
 import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
@@ -18,7 +17,7 @@ public class UserTransactionalAdapter implements StaffRegistrationCommands {
 
   @Override
   @Transactional
-  public User register(RequestContext request, RegisterStaffCommand command) {
-    return registerStaffUseCase.execute(request, command);
+  public User register(RegisterStaffCommand command) {
+    return registerStaffUseCase.execute(command);
   }
 }

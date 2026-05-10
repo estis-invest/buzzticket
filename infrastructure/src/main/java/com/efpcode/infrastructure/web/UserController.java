@@ -1,6 +1,5 @@
 package com.efpcode.infrastructure.web;
 
-import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.usecase.user.dto.RegisterStaffCommand;
 import com.efpcode.domain.user.model.User;
@@ -19,12 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/users")
 class UserController {
 
-  private final RequestContext requestContext;
   private final StaffRegistrationCommands staffRegistrationCommands;
 
-  public UserController(
-      RequestContext requestContext, StaffRegistrationCommands staffRegistrationCommands) {
-    this.requestContext = requestContext;
+  public UserController(StaffRegistrationCommands staffRegistrationCommands) {
     this.staffRegistrationCommands = staffRegistrationCommands;
   }
 
@@ -36,7 +32,7 @@ class UserController {
         new RegisterStaffCommand(
             request.name(), request.email(), request.password(), request.role());
 
-    User staff = staffRegistrationCommands.register(requestContext, command);
+    User staff = staffRegistrationCommands.register(command);
 
     return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromDomain(staff));
   }
