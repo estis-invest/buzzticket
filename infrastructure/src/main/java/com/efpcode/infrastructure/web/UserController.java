@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -56,10 +57,7 @@ class UserController {
 
     CreateStaffInvitationResult invitationResult =
         staffRegistrationCommands.sendInvitation(command);
-    String inviteLink =
-        frontendProperties.baseUrl()
-            + "/staff/invitations/accept?token="
-            + invitationResult.rawToken();
+    String inviteLink = generateLink(invitationResult.rawToken());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(
@@ -71,4 +69,15 @@ class UserController {
                 invitationResult.expiresAt(),
                 inviteLink));
   }
+
+
+  private String generateLink(String token){
+    var tokenStem = "/staff/invitations/accept?toke=";
+    return UriComponentsBuilder.fromUriString(frontendProperties.baseUrl())
+            .path(tokenStem)
+            .queryParam(token)
+            .build()
+            .toUriString();
+  }
+
 }

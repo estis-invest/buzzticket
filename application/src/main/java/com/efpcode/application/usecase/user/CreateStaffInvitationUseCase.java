@@ -23,7 +23,6 @@ import java.time.Clock;
 import java.time.Instant;
 
 public class CreateStaffInvitationUseCase {
-  private final RequestContext requestContext;
   private final IdGenerator<StaffInvitationId> staffInvitationIdGenerator;
   private final StaffInvitationRepository staffInvitationRepository;
   private final AdminActionPolicy adminActionPolicy;
@@ -33,7 +32,6 @@ public class CreateStaffInvitationUseCase {
   private final StaffInvitationTimeToLivePolicy timeToLivePolicy;
 
   public CreateStaffInvitationUseCase(
-      RequestContext requestContext,
       IdGenerator<StaffInvitationId> staffInvitationIdGenerator,
       StaffInvitationRepository staffInvitationRepository,
       AdminActionPolicy adminActionPolicy,
@@ -41,7 +39,6 @@ public class CreateStaffInvitationUseCase {
       Clock clock,
       StaffInvitationTokenGenerator tokenGenerator,
       StaffInvitationTimeToLivePolicy timeToLivePolicy) {
-    this.requestContext = requestContext;
     this.staffInvitationIdGenerator = staffInvitationIdGenerator;
     this.staffInvitationRepository = staffInvitationRepository;
     this.adminActionPolicy = adminActionPolicy;
@@ -51,7 +48,7 @@ public class CreateStaffInvitationUseCase {
     this.timeToLivePolicy = timeToLivePolicy;
   }
 
-  public CreateStaffInvitationResult execute(RegisterStaffInvitationCommand command) {
+  public CreateStaffInvitationResult execute(RegisterStaffInvitationCommand command, RequestContext requestContext) {
     var adminContext = adminActionPolicy.adminValidator(requestContext);
 
     Instant now = Instant.now(clock);
@@ -60,7 +57,7 @@ public class CreateStaffInvitationUseCase {
 
     if (command.expiresAt().isAfter(maxAllowedTime)) {
       throw new IllegalStaffInvitationExpirationDateArgumentException(
-          "Staff invitation expiration cannot exceed " + maxAllowedTime + " days");
+          "Staff invitation expiration must not exceed "+ maxAllowedTime);
     }
     UserRole role;
 

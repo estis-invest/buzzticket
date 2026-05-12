@@ -22,18 +22,16 @@ public class UserConfig {
 
   @Bean
   public RegisterStaffUseCase registerStaffUseCase(
-      RequestContext requestContext,
       IdGenerator<UserId> idGenerator,
       UserRepository userRepository,
       AdminActionPolicy adminActionPolicy,
       PasswordHasher passwordHasher) {
     return new RegisterStaffUseCase(
-        requestContext, idGenerator, userRepository, adminActionPolicy, passwordHasher);
+            idGenerator, userRepository, adminActionPolicy, passwordHasher);
   }
 
   @Bean
   public CreateStaffInvitationUseCase createStaffInvitationUseCase(
-      RequestContext requestContext,
       IdGenerator<StaffInvitationId> idGenerator,
       StaffInvitationRepository staffInvitationRepository,
       AdminActionPolicy adminActionPolicy,
@@ -42,8 +40,7 @@ public class UserConfig {
       StaffInvitationTokenGenerator tokenGenerator,
       StaffInvitationTimeToLivePolicy timeToLivePolicy) {
     return new CreateStaffInvitationUseCase(
-        requestContext,
-        idGenerator,
+            idGenerator,
         staffInvitationRepository,
         adminActionPolicy,
         tokenHasher,

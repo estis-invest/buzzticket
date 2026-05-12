@@ -12,6 +12,7 @@ touch "$ENV_FILE"
 
 # Remove any existing definition
 sed -i.bak "/^${VAR_NAME}=/d" "$ENV_FILE"
+rm -f "${ENV_FILE}.bak"
 
 # Append new secret
 echo "${VAR_NAME}=${SECRET}" >> "$ENV_FILE"

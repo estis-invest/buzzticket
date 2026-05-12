@@ -1,5 +1,6 @@
 package com.efpcode.infrastructure.adapters;
 
+import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.usecase.user.CreateStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
@@ -14,23 +15,27 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserTransactionalAdapter implements StaffRegistrationCommands {
   private final RegisterStaffUseCase registerStaffUseCase;
   private final CreateStaffInvitationUseCase createStaffInvitationUseCase;
+  private final RequestContext requestContext;
 
   public UserTransactionalAdapter(
       RegisterStaffUseCase registerStaffUseCase,
-      CreateStaffInvitationUseCase createStaffInvitationUseCase) {
+      CreateStaffInvitationUseCase createStaffInvitationUseCase,
+      RequestContext requestContext
+      ) {
     this.registerStaffUseCase = registerStaffUseCase;
     this.createStaffInvitationUseCase = createStaffInvitationUseCase;
+    this.requestContext=requestContext;
   }
 
   @Override
   @Transactional
   public User register(RegisterStaffCommand command) {
-    return registerStaffUseCase.execute(command);
+    return registerStaffUseCase.execute(command, requestContext );
   }
 
   @Override
   @Transactional
   public CreateStaffInvitationResult sendInvitation(RegisterStaffInvitationCommand command) {
-    return createStaffInvitationUseCase.execute(command);
+    return createStaffInvitationUseCase.execute(command, requestContext);
   }
 }

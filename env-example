@@ -26,4 +26,5 @@ BUZZTICKET_JWT_TTL_SECONDS=900
 # HMAC secret used to hash staff invitation tokens
 # Generate once using: openssl rand -base64 32
 STAFF_INVITE_HMAC_SECRET=
-
+APP_FRONTEND_BASE_URL=
+APP_STAFF_INVITATION_TTL_DAYS=

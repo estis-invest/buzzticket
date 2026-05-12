@@ -14,26 +14,23 @@ import com.efpcode.domain.user.model.*;
 import com.efpcode.domain.user.port.UserRepository;
 
 public class RegisterStaffUseCase {
-  private final RequestContext requestContext;
   private final IdGenerator<UserId> userIdGenerator;
   private final UserRepository userRepository;
   private final AdminActionPolicy adminActionPolicy;
   private final PasswordHasher passwordHasher;
 
   public RegisterStaffUseCase(
-      RequestContext requestContext,
       IdGenerator<UserId> userIdGenerator,
       UserRepository userRepository,
       AdminActionPolicy adminActionPolicy,
       PasswordHasher passwordHasher) {
-    this.requestContext = requestContext;
     this.userIdGenerator = userIdGenerator;
     this.userRepository = userRepository;
     this.adminActionPolicy = adminActionPolicy;
     this.passwordHasher = passwordHasher;
   }
 
-  public User execute(RegisterStaffCommand command) {
+  public User execute(RegisterStaffCommand command, RequestContext requestContext) {
 
     AdminContext adminContext = adminActionPolicy.adminValidator(requestContext);
     PartnerId partnerId = adminContext.partner().id();

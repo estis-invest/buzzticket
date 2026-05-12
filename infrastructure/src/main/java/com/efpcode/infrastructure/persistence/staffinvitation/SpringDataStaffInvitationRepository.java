@@ -13,7 +13,7 @@ public interface SpringDataStaffInvitationRepository
   Optional<StaffInvitationEntity> findByStatusAndInvitationTokenHash(
       String status, String invitationTokenHash);
 
-  boolean existsByInviteeEmailAndPartnerId(String inviteeEmail, UUID partnerId);
+  boolean existsByInviteeEmailAndPartnerIdAndStatus(String inviteeEmail, UUID partnerId, String status);
 
   List<StaffInvitationEntity> findByPartnerIdAndStatus(UUID partnerId, String status);
 }

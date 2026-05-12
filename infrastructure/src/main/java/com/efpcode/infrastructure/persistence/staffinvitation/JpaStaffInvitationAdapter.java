@@ -35,8 +35,8 @@ public class JpaStaffInvitationAdapter implements StaffInvitationRepository {
 
   @Override
   public boolean existsPendingByEmailAndPartnerId(UserEmail inviteeEmail, PartnerId partnerId) {
-    return staffInvitationRepository.existsByInviteeEmailAndPartnerId(
-        inviteeEmail.email(), partnerId.partnerId());
+    return staffInvitationRepository.existsByInviteeEmailAndPartnerIdAndStatus(
+        inviteeEmail.email(), partnerId.partnerId(), StaffInvitationStatus.PENDING.name());
   }
 
   @Override

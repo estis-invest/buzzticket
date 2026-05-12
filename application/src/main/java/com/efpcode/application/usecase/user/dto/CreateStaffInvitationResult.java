@@ -9,4 +9,18 @@ public record CreateStaffInvitationResult(
     String role,
     String status,
     Instant expiresAt,
-    String rawToken) {}
+    String rawToken) {
+
+
+    @Override
+    public String toString() {
+        return "CreateStaffInvitationResult{" +
+                "invitationId=" + invitationId +
+                ", inviteeEmail='" + inviteeEmail + '\'' +
+                ", role='" + role + '\'' +
+                ", status='" + status + '\'' +
+                ", expiresAt=" + expiresAt +
+                ", rawToken='" + "'REDACTED'" + '\'' +
+                '}';
+    }
+}

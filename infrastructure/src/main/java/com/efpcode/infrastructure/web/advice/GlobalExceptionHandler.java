@@ -11,6 +11,7 @@ import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
 import com.efpcode.domain.staffinvitation.exceptions.StaffInvitationDomainException;
 import com.efpcode.domain.user.exceptions.UserDomainException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -87,5 +88,13 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(StaffInvitationDomainException.class)
   public ProblemDetail handleStaffInvitationDomain(StaffInvitationDomainException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+    return ProblemDetail.forStatusAndDetail(
+            HttpStatus.CONFLICT,
+            "Resource already exists"
+    );
   }
 }
