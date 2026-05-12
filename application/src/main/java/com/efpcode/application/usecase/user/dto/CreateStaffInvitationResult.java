@@ -1,12 +1,12 @@
-package com.efpcode.infrastructure.web.dto.responses;
+package com.efpcode.application.usecase.user.dto;
 
 import java.time.Instant;
 import java.util.UUID;
 
-public record StaffInvitationResponse(
+public record CreateStaffInvitationResult(
     UUID invitationId,
     String inviteeEmail,
     String role,
     String status,
     Instant expiresAt,
-    String inviteLink) {}
+    String rawToken) {}
