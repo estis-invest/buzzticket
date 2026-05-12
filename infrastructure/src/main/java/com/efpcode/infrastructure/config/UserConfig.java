@@ -1,6 +1,5 @@
 package com.efpcode.infrastructure.config;
 
-import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.StaffInvitationTimeToLivePolicy;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
@@ -26,8 +25,7 @@ public class UserConfig {
       UserRepository userRepository,
       AdminActionPolicy adminActionPolicy,
       PasswordHasher passwordHasher) {
-    return new RegisterStaffUseCase(
-            idGenerator, userRepository, adminActionPolicy, passwordHasher);
+    return new RegisterStaffUseCase(idGenerator, userRepository, adminActionPolicy, passwordHasher);
   }
 
   @Bean
@@ -40,7 +38,7 @@ public class UserConfig {
       StaffInvitationTokenGenerator tokenGenerator,
       StaffInvitationTimeToLivePolicy timeToLivePolicy) {
     return new CreateStaffInvitationUseCase(
-            idGenerator,
+        idGenerator,
         staffInvitationRepository,
         adminActionPolicy,
         tokenHasher,

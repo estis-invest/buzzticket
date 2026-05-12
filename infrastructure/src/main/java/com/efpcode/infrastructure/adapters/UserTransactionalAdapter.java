@@ -20,17 +20,16 @@ public class UserTransactionalAdapter implements StaffRegistrationCommands {
   public UserTransactionalAdapter(
       RegisterStaffUseCase registerStaffUseCase,
       CreateStaffInvitationUseCase createStaffInvitationUseCase,
-      RequestContext requestContext
-      ) {
+      RequestContext requestContext) {
     this.registerStaffUseCase = registerStaffUseCase;
     this.createStaffInvitationUseCase = createStaffInvitationUseCase;
-    this.requestContext=requestContext;
+    this.requestContext = requestContext;
   }
 
   @Override
   @Transactional
   public User register(RegisterStaffCommand command) {
-    return registerStaffUseCase.execute(command, requestContext );
+    return registerStaffUseCase.execute(command, requestContext);
   }
 
   @Override

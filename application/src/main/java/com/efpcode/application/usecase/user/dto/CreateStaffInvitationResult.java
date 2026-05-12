@@ -11,16 +11,25 @@ public record CreateStaffInvitationResult(
     Instant expiresAt,
     String rawToken) {
 
-
-    @Override
-    public String toString() {
-        return "CreateStaffInvitationResult{" +
-                "invitationId=" + invitationId +
-                ", inviteeEmail='" + inviteeEmail + '\'' +
-                ", role='" + role + '\'' +
-                ", status='" + status + '\'' +
-                ", expiresAt=" + expiresAt +
-                ", rawToken='" + "'REDACTED'" + '\'' +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "CreateStaffInvitationResult{"
+        + "invitationId="
+        + invitationId
+        + ", inviteeEmail='"
+        + inviteeEmail
+        + '\''
+        + ", role='"
+        + role
+        + '\''
+        + ", status='"
+        + status
+        + '\''
+        + ", expiresAt="
+        + expiresAt
+        + ", rawToken='"
+        + "'REDACTED'"
+        + '\''
+        + '}';
+  }
 }

@@ -48,7 +48,8 @@ public class CreateStaffInvitationUseCase {
     this.timeToLivePolicy = timeToLivePolicy;
   }
 
-  public CreateStaffInvitationResult execute(RegisterStaffInvitationCommand command, RequestContext requestContext) {
+  public CreateStaffInvitationResult execute(
+      RegisterStaffInvitationCommand command, RequestContext requestContext) {
     var adminContext = adminActionPolicy.adminValidator(requestContext);
 
     Instant now = Instant.now(clock);
@@ -57,7 +58,7 @@ public class CreateStaffInvitationUseCase {
 
     if (command.expiresAt().isAfter(maxAllowedTime)) {
       throw new IllegalStaffInvitationExpirationDateArgumentException(
-          "Staff invitation expiration must not exceed "+ maxAllowedTime);
+          "Staff invitation expiration must not exceed " + maxAllowedTime);
     }
     UserRole role;
 

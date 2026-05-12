@@ -70,14 +70,12 @@ class UserController {
                 inviteLink));
   }
 
-
-  private String generateLink(String token){
-    var tokenStem = "/staff/invitations/accept?toke=";
+  private String generateLink(String token) {
+    var tokenStem = "/staff/invitations/accept?token=";
     return UriComponentsBuilder.fromUriString(frontendProperties.baseUrl())
-            .path(tokenStem)
-            .queryParam(token)
-            .build()
-            .toUriString();
+        .path(tokenStem)
+        .queryParam(token)
+        .build()
+        .toUriString();
   }
-
 }

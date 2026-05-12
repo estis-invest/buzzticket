@@ -92,9 +92,6 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
-    return ProblemDetail.forStatusAndDetail(
-            HttpStatus.CONFLICT,
-            "Resource already exists"
-    );
+    return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Resource already exists");
   }
 }
