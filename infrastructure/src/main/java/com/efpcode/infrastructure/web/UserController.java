@@ -46,6 +46,7 @@ class UserController {
     return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.fromDomain(staff));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/staff/invitations")
   public ResponseEntity<StaffInvitationResponse> sendInvite(
       @Valid @RequestBody RegisterStaffInvitationRequest request) {
