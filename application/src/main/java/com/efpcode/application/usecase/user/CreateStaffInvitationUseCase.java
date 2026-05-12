@@ -1,6 +1,7 @@
 package com.efpcode.application.usecase.user;
 
 import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.StaffInvitationTimeToLivePolicy;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
 import com.efpcode.application.port.out.security.StaffInvitationTokenHasher;
@@ -20,7 +21,6 @@ import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 public class CreateStaffInvitationUseCase {
   private final RequestContext requestContext;
@@ -30,6 +30,7 @@ public class CreateStaffInvitationUseCase {
   private final StaffInvitationTokenHasher tokenHasher;
   private final Clock clock;
   private final StaffInvitationTokenGenerator tokenGenerator;
+  private final StaffInvitationTimeToLivePolicy timeToLivePolicy;
 
   public CreateStaffInvitationUseCase(
       RequestContext requestContext,
@@ -38,7 +39,8 @@ public class CreateStaffInvitationUseCase {
       AdminActionPolicy adminActionPolicy,
       StaffInvitationTokenHasher tokenHasher,
       Clock clock,
-      StaffInvitationTokenGenerator tokenGenerator) {
+      StaffInvitationTokenGenerator tokenGenerator,
+      StaffInvitationTimeToLivePolicy timeToLivePolicy) {
     this.requestContext = requestContext;
     this.staffInvitationIdGenerator = staffInvitationIdGenerator;
     this.staffInvitationRepository = staffInvitationRepository;
@@ -46,6 +48,7 @@ public class CreateStaffInvitationUseCase {
     this.tokenHasher = tokenHasher;
     this.clock = clock;
     this.tokenGenerator = tokenGenerator;
+    this.timeToLivePolicy = timeToLivePolicy;
   }
 
   public CreateStaffInvitationResult execute(RegisterStaffInvitationCommand command) {
@@ -53,7 +56,7 @@ public class CreateStaffInvitationUseCase {
 
     Instant now = Instant.now(clock);
 
-    Instant maxAllowedTime = now.plus(7, ChronoUnit.DAYS);
+    Instant maxAllowedTime = now.plus(timeToLivePolicy.timeToLive());
 
     if (command.expiresAt().isAfter(maxAllowedTime)) {
       throw new IllegalStaffInvitationExpirationDateArgumentException(

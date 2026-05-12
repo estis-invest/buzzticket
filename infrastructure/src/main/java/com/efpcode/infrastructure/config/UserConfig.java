@@ -1,6 +1,7 @@
 package com.efpcode.infrastructure.config;
 
 import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.StaffInvitationTimeToLivePolicy;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
@@ -38,7 +39,8 @@ public class UserConfig {
       AdminActionPolicy adminActionPolicy,
       StaffInvitationTokenHasher tokenHasher,
       Clock clock,
-      StaffInvitationTokenGenerator tokenGenerator) {
+      StaffInvitationTokenGenerator tokenGenerator,
+      StaffInvitationTimeToLivePolicy timeToLivePolicy) {
     return new CreateStaffInvitationUseCase(
         requestContext,
         idGenerator,
@@ -46,6 +48,7 @@ public class UserConfig {
         adminActionPolicy,
         tokenHasher,
         clock,
-        tokenGenerator);
+        tokenGenerator,
+        timeToLivePolicy);
   }
 }

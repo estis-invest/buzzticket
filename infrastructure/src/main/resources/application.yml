@@ -36,6 +36,8 @@ security:
 app:
   frontend:
     base-url: https://app.buzzticket.com
+  staff-invite:
+    ttl-days: 7
 
 logging:
   level:

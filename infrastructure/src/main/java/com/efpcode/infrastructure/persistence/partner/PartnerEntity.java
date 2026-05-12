@@ -13,7 +13,7 @@ public class PartnerEntity {
   @Column(name = "partner_id", unique = true, nullable = false)
   private UUID partnerId;
 
-  @Column(name = "partner_name", unique = false, nullable = false)
+  @Column(name = "partner_name", unique = true, nullable = false)
   private String partnerName;
 
   @Column(name = "partner_city", nullable = false)
