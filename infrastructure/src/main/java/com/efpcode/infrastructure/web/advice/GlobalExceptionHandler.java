@@ -9,6 +9,7 @@ import com.efpcode.application.usecase.user.exceptions.IllegalUserEmailDuplicate
 import com.efpcode.application.usecase.user.exceptions.UserApplicationException;
 import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
+import com.efpcode.domain.staffinvitation.exceptions.StaffInvitationDomainException;
 import com.efpcode.domain.user.exceptions.UserDomainException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -80,6 +81,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(UserApplicationException.class)
   public ProblemDetail handleUserApplicationException(UserApplicationException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+  }
+
+  @ExceptionHandler(StaffInvitationDomainException.class)
+  public ProblemDetail handleStaffInvitationDomain(StaffInvitationDomainException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
 }

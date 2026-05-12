@@ -60,7 +60,7 @@ public class CreateStaffInvitationUseCase {
 
     if (command.expiresAt().isAfter(maxAllowedTime)) {
       throw new IllegalStaffInvitationExpirationDateArgumentException(
-          "Staff invitation expiration cannot exceed 7 days");
+          "Staff invitation expiration cannot exceed " + maxAllowedTime + " days");
     }
     UserRole role;
 
