@@ -1,4 +1,4 @@
-package com.efpcode.infrastructure.web.dto;
+package com.efpcode.infrastructure.web.dto.requests;
 
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 

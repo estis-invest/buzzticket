@@ -30,7 +30,7 @@ public class RegisterStaffUseCase {
     this.passwordHasher = passwordHasher;
   }
 
-  public User execute(RequestContext requestContext, RegisterStaffCommand command) {
+  public User execute(RegisterStaffCommand command, RequestContext requestContext) {
 
     AdminContext adminContext = adminActionPolicy.adminValidator(requestContext);
     PartnerId partnerId = adminContext.partner().id();

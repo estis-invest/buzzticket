@@ -1,4 +1,4 @@
-package com.efpcode.infrastructure.web.dto;
+package com.efpcode.infrastructure.web.dto.responses;
 
 import java.util.List;
 

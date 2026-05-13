@@ -8,5 +8,6 @@ CREATE TABLE partner
     partner_status     VARCHAR(255)                NOT NULL,
     partner_created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
     partner_updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
-    CONSTRAINT pk_partner PRIMARY KEY (partner_id)
+    CONSTRAINT pk_partner PRIMARY KEY (partner_id),
+    CONSTRAINT uq_partner_name UNIQUE (partner_name)
 );

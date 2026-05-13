@@ -30,6 +30,15 @@ spring:
     table: flyway_schema_history
     baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:false}
 
+security:
+  staff-invite:
+    hmac-secret: ${STAFF_INVITE_HMAC_SECRET}
+app:
+  frontend:
+    base-url: ${APP_FRONTEND_BASE_URL:https://app.buzzticket.com}
+  staff-invite:
+    ttl-days: ${APP_STAFF_INVITATION_TTL_DAYS:7}
+
 logging:
   level:
     root: INFO

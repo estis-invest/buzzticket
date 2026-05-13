@@ -1,4 +1,4 @@
-package com.efpcode.infrastructure.web.dto;
+package com.efpcode.infrastructure.web.dto.responses;
 
 import com.efpcode.application.usecase.company.dto.CompanyResult;
 import java.util.UUID;

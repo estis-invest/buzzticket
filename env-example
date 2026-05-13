@@ -22,3 +22,9 @@ BUZZTICKET_JWT_ISSUER=buzzticket-prod
 BUZZTICKET_JWT_AUDIENCE=buzzticket-api
 BUZZTICKET_JWT_KEY_ID=buzzticket-jwt-v1
 BUZZTICKET_JWT_TTL_SECONDS=900
+# --- Staff Invitation ---
+# HMAC secret used to hash staff invitation tokens
+# Generate once using: openssl rand -base64 32
+STAFF_INVITE_HMAC_SECRET=
+APP_FRONTEND_BASE_URL=
+APP_STAFF_INVITATION_TTL_DAYS=
