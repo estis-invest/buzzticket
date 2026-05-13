@@ -71,10 +71,10 @@ class UserController {
   }
 
   private String generateLink(String token) {
-    var tokenStem = "/staff/invitations/accept?token=";
+    var tokenStem = "/staff/invitations/accept";
     return UriComponentsBuilder.fromUriString(frontendProperties.baseUrl())
         .path(tokenStem)
-        .queryParam(token)
+        .queryParam("token", token)
         .build()
         .toUriString();
   }
