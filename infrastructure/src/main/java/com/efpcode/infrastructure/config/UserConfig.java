@@ -5,6 +5,7 @@ import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
 import com.efpcode.application.port.out.security.StaffInvitationTokenHasher;
+import com.efpcode.application.usecase.user.AcceptStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.CreateStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
 import com.efpcode.domain.common.port.IdGenerator;
@@ -45,5 +46,17 @@ public class UserConfig {
         clock,
         tokenGenerator,
         timeToLivePolicy);
+  }
+
+  @Bean
+  public AcceptStaffInvitationUseCase acceptStaffInvitationUseCase(
+      IdGenerator<UserId> idGenerator,
+      UserRepository userRepository,
+      StaffInvitationRepository staffInvitationRepository,
+      StaffInvitationTokenHasher tokenHasher,
+      Clock clock,
+      PasswordHasher passwordHasher) {
+    return new AcceptStaffInvitationUseCase(
+        idGenerator, userRepository, staffInvitationRepository, tokenHasher, clock, passwordHasher);
   }
 }
