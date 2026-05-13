@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/public/staff/invitations/accept")
 class StaffInvitationAcceptanceController {
 
-  private final StaffInvitationAcceptanceCommands staffRegistrationCommands;
+  private final StaffInvitationAcceptanceCommands staffInvitationAcceptanceCommands;
 
   StaffInvitationAcceptanceController(StaffInvitationAcceptanceCommands staffRegistrationCommands) {
-    this.staffRegistrationCommands = staffRegistrationCommands;
+    this.staffInvitationAcceptanceCommands = staffRegistrationCommands;
   }
 
   @PostMapping
@@ -30,7 +30,7 @@ class StaffInvitationAcceptanceController {
         new RegisterStaffInvitationAccountCommand(
             request.rawToken(), request.name(), request.password());
 
-    StaffInvitationAcceptanceResult result = staffRegistrationCommands.acceptInvitation(command);
+    StaffInvitationAcceptanceResult result = staffInvitationAcceptanceCommands.acceptInvitation(command);
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(StaffInvitationAcceptanceResponse.fromResult(result));
