@@ -63,6 +63,13 @@ class StaffInvitationCommandController {
   }
 
   @PreAuthorize("hasRole('ADMIN')")
+  @PatchMapping("/invitations/{id}/cancel")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void cancelStaffInvitation(@PathVariable UUID id) {
+    staffRegistrationCommands.cancelInvitation(new StaffInvitationId(id));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/invitations/{id}")
   public ResponseEntity<StaffInvitationQueryResponse> getStaffInvitation(@PathVariable UUID id) {
     StaffInvitationQueryResult result =

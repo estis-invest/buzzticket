@@ -43,6 +43,29 @@ public record StaffInvitation(
     validateAcceptanceMetadata(invitationStatus, acceptedAt, acceptedUserId);
   }
 
+  public StaffInvitation cancel(Instant currentTime) {
+    requireMethodArgument(currentTime, "Current time cannot be null");
+
+    if (this.invitationStatus != StaffInvitationStatus.PENDING) {
+      throw new InvalidStaffInvitationStatusException(
+          "Only pending invitations can be cancelled", null);
+    }
+
+    return new StaffInvitation(
+        this.invitationId,
+        this.invitedByUserId,
+        this.inviteeEmail,
+        this.role,
+        this.partnerId,
+        this.invitationTokenHash,
+        StaffInvitationStatus.EXPIRED,
+        this.invitationCreatedAt,
+        this.invitationExpiresAt,
+        new StaffInvitationUpdatedAt(currentTime),
+        Optional.empty(),
+        Optional.empty());
+  }
+
   public StaffInvitation accept(Instant currentTime, UserId acceptedUserId) {
     requireMethodArgument(currentTime, "Current time cannot be null");
     requireMethodArgument(acceptedUserId, "Accepted user id cannot be null");
