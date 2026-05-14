@@ -62,6 +62,7 @@ class StaffInvitationCommandController {
                 inviteLink));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/invitations/{id}")
   public ResponseEntity<StaffInvitationQueryResponse> getStaffInvitation(@PathVariable UUID id) {
     StaffInvitationQueryResult result =
@@ -69,6 +70,7 @@ class StaffInvitationCommandController {
     return ResponseEntity.ok(StaffInvitationQueryResponse.fromResult(result));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @GetMapping("/invitations")
   public ResponseEntity<StaffInvitationQueryListResponse> getAllStaffInvitations(
       @RequestParam StaffInvitationStatus status) {
@@ -82,6 +84,15 @@ class StaffInvitationCommandController {
     return ResponseEntity.ok(
         new StaffInvitationQueryListResponse(
             invitationQueryResponses, invitationQueryResponses.size()));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/invitations/exists")
+  public ResponseEntity<Boolean> hasInvitationByEmail(@RequestParam String inviteeEmail) {
+
+    boolean hasInvite = staffInvitationQueryReads.hasPendingInvite(inviteeEmail);
+
+    return ResponseEntity.ok(hasInvite);
   }
 
   private String generateLink(String token) {

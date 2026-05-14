@@ -10,4 +10,6 @@ public interface StaffInvitationQueryReads {
   StaffInvitationQueryResult getStaffInvitation(StaffInvitationId invitationId);
 
   List<StaffInvitationQueryResult> getAllStaffInvitationByStatus(StaffInvitationStatus status);
+
+  boolean hasPendingInvite(String inviteeEmail);
 }
