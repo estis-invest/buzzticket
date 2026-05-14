@@ -3,17 +3,16 @@ package com.efpcode.application.usecase.user.dto;
 import java.time.Instant;
 import java.util.UUID;
 
-public record CreateStaffInvitationResult(
+public record StaffInvitationQueryResult(
     UUID invitationId,
     String inviteeEmail,
     String role,
     String status,
     Instant expiresAt,
-    String rawToken) {
-
+    Instant updatedAt) {
   @Override
   public String toString() {
-    return "CreateStaffInvitationResult{"
+    return "StaffInvitationQueryResult{"
         + "invitationId="
         + invitationId
         + ", inviteeEmail='"
@@ -27,9 +26,8 @@ public record CreateStaffInvitationResult(
         + '\''
         + ", expiresAt="
         + expiresAt
-        + ", rawToken='"
-        + "'REDACTED'"
-        + '\''
+        + ", updatedAt="
+        + updatedAt
         + '}';
   }
 }

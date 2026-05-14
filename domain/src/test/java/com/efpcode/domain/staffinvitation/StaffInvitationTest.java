@@ -456,6 +456,49 @@ class StaffInvitationTest {
     }
 
     @Test
+    @DisplayName("Pending invitation cannot be expired before natural expiry")
+    void pendingInvitationCannotBeExpiredBeforeNaturalExpiry() {
+      Instant cancelTime = NOW.plusSeconds(10); // BEFORE EXPIRES_AT
+
+      assertThatThrownBy(() -> pending.expire(cancelTime))
+          .isInstanceOf(InvalidStaffInvitationDateException.class)
+          .hasMessageContaining("Invitation has not expired yet");
+    }
+
+    @Test
+    @DisplayName("Pending invitation can be cancelled by cancel method before expiry")
+    void pendingInvitationCanBeCancelledByCancelMethodBeforeExpiry() {
+      Instant cancelTime = NOW.plusSeconds(10);
+
+      StaffInvitation cancelled = pending.cancel(cancelTime);
+
+      assertThat(cancelled.invitationStatus()).isEqualTo(StaffInvitationStatus.EXPIRED);
+
+      assertThat(cancelled.acceptedAt()).isEmpty();
+      assertThat(cancelled.acceptedUserId()).isEmpty();
+      assertThat(cancelled.invitationUpdatedAt().time()).isAfterOrEqualTo(cancelTime);
+    }
+
+    @Test
+    @DisplayName("Invitation cannot be cancelled by cancel method if not PENDING throws error")
+    void invitationCannotBeCancelledByCancelMethodIfNotPendingThrowsError() {
+      Instant cancelTime = NOW.plusSeconds(10);
+
+      assertThatThrownBy(() -> accepted.cancel(cancelTime))
+          .isInstanceOf(InvalidStaffInvitationStatusException.class)
+          .hasMessageContaining("Only pending invitations can be cancelled");
+    }
+
+    @Test
+    @DisplayName("Invitation cancel method throws error if status expires status")
+    void invitationCancelMethodThrowsErrorIfStatusExpiresStatus() {
+      Instant cancelTime = NOW.plusSeconds(10);
+      assertThatThrownBy(() -> expired.cancel(cancelTime))
+          .isInstanceOf(InvalidStaffInvitationStatusException.class)
+          .hasMessageContaining("Only pending invitations can be cancelled");
+    }
+
+    @Test
     @DisplayName("Pending invitation can be accepted")
     void pendingInvitationCanBeAccepted() {
       StaffInvitation result = pending.accept(ACCEPTED_AT, acceptedUserId);

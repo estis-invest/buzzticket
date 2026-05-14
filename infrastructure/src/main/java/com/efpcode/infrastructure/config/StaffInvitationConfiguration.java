@@ -1,0 +1,41 @@
+package com.efpcode.infrastructure.config;
+
+import com.efpcode.application.policy.admin.AdminActionPolicy;
+import com.efpcode.application.usecase.user.CancelStaffInvitationUseCase;
+import com.efpcode.application.usecase.user.GetAllStaffInvitationByStatusUseCase;
+import com.efpcode.application.usecase.user.GetStaffInvitationUseCase;
+import com.efpcode.application.usecase.user.HasStaffInvitationUseCase;
+import com.efpcode.domain.staffinvitation.port.StaffInvitationRepository;
+import java.time.Clock;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+class StaffInvitationConfiguration {
+
+  @Bean
+  public GetStaffInvitationUseCase getStaffInvitationUseCase(
+      StaffInvitationRepository staffInvitationRepository, AdminActionPolicy adminActionPolicy) {
+    return new GetStaffInvitationUseCase(staffInvitationRepository, adminActionPolicy);
+  }
+
+  @Bean
+  public GetAllStaffInvitationByStatusUseCase getAllStaffInvitationByStatusUseCase(
+      StaffInvitationRepository staffInvitationRepository, AdminActionPolicy adminActionPolicy) {
+    return new GetAllStaffInvitationByStatusUseCase(staffInvitationRepository, adminActionPolicy);
+  }
+
+  @Bean
+  public HasStaffInvitationUseCase hasStaffInvitationUseCase(
+      StaffInvitationRepository staffInvitationRepository, AdminActionPolicy adminActionPolicy) {
+    return new HasStaffInvitationUseCase(staffInvitationRepository, adminActionPolicy);
+  }
+
+  @Bean
+  public CancelStaffInvitationUseCase cancelStaffInvitationUseCase(
+      StaffInvitationRepository staffInvitationRepository,
+      AdminActionPolicy adminActionPolicy,
+      Clock clock) {
+    return new CancelStaffInvitationUseCase(staffInvitationRepository, adminActionPolicy, clock);
+  }
+}
