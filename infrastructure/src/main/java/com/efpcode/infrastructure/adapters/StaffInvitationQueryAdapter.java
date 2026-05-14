@@ -1,25 +1,38 @@
 package com.efpcode.infrastructure.adapters;
 
 import com.efpcode.application.context.RequestContext;
-import com.efpcode.application.port.in.user.StaffInvitationQueryCommands;
+import com.efpcode.application.port.in.user.StaffInvitationQueryReads;
+import com.efpcode.application.usecase.user.GetAllStaffInvitationByStatusUseCase;
 import com.efpcode.application.usecase.user.GetStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.dto.StaffInvitationQueryResult;
 import com.efpcode.domain.staffinvitation.StaffInvitationId;
+import com.efpcode.domain.staffinvitation.StaffInvitationStatus;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StaffInvitationQueryAdapter implements StaffInvitationQueryCommands {
+public class StaffInvitationQueryAdapter implements StaffInvitationQueryReads {
   private final RequestContext request;
   private final GetStaffInvitationUseCase getStaffInvitationUseCase;
+  private final GetAllStaffInvitationByStatusUseCase getAllStaffInvitationByStatusUseCase;
 
   public StaffInvitationQueryAdapter(
-      GetStaffInvitationUseCase getStaffInvitationUseCase, RequestContext request) {
+      GetStaffInvitationUseCase getStaffInvitationUseCase,
+      GetAllStaffInvitationByStatusUseCase getAllStaffInvitationByStatusUseCase,
+      RequestContext request) {
     this.getStaffInvitationUseCase = getStaffInvitationUseCase;
+    this.getAllStaffInvitationByStatusUseCase = getAllStaffInvitationByStatusUseCase;
     this.request = request;
   }
 
   @Override
   public StaffInvitationQueryResult getStaffInvitation(StaffInvitationId invitationId) {
     return getStaffInvitationUseCase.execute(invitationId, request);
+  }
+
+  @Override
+  public List<StaffInvitationQueryResult> getAllStaffInvitationByStatus(
+      StaffInvitationStatus status) {
+    return getAllStaffInvitationByStatusUseCase.execute(status, request);
   }
 }

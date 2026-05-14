@@ -1,16 +1,19 @@
 package com.efpcode.infrastructure.web;
 
-import com.efpcode.application.port.in.user.StaffInvitationQueryCommands;
+import com.efpcode.application.port.in.user.StaffInvitationQueryReads;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.usecase.user.dto.CreateStaffInvitationResult;
 import com.efpcode.application.usecase.user.dto.RegisterStaffInvitationCommand;
 import com.efpcode.application.usecase.user.dto.StaffInvitationQueryResult;
 import com.efpcode.domain.staffinvitation.StaffInvitationId;
+import com.efpcode.domain.staffinvitation.StaffInvitationStatus;
 import com.efpcode.infrastructure.config.properties.FrontendProperties;
 import com.efpcode.infrastructure.web.dto.requests.RegisterStaffInvitationRequest;
 import com.efpcode.infrastructure.web.dto.responses.StaffInvitationCreateResponse;
+import com.efpcode.infrastructure.web.dto.responses.StaffInvitationQueryListResponse;
 import com.efpcode.infrastructure.web.dto.responses.StaffInvitationQueryResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -24,15 +27,15 @@ import org.springframework.web.util.UriComponentsBuilder;
 class StaffInvitationCommandController {
 
   private final StaffRegistrationCommands staffRegistrationCommands;
-  private final StaffInvitationQueryCommands staffInvitationQueryCommands;
+  private final StaffInvitationQueryReads staffInvitationQueryReads;
   private final FrontendProperties frontendProperties;
 
   public StaffInvitationCommandController(
       StaffRegistrationCommands staffRegistrationCommands,
-      StaffInvitationQueryCommands staffInvitationQueryCommands,
+      StaffInvitationQueryReads staffInvitationQueryReads,
       FrontendProperties frontendProperties) {
     this.staffRegistrationCommands = staffRegistrationCommands;
-    this.staffInvitationQueryCommands = staffInvitationQueryCommands;
+    this.staffInvitationQueryReads = staffInvitationQueryReads;
     this.frontendProperties = frontendProperties;
   }
 
@@ -62,8 +65,23 @@ class StaffInvitationCommandController {
   @GetMapping("/invitations/{id}")
   public ResponseEntity<StaffInvitationQueryResponse> getStaffInvitation(@PathVariable UUID id) {
     StaffInvitationQueryResult result =
-        staffInvitationQueryCommands.getStaffInvitation(new StaffInvitationId(id));
+        staffInvitationQueryReads.getStaffInvitation(new StaffInvitationId(id));
     return ResponseEntity.ok(StaffInvitationQueryResponse.fromResult(result));
+  }
+
+  @GetMapping("/invitations")
+  public ResponseEntity<StaffInvitationQueryListResponse> getAllStaffInvitations(
+      @RequestParam StaffInvitationStatus status) {
+
+    List<StaffInvitationQueryResult> invitationQueryResults =
+        staffInvitationQueryReads.getAllStaffInvitationByStatus(status);
+
+    List<StaffInvitationQueryResponse> invitationQueryResponses =
+        invitationQueryResults.stream().map(StaffInvitationQueryResponse::fromResult).toList();
+
+    return ResponseEntity.ok(
+        new StaffInvitationQueryListResponse(
+            invitationQueryResponses, invitationQueryResponses.size()));
   }
 
   private String generateLink(String token) {
