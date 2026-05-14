@@ -4,9 +4,7 @@ import com.efpcode.application.usecase.auth.exceptions.LoginFailException;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
-import com.efpcode.application.usecase.user.exceptions.IllegalStaffInvitationExpirationDateArgumentException;
-import com.efpcode.application.usecase.user.exceptions.IllegalUserEmailDuplicatedException;
-import com.efpcode.application.usecase.user.exceptions.UserApplicationException;
+import com.efpcode.application.usecase.user.exceptions.*;
 import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
 import com.efpcode.domain.staffinvitation.exceptions.StaffInvitationDomainException;
@@ -20,6 +18,17 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+  @ExceptionHandler(InvitationNotFoundException.class)
+  public ProblemDetail handleInvitationNotFound(InvitationNotFoundException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+  }
+
+  @ExceptionHandler(InvitationForbiddenException.class)
+  public ProblemDetail handleInvitationForbidden(InvitationForbiddenException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+  }
+
   @ExceptionHandler(PartnerAlreadyExistsException.class)
   public ProblemDetail handleAlreadyExists(PartnerAlreadyExistsException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());

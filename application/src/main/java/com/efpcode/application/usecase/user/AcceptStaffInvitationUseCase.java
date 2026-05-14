@@ -54,7 +54,6 @@ public class AcceptStaffInvitationUseCase {
             .findPendingByTokenHash(hashedToken)
             .orElseThrow(() -> new InvitationNotFoundException("User has no invitation"));
 
-
     if (invitation.invitationExpiresAt().time().isBefore(now)) {
       var invitationUpdated = invitation.expire(now);
       staffInvitationRepository.save(invitationUpdated);

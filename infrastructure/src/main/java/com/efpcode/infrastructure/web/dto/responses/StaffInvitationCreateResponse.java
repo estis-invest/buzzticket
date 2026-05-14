@@ -3,7 +3,7 @@ package com.efpcode.infrastructure.web.dto.responses;
 import java.time.Instant;
 import java.util.UUID;
 
-public record StaffInvitationResponse(
+public record StaffInvitationCreateResponse(
     UUID invitationId,
     String inviteeEmail,
     String role,

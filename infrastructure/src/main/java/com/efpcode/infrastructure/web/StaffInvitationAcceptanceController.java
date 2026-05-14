@@ -30,7 +30,8 @@ class StaffInvitationAcceptanceController {
         new RegisterStaffInvitationAccountCommand(
             request.rawToken(), request.name(), request.password());
 
-    StaffInvitationAcceptanceResult result = staffInvitationAcceptanceCommands.acceptInvitation(command);
+    StaffInvitationAcceptanceResult result =
+        staffInvitationAcceptanceCommands.acceptInvitation(command);
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(StaffInvitationAcceptanceResponse.fromResult(result));
