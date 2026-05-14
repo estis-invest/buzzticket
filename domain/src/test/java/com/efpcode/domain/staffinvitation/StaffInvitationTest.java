@@ -456,8 +456,8 @@ class StaffInvitationTest {
     }
 
     @Test
-    @DisplayName("Pending invitation cannot be cancelled before natural expiry")
-    void pendingInvitationCannotBeCancelledBeforeNaturalExpiry() {
+    @DisplayName("Pending invitation cannot be expired before natural expiry")
+    void pendingInvitationCannotBeExpiredBeforeNaturalExpiry() {
       Instant cancelTime = NOW.plusSeconds(10); // BEFORE EXPIRES_AT
 
       assertThatThrownBy(() -> pending.expire(cancelTime))

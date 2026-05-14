@@ -38,9 +38,9 @@ public class CancelStaffInvitationUseCase {
     }
 
     Instant now = Instant.now(clock);
-    Instant effectiveExpiry = now.plus(Duration.ofMinutes(1));
+    Instant effectiveExpiryTime = now.plus(Duration.ofMinutes(1));
 
-    StaffInvitation setInviteToExpire = invitation.cancel(effectiveExpiry);
+    StaffInvitation setInviteToExpire = invitation.cancel(effectiveExpiryTime);
 
     staffInvitationRepository.save(setInviteToExpire);
   }
