@@ -7,6 +7,7 @@ import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
 import com.efpcode.application.port.out.security.StaffInvitationTokenHasher;
 import com.efpcode.application.usecase.user.AcceptStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.CreateStaffInvitationUseCase;
+import com.efpcode.application.usecase.user.RegisterCustomerUseCase;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
 import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.staffinvitation.StaffInvitationId;
@@ -58,5 +59,12 @@ public class UserConfig {
       PasswordHasher passwordHasher) {
     return new AcceptStaffInvitationUseCase(
         idGenerator, userRepository, staffInvitationRepository, tokenHasher, clock, passwordHasher);
+  }
+
+  @Bean
+  public RegisterCustomerUseCase registerCustomerUseCase(
+      IdGenerator<UserId> idGenerator, UserRepository repository, PasswordHasher passwordHasher) {
+
+    return new RegisterCustomerUseCase(idGenerator, repository, passwordHasher);
   }
 }

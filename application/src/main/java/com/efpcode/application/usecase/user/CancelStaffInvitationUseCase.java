@@ -9,7 +9,6 @@ import com.efpcode.domain.staffinvitation.StaffInvitation;
 import com.efpcode.domain.staffinvitation.StaffInvitationId;
 import com.efpcode.domain.staffinvitation.port.StaffInvitationRepository;
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 
 public class CancelStaffInvitationUseCase {
@@ -37,8 +36,7 @@ public class CancelStaffInvitationUseCase {
       throw new InvitationForbiddenException("Cannot update expiration");
     }
 
-    Instant now = Instant.now(clock);
-    Instant effectiveExpiryTime = now.plus(Duration.ofMinutes(1));
+    Instant effectiveExpiryTime = Instant.now(clock);
 
     StaffInvitation setInviteToExpire = invitation.cancel(effectiveExpiryTime);
 
