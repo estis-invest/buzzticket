@@ -1,4 +1,4 @@
-package com.efpcode.infrastructure;
+package com.efpcode.infrastructure.adapters;
 
 import com.efpcode.application.port.in.user.StaffInvitationAcceptanceCommands;
 import com.efpcode.application.usecase.user.AcceptStaffInvitationUseCase;
