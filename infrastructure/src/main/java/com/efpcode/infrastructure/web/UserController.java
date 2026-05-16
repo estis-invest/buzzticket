@@ -4,10 +4,7 @@ import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.port.in.user.UserAccountCommands;
 import com.efpcode.application.usecase.user.dto.*;
 import com.efpcode.domain.user.model.User;
-import com.efpcode.infrastructure.web.dto.requests.RegisterStaffRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterUserEmailChangeRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterUserNameChangeRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterUserPasswordChangeRequest;
+import com.efpcode.infrastructure.web.dto.requests.*;
 import com.efpcode.infrastructure.web.dto.responses.UserResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -63,5 +60,13 @@ class UserController {
     var command = new ChangeUserPasswordCommand(request.currentPassword(), request.newPassword());
 
     userAccountCommands.updateUserPassword(command);
+  }
+
+  @DeleteMapping("/me")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAccount(@Valid @RequestBody RegisterAccountDeactivationRequest request) {
+    var command = new UserAccountDeactivationCommand(request.currentPassword());
+
+    userAccountCommands.deactivateAccount(command);
   }
 }

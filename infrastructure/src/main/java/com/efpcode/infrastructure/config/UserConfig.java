@@ -85,4 +85,13 @@ public class UserConfig {
       PasswordHasher passwordHasher) {
     return new UserPasswordUpdateUseCase(userRepository, authenticationPolicy, passwordHasher);
   }
+
+  @Bean
+  public AccountDeactivationUseCase accountDeactivationUseCase(
+      UserRepository userRepository,
+      UserAuthenticationPolicy authenticationPolicy,
+      PasswordHasher passwordHasher) {
+
+    return new AccountDeactivationUseCase(userRepository, authenticationPolicy, passwordHasher);
+  }
 }
