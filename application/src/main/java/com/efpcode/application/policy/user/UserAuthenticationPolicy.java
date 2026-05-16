@@ -5,7 +5,6 @@ import com.efpcode.application.policy.user.dto.UserContext;
 import com.efpcode.application.usecase.auth.exceptions.AuthenticatedUserNotFoundException;
 import com.efpcode.application.usecase.auth.exceptions.InvalidAuthenticationException;
 import com.efpcode.application.usecase.auth.exceptions.TokenValidationException;
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.port.PartnerRepository;
@@ -53,7 +52,7 @@ public class UserAuthenticationPolicy {
       Partner partnerFound =
           partnerRepository
               .findById(partnerId)
-              .orElseThrow(() -> new PartnerNotFoundException(ERROR_MESSAGE));
+              .orElseThrow(() -> new InvalidAuthenticationException(ERROR_MESSAGE));
 
       if (!partnerFound.isActive()) {
         throw new InvalidAuthenticationException(ERROR_MESSAGE);
