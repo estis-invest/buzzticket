@@ -86,11 +86,6 @@ public class JpaUserAdapter implements UserRepository {
   }
 
   @Override
-  public void deleteByUserId(UserId id) {
-    userRepository.deleteById(id.id());
-  }
-
-  @Override
   public boolean existsAdminForPartner(PartnerId partnerId) {
     return userRepository.existsByPartnerPartnerIdAndUserRole(
         partnerId.partnerId(), UserRole.ADMIN.name());
