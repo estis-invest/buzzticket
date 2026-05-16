@@ -2,13 +2,11 @@ package com.efpcode.infrastructure.config;
 
 import com.efpcode.application.policy.StaffInvitationTimeToLivePolicy;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
+import com.efpcode.application.policy.user.UserAuthenticationPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
 import com.efpcode.application.port.out.security.StaffInvitationTokenHasher;
-import com.efpcode.application.usecase.user.AcceptStaffInvitationUseCase;
-import com.efpcode.application.usecase.user.CreateStaffInvitationUseCase;
-import com.efpcode.application.usecase.user.RegisterCustomerUseCase;
-import com.efpcode.application.usecase.user.RegisterStaffUseCase;
+import com.efpcode.application.usecase.user.*;
 import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.staffinvitation.StaffInvitationId;
 import com.efpcode.domain.staffinvitation.port.StaffInvitationRepository;
@@ -66,5 +64,25 @@ public class UserConfig {
       IdGenerator<UserId> idGenerator, UserRepository repository, PasswordHasher passwordHasher) {
 
     return new RegisterCustomerUseCase(idGenerator, repository, passwordHasher);
+  }
+
+  @Bean
+  public UserNameUpdateUseCase userNameUpdateUseCase(
+      UserRepository userRepository, UserAuthenticationPolicy authenticationPolicy) {
+    return new UserNameUpdateUseCase(userRepository, authenticationPolicy);
+  }
+
+  @Bean
+  public UserEmailUpdateUseCase userEmailUpdateUseCase(
+      UserRepository userRepository, UserAuthenticationPolicy userAuthenticationPolicy) {
+    return new UserEmailUpdateUseCase(userRepository, userAuthenticationPolicy);
+  }
+
+  @Bean
+  public UserPasswordUpdateUseCase userPasswordUpdateUseCase(
+      UserRepository userRepository,
+      UserAuthenticationPolicy authenticationPolicy,
+      PasswordHasher passwordHasher) {
+    return new UserPasswordUpdateUseCase(userRepository, authenticationPolicy, passwordHasher);
   }
 }
