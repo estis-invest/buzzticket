@@ -5,10 +5,10 @@ public record RegisterCustomerCommand(String name, String email, String password
   public String toString() {
     return "RegisterCustomerCommand{"
         + "name='"
-        + name
+        + "REDACTED"
         + '\''
         + ", email='"
-        + email
+        + "REDACTED"
         + '\''
         + ", password='"
         + "REDACTED"

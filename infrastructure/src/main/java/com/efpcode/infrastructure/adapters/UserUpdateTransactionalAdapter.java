@@ -8,6 +8,8 @@ import com.efpcode.application.usecase.user.UserPasswordUpdateUseCase;
 import com.efpcode.application.usecase.user.dto.ChangeUserEmailCommand;
 import com.efpcode.application.usecase.user.dto.ChangeUserNameCommand;
 import com.efpcode.application.usecase.user.dto.ChangeUserPasswordCommand;
+import com.efpcode.application.usecase.user.exceptions.IllegalUserEmailDuplicatedException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,7 +42,12 @@ public class UserUpdateTransactionalAdapter implements UserAccountCommands {
   @Override
   @Transactional
   public void updateUserEmail(ChangeUserEmailCommand command) {
-    userEmailUpdateUseCase.execute(command, requestContext);
+    try {
+      userEmailUpdateUseCase.execute(command, requestContext);
+
+    } catch (DataIntegrityViolationException ex) {
+      throw new IllegalUserEmailDuplicatedException("Duplicate email cannot update");
+    }
   }
 
   @Override

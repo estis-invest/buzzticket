@@ -29,6 +29,14 @@ public class UserPasswordUpdateUseCase {
   public void execute(ChangeUserPasswordCommand command, RequestContext requestContext) {
     UserContext userContext = authenticationPolicy.userValidator(requestContext);
 
+    if (command.currentPassword() == null
+        || command.currentPassword().trim().isBlank()
+        || command.newPassword() == null
+        || command.newPassword().trim().isBlank()) {
+      throw new PasswordFailException(
+          "Required fields 'current password' and 'new password' are missing");
+    }
+
     if (command.currentPassword().equals(command.newPassword())) {
       throw new PasswordFailException("New password must be different from current password");
     }

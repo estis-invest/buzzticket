@@ -5,9 +5,7 @@ import com.efpcode.application.policy.user.dto.UserContext;
 import com.efpcode.application.usecase.auth.exceptions.AuthenticatedUserNotFoundException;
 import com.efpcode.application.usecase.auth.exceptions.InvalidAuthenticationException;
 import com.efpcode.application.usecase.auth.exceptions.TokenValidationException;
-import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
-import com.efpcode.application.usecase.user.exceptions.IllegalUserStatusException;
 import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.port.PartnerRepository;
@@ -18,6 +16,7 @@ import java.util.Optional;
 public class UserAuthenticationPolicy {
   private final UserRepository userRepository;
   private final PartnerRepository partnerRepository;
+  private static final String ERROR_MESSAGE = "Authentication failed";
 
   public UserAuthenticationPolicy(
       UserRepository userRepository, PartnerRepository partnerRepository) {
@@ -28,20 +27,20 @@ public class UserAuthenticationPolicy {
   public UserContext userValidator(RequestContext requestContext) {
 
     if (requestContext == null) {
-      throw new InvalidAuthenticationException("Authentication required");
+      throw new InvalidAuthenticationException(ERROR_MESSAGE);
     }
 
     User user =
         userRepository
             .findUserById(requestContext.userId())
-            .orElseThrow(() -> new AuthenticatedUserNotFoundException("User no longer exists"));
+            .orElseThrow(() -> new AuthenticatedUserNotFoundException(ERROR_MESSAGE));
 
     if (requestContext.role() != user.role()) {
-      throw new TokenValidationException("Token role mismatch");
+      throw new TokenValidationException(ERROR_MESSAGE);
     }
 
     if (!user.isActive()) {
-      throw new InvalidAuthenticationException("User is not active");
+      throw new InvalidAuthenticationException(ERROR_MESSAGE);
     }
 
     Optional<Partner> partner = Optional.empty();
@@ -49,17 +48,15 @@ public class UserAuthenticationPolicy {
     if (user.role().isStaff()) {
 
       PartnerId partnerId =
-          user.partnerId()
-              .orElseThrow(
-                  () -> new IllegalUserStatusException("Staff user must have a partner id"));
+          user.partnerId().orElseThrow(() -> new InvalidAuthenticationException(ERROR_MESSAGE));
 
       Partner partnerFound =
           partnerRepository
               .findById(partnerId)
-              .orElseThrow(() -> new PartnerNotFoundException("Partner not found"));
+              .orElseThrow(() -> new PartnerNotFoundException(ERROR_MESSAGE));
 
       if (!partnerFound.isActive()) {
-        throw new IllegalPartnerStatusException("Partner is not active");
+        throw new InvalidAuthenticationException(ERROR_MESSAGE);
       }
 
       partner = Optional.of(partnerFound);
