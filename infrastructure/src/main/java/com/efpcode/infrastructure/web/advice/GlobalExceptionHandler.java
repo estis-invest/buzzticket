@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.web.advice;
 
-import com.efpcode.application.usecase.auth.exceptions.LoginFailException;
+import com.efpcode.application.usecase.auth.exceptions.AuthApplicationException;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
@@ -18,6 +18,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+  @ExceptionHandler(AuthApplicationException.class)
+  public ProblemDetail handleAuthExceptions(AuthApplicationException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+  }
 
   @ExceptionHandler(InvitationNotFoundException.class)
   public ProblemDetail handleInvitationNotFound(InvitationNotFoundException ex) {
@@ -71,11 +75,6 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(CommonDomainException.class)
   public ProblemDetail handleCommonDomain(CommonDomainException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
-  }
-
-  @ExceptionHandler(LoginFailException.class)
-  public ProblemDetail handleLoginFailure(LoginFailException ex) {
-    return ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
   }
 
   @ExceptionHandler(IllegalUserEmailDuplicatedException.class)
