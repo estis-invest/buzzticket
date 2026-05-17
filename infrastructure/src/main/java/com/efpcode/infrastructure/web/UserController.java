@@ -1,5 +1,6 @@
 package com.efpcode.infrastructure.web;
 
+import com.efpcode.application.port.in.user.AdminAccountCommands;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.port.in.user.UserAccountCommands;
 import com.efpcode.application.usecase.user.dto.*;
@@ -7,6 +8,7 @@ import com.efpcode.domain.user.model.User;
 import com.efpcode.infrastructure.web.dto.requests.*;
 import com.efpcode.infrastructure.web.dto.responses.UserResponse;
 import jakarta.validation.Valid;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,12 +20,15 @@ class UserController {
 
   private final StaffRegistrationCommands staffRegistrationCommands;
   private final UserAccountCommands userAccountCommands;
+  private final AdminAccountCommands adminAccountCommands;
 
   public UserController(
       StaffRegistrationCommands staffRegistrationCommands,
-      UserAccountCommands userAccountCommands) {
+      UserAccountCommands userAccountCommands,
+      AdminAccountCommands adminAccountCommands) {
     this.staffRegistrationCommands = staffRegistrationCommands;
     this.userAccountCommands = userAccountCommands;
+    this.adminAccountCommands = adminAccountCommands;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -69,4 +74,25 @@ class UserController {
 
     userAccountCommands.deactivateAccount(command);
   }
+
+  @PostMapping("/{id}/deactivate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deactivateAccount(@PathVariable UUID id) {
+    var command = new DeactivateCommand(id);
+    adminAccountCommands.deactivateAccount(command);
+  }
+
+  // TODO: Admin user management endpoints (future work)
+  // - POST /api/v1/users/{id}/activate
+  // - POST /api/v1/users/{id}/deactivate
+  // - POST /api/v1/users/{id}/promote
+  // - POST /api/v1/users/{id}/demote
+  // - GET  /api/v1/users
+  //
+  // Notes:
+  // - These are admin-only operations (role-based authorization required)
+  // - Consider separate AdminUserCommands/use cases (do NOT reuse self `/me` flows)
+  // - Define clear domain rules for role transitions and activation lifecycle
+  // - Ensure audit logging for all actions
+
 }

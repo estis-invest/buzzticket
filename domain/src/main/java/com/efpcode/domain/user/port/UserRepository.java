@@ -21,9 +21,9 @@ public interface UserRepository {
 
   List<User> findByPartnerId(PartnerId id);
 
+  List<User> findAdminsForUpdate(PartnerId partnerId);
+
   boolean existsByEmail(UserEmail email);
 
   void save(User user);
-
-  boolean existsAdminForPartner(PartnerId partnerId);
 }

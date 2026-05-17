@@ -1,11 +1,15 @@
 package com.efpcode.infrastructure.persistence.user;
 
+import jakarta.persistence.LockModeType;
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface SpringDataUserRepository extends JpaRepository<UserEntity, UUID> {
 
@@ -20,5 +24,13 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, UUID
 
   boolean existsByUserEmailIgnoreCase(String userEmail);
 
-  boolean existsByPartnerPartnerIdAndUserRole(UUID partnerPartnerId, String userRole);
+  boolean existsByPartnerPartnerIdAndUserRoleAndUserAccountStatus(
+      UUID partnerPartnerId, String userRole, String userStatus);
+
+  @Lock(LockModeType.PESSIMISTIC_WRITE)
+  @Query(
+"""
+SELECT u FROM UserEntity u WHERE u.partner.partnerId = :partnerId AND u.userRole = 'ADMIN'
+""")
+  List<UserEntity> findAdminsForUpdate(@Param("partnerId") UUID partnerId);
 }

@@ -55,4 +55,24 @@ public class AdminActionPolicy {
 
     return new AdminContext(adminHandler, partner);
   }
+
+  public void assertSamePartnerIfStaff(AdminContext adminContext, User targetUser) {
+
+    if (targetUser.role().isStaff()) {
+      PartnerId targetPartnerId =
+          targetUser
+              .partnerId()
+              .orElseThrow(() -> new IllegalUserNotFoundException("Staff must have partner id"));
+
+      if (!targetPartnerId.equals(adminContext.partner().id())) {
+        throw new IllegalPartnerStatusException("Target user belongs to another partner");
+      }
+    }
+  }
+
+  public void assertThatTargetIsActive(User targetUser) {
+    if (!targetUser.isActive()) {
+      throw new IllegalUserStatusException("User already deactivated");
+    }
+  }
 }

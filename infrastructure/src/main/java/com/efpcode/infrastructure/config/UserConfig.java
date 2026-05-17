@@ -2,6 +2,7 @@ package com.efpcode.infrastructure.config;
 
 import com.efpcode.application.policy.StaffInvitationTimeToLivePolicy;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
+import com.efpcode.application.policy.partner.PartnerAdminInvariantPolicy;
 import com.efpcode.application.policy.user.UserAuthenticationPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
@@ -93,5 +94,14 @@ public class UserConfig {
       PasswordHasher passwordHasher) {
 
     return new AccountDeactivationUseCase(userRepository, authenticationPolicy, passwordHasher);
+  }
+
+  @Bean
+  public AdminAccountDeactivationUseCase adminAccountDeactivationUseCase(
+      UserRepository userRepository,
+      AdminActionPolicy adminActionPolicy,
+      PartnerAdminInvariantPolicy partnerAdminInvariantPolicy) {
+    return new AdminAccountDeactivationUseCase(
+        userRepository, adminActionPolicy, partnerAdminInvariantPolicy);
   }
 }

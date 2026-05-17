@@ -63,6 +63,13 @@ public class JpaUserAdapter implements UserRepository {
   }
 
   @Override
+  public List<User> findAdminsForUpdate(PartnerId partnerId) {
+    List<UserEntity> userEntities = userRepository.findAdminsForUpdate(partnerId.partnerId());
+
+    return userEntities.stream().map(UserMapper::toDomain).toList();
+  }
+
+  @Override
   public boolean existsByEmail(UserEmail email) {
     return userRepository.existsByUserEmailIgnoreCase(email.email());
   }
@@ -83,12 +90,6 @@ public class JpaUserAdapter implements UserRepository {
 
     UserEntity entity = UserMapper.toEntity(user, partnerEntity);
     userRepository.save(entity);
-  }
-
-  @Override
-  public boolean existsAdminForPartner(PartnerId partnerId) {
-    return userRepository.existsByPartnerPartnerIdAndUserRole(
-        partnerId.partnerId(), UserRole.ADMIN.name());
   }
 
   // Helper methods
