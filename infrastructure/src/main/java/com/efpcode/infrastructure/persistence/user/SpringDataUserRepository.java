@@ -24,13 +24,23 @@ public interface SpringDataUserRepository extends JpaRepository<UserEntity, UUID
 
   boolean existsByUserEmailIgnoreCase(String userEmail);
 
-  boolean existsByPartnerPartnerIdAndUserRoleAndUserAccountStatus(
-      UUID partnerPartnerId, String userRole, String userStatus);
-
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query(
 """
 SELECT u FROM UserEntity u WHERE u.partner.partnerId = :partnerId AND u.userRole = 'ADMIN'
 """)
   List<UserEntity> findAdminsForUpdate(@Param("partnerId") UUID partnerId);
+
+  @Query(
+"""
+    SELECT u FROM UserEntity u
+    LEFT JOIN u.partner p
+    WHERE
+        u.userRole = 'CUSTOMER'
+        OR (
+            u.userRole IN ('ADMIN', 'SUPPORT')
+            AND p.partnerId = :partnerId
+        )
+""")
+  List<UserEntity> findVisibleUsersForAdmin(@Param("partnerId") UUID partnerId);
 }

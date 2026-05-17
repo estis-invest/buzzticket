@@ -6,6 +6,7 @@ import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.port.in.user.UserAccountCommands;
 import com.efpcode.application.usecase.user.dto.*;
 import com.efpcode.domain.user.model.User;
+import com.efpcode.domain.user.model.UserId;
 import com.efpcode.infrastructure.web.dto.requests.*;
 import com.efpcode.infrastructure.web.dto.responses.UserListResponse;
 import com.efpcode.infrastructure.web.dto.responses.UserResponse;
@@ -124,13 +125,23 @@ class UserController {
     return ResponseEntity.ok(new UserListResponse(userListResponses, userListResponses.size()));
   }
 
-  // TODO: Admin user management endpoints (future work)
-  // - GET  /api/v1/users
-  //
-  // Notes:
-  // - These are admin-only operations (role-based authorization required)
-  // - Consider separate AdminUserCommands/use cases (do NOT reuse self `/me` flows)
-  // - Define clear domain rules for role transitions and activation lifecycle
-  // - Ensure audit logging for all actions
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/staff")
+  public ResponseEntity<UserListResponse> getAllStaffUsers() {
+    List<UserResult> userResults = adminUserReads.staffUsers();
+    List<UserResponse> userResponseList =
+        userResults.stream().map(UserResponse::fromResult).toList();
 
+    return ResponseEntity.ok(new UserListResponse(userResponseList, userResponseList.size()));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/{id}")
+  public ResponseEntity<UserResponse> getUser(@PathVariable UUID id) {
+    var userId = UserId.of(id);
+
+    UserResult userResult = adminUserReads.getUser(userId);
+
+    return ResponseEntity.ok(UserResponse.fromResult(userResult));
+  }
 }

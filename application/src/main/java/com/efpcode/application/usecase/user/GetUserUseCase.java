@@ -4,26 +4,29 @@ import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.policy.admin.dto.AdminContext;
 import com.efpcode.application.usecase.user.dto.UserResult;
+import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
 import com.efpcode.domain.user.model.User;
+import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.port.UserRepository;
-import java.util.List;
 
-public class GetAllUsersUseCase {
+public class GetUserUseCase {
   private final UserRepository userRepository;
   private final AdminActionPolicy adminActionPolicy;
 
-  public GetAllUsersUseCase(UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
+  public GetUserUseCase(UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
     this.userRepository = userRepository;
     this.adminActionPolicy = adminActionPolicy;
   }
 
-  public List<UserResult> execute(RequestContext requestContext) {
-
+  public UserResult execute(RequestContext requestContext, UserId id) {
     AdminContext adminContext = adminActionPolicy.adminValidator(requestContext);
 
-    List<User> users =
-        userRepository.findAllCustomersAndStaffByPartnerId(adminContext.partner().id());
+    User user =
+        userRepository
+            .findUserById(id)
+            .orElseThrow(() -> new IllegalUserNotFoundException("User not found"));
+    adminActionPolicy.assertSamePartnerIfStaff(adminContext, user);
 
-    return users.stream().map(UserResult::fromDomain).toList();
+    return UserResult.fromDomain(user);
   }
 }

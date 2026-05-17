@@ -8,22 +8,24 @@ import com.efpcode.domain.user.model.User;
 import com.efpcode.domain.user.port.UserRepository;
 import java.util.List;
 
-public class GetAllUsersUseCase {
+public class GetAllStaffUsersUseCase {
   private final UserRepository userRepository;
   private final AdminActionPolicy adminActionPolicy;
 
-  public GetAllUsersUseCase(UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
+  public GetAllStaffUsersUseCase(
+      UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
     this.userRepository = userRepository;
     this.adminActionPolicy = adminActionPolicy;
   }
 
   public List<UserResult> execute(RequestContext requestContext) {
-
     AdminContext adminContext = adminActionPolicy.adminValidator(requestContext);
 
-    List<User> users =
-        userRepository.findAllCustomersAndStaffByPartnerId(adminContext.partner().id());
+    List<User> staffs = userRepository.findByPartnerId(adminContext.partner().id());
 
-    return users.stream().map(UserResult::fromDomain).toList();
+    return staffs.stream()
+        .filter(user -> user.role().isStaff())
+        .map(UserResult::fromDomain)
+        .toList();
   }
 }

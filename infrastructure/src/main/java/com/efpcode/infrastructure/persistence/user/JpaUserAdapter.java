@@ -49,9 +49,10 @@ public class JpaUserAdapter implements UserRepository {
   }
 
   @Override
-  public List<User> findAll() {
-    Sort sort = getSort();
-    return userRepository.findAll(sort).stream().map(UserMapper::toDomain).toList();
+  public List<User> findAllCustomersAndStaffByPartnerId(PartnerId id) {
+    return userRepository.findVisibleUsersForAdmin(id.partnerId()).stream()
+        .map(UserMapper::toDomain)
+        .toList();
   }
 
   @Override
