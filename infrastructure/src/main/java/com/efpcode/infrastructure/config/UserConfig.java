@@ -118,4 +118,13 @@ public class UserConfig {
       UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
     return new AdminAccountPromotionUseCase(userRepository, adminActionPolicy);
   }
+
+  @Bean
+  public AdminAccountDemotionUseCase adminAccountDemotionUseCase(
+      UserRepository userRepository,
+      AdminActionPolicy adminActionPolicy,
+      PartnerAdminInvariantPolicy partnerAdminInvariantPolicy) {
+    return new AdminAccountDemotionUseCase(
+        userRepository, adminActionPolicy, partnerAdminInvariantPolicy);
+  }
 }

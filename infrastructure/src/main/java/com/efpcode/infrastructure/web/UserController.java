@@ -99,6 +99,14 @@ class UserController {
     adminAccountCommands.promoteUser(command);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/demote")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void demoteAccount(@PathVariable UUID id) {
+    var command = new DemoteCommand(id);
+    adminAccountCommands.demoteUser(command);
+  }
+
   // TODO: Admin user management endpoints (future work)
   // - POST /api/v1/users/{id}/demote
   // - GET  /api/v1/users
