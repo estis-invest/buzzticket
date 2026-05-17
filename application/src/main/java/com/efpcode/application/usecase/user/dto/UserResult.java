@@ -1,12 +1,11 @@
-package com.efpcode.infrastructure.web.dto.responses;
+package com.efpcode.application.usecase.user.dto;
 
-import com.efpcode.application.usecase.user.dto.UserResult;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.user.model.User;
 import java.time.Instant;
 import java.util.UUID;
 
-public record UserResponse(
+public record UserResult(
     UUID id,
     String name,
     String email,
@@ -15,8 +14,9 @@ public record UserResponse(
     Instant createdAt,
     Instant updatedAt,
     UUID partnerId) {
-  public static UserResponse fromDomain(User user) {
-    return new UserResponse(
+
+  public static UserResult fromDomain(User user) {
+    return new UserResult(
         user.id().id(),
         user.name().name(),
         user.email().email(),
@@ -25,17 +25,5 @@ public record UserResponse(
         user.userCreatedAt().time(),
         user.userUpdateAt().updatedAt(),
         user.partnerId().map(PartnerId::partnerId).orElse(null));
-  }
-
-  public static UserResponse fromResult(UserResult user) {
-    return new UserResponse(
-        user.id(),
-        user.name(),
-        user.email(),
-        user.role(),
-        user.status(),
-        user.createdAt(),
-        user.updatedAt(),
-        user.partnerId());
   }
 }

@@ -1,13 +1,16 @@
 package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.in.user.AdminAccountCommands;
+import com.efpcode.application.port.in.user.AdminUserReads;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.port.in.user.UserAccountCommands;
 import com.efpcode.application.usecase.user.dto.*;
 import com.efpcode.domain.user.model.User;
 import com.efpcode.infrastructure.web.dto.requests.*;
+import com.efpcode.infrastructure.web.dto.responses.UserListResponse;
 import com.efpcode.infrastructure.web.dto.responses.UserResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +24,17 @@ class UserController {
   private final StaffRegistrationCommands staffRegistrationCommands;
   private final UserAccountCommands userAccountCommands;
   private final AdminAccountCommands adminAccountCommands;
+  private final AdminUserReads adminUserReads;
 
   public UserController(
       StaffRegistrationCommands staffRegistrationCommands,
       UserAccountCommands userAccountCommands,
-      AdminAccountCommands adminAccountCommands) {
+      AdminAccountCommands adminAccountCommands,
+      AdminUserReads adminUserReads) {
     this.staffRegistrationCommands = staffRegistrationCommands;
     this.userAccountCommands = userAccountCommands;
     this.adminAccountCommands = adminAccountCommands;
+    this.adminUserReads = adminUserReads;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -107,8 +113,18 @@ class UserController {
     adminAccountCommands.demoteUser(command);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping
+  public ResponseEntity<UserListResponse> getAllUsers() {
+
+    List<UserResult> userResults = adminUserReads.getUsers();
+    List<UserResponse> userListResponses =
+        userResults.stream().map(UserResponse::fromResult).toList();
+
+    return ResponseEntity.ok(new UserListResponse(userListResponses, userListResponses.size()));
+  }
+
   // TODO: Admin user management endpoints (future work)
-  // - POST /api/v1/users/{id}/demote
   // - GET  /api/v1/users
   //
   // Notes:
