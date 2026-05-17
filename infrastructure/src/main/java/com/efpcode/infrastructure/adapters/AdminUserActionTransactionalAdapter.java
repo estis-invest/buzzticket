@@ -2,7 +2,9 @@ package com.efpcode.infrastructure.adapters;
 
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.user.AdminAccountCommands;
+import com.efpcode.application.usecase.user.AdminAccountActivateUseCase;
 import com.efpcode.application.usecase.user.AdminAccountDeactivationUseCase;
+import com.efpcode.application.usecase.user.AdminAccountPromotionUseCase;
 import com.efpcode.application.usecase.user.dto.ActivateUserCommand;
 import com.efpcode.application.usecase.user.dto.DeactivateCommand;
 import com.efpcode.application.usecase.user.dto.DemoteCommand;
@@ -15,17 +17,25 @@ class AdminUserActionTransactionalAdapter implements AdminAccountCommands {
 
   private final RequestContext requestContext;
   private final AdminAccountDeactivationUseCase adminAccountDeactivationUseCase;
+  private final AdminAccountActivateUseCase adminAccountActivateUseCase;
+  private final AdminAccountPromotionUseCase adminAccountPromotionUseCase;
 
   public AdminUserActionTransactionalAdapter(
       RequestContext requestContext,
-      AdminAccountDeactivationUseCase adminAccountDeactivationUseCase) {
+      AdminAccountDeactivationUseCase adminAccountDeactivationUseCase,
+      AdminAccountActivateUseCase adminAccountActivateUseCase,
+      AdminAccountPromotionUseCase adminAccountPromotionUseCase) {
     this.requestContext = requestContext;
     this.adminAccountDeactivationUseCase = adminAccountDeactivationUseCase;
+    this.adminAccountActivateUseCase = adminAccountActivateUseCase;
+    this.adminAccountPromotionUseCase = adminAccountPromotionUseCase;
   }
 
   @Override
   @Transactional
-  public void activateAccount(ActivateUserCommand command) {}
+  public void activateAccount(ActivateUserCommand command) {
+    adminAccountActivateUseCase.execute(command, requestContext);
+  }
 
   @Override
   @Transactional
@@ -35,7 +45,9 @@ class AdminUserActionTransactionalAdapter implements AdminAccountCommands {
 
   @Override
   @Transactional
-  public void promoteUser(PromoteCommand command) {}
+  public void promoteUser(PromoteCommand command) {
+    adminAccountPromotionUseCase.execute(command, requestContext);
+  }
 
   @Override
   @Transactional

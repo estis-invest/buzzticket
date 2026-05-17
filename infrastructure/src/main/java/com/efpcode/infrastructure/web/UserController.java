@@ -83,10 +83,23 @@ class UserController {
     adminAccountCommands.deactivateAccount(command);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/activate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void activateAccount(@PathVariable UUID id) {
+    var command = new ActivateUserCommand(id);
+    adminAccountCommands.activateAccount(command);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/promote")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void promoteAccount(@PathVariable UUID id) {
+    var command = new PromoteCommand(id);
+    adminAccountCommands.promoteUser(command);
+  }
+
   // TODO: Admin user management endpoints (future work)
-  // - POST /api/v1/users/{id}/activate
-  // - POST /api/v1/users/{id}/deactivate
-  // - POST /api/v1/users/{id}/promote
   // - POST /api/v1/users/{id}/demote
   // - GET  /api/v1/users
   //

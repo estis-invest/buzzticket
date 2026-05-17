@@ -94,7 +94,8 @@ public class UserConfig {
       PartnerAdminInvariantPolicy partnerAdminInvariantPolicy,
       PasswordHasher passwordHasher) {
 
-    return new AccountDeactivationUseCase(userRepository, authenticationPolicy,partnerAdminInvariantPolicy ,passwordHasher);
+    return new AccountDeactivationUseCase(
+        userRepository, authenticationPolicy, partnerAdminInvariantPolicy, passwordHasher);
   }
 
   @Bean
@@ -104,5 +105,17 @@ public class UserConfig {
       PartnerAdminInvariantPolicy partnerAdminInvariantPolicy) {
     return new AdminAccountDeactivationUseCase(
         userRepository, adminActionPolicy, partnerAdminInvariantPolicy);
+  }
+
+  @Bean
+  public AdminAccountActivateUseCase adminAccountActivateUseCase(
+      UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
+    return new AdminAccountActivateUseCase(userRepository, adminActionPolicy);
+  }
+
+  @Bean
+  public AdminAccountPromotionUseCase adminAccountPromotionUseCase(
+      UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
+    return new AdminAccountPromotionUseCase(userRepository, adminActionPolicy);
   }
 }
