@@ -91,9 +91,10 @@ public class UserConfig {
   public AccountDeactivationUseCase accountDeactivationUseCase(
       UserRepository userRepository,
       UserAuthenticationPolicy authenticationPolicy,
+      PartnerAdminInvariantPolicy partnerAdminInvariantPolicy,
       PasswordHasher passwordHasher) {
 
-    return new AccountDeactivationUseCase(userRepository, authenticationPolicy, passwordHasher);
+    return new AccountDeactivationUseCase(userRepository, authenticationPolicy,partnerAdminInvariantPolicy ,passwordHasher);
   }
 
   @Bean

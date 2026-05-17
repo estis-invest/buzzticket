@@ -75,6 +75,7 @@ class UserController {
     userAccountCommands.deactivateAccount(command);
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping("/{id}/deactivate")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void deactivateAccount(@PathVariable UUID id) {
