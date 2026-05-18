@@ -2,7 +2,9 @@ package com.efpcode.domain.ticket.model;
 
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketDescriptionUpdateException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
+import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.util.Objects;
@@ -34,16 +36,16 @@ public record Ticket(
     Objects.requireNonNull(ownerPartner, "PartnerId cannot be null");
   }
 
-  public Ticket open() {
-    return withStatus(this.status.open(), updatedAt);
+  public Ticket open(TicketUpdateAt updateAt) {
+    return withStatus(this.status.open(), updateAt);
   }
 
-  public Ticket close() {
-    return withStatus(this.status().close(), updatedAt);
+  public Ticket close(TicketUpdateAt updateAt) {
+    return withStatus(this.status().close(), updateAt);
   }
 
-  public Ticket archive() {
-    return withStatus(this.status.archive(), updatedAt);
+  public Ticket archive(TicketUpdateAt updateAt) {
+    return withStatus(this.status.archive(), updateAt);
   }
 
   public static Ticket createPending(
@@ -92,8 +94,9 @@ public record Ticket(
   }
 
   public Ticket withPriority(TicketPriority ticketPriority, TicketUpdateAt updateAt) {
-    if (ticketPriority == null)
-      throw new IllegalTicketPriorityException("Ticket priority passed cannot be null");
+    if (ticketPriority == null || updateAt == null)
+      throw new IllegalTicketPriorityException(
+          "Ticket priority or update time passed cannot be null");
     this.status().ticketChangeStatusPriorityGuard();
     return new Ticket(
         id,
@@ -103,13 +106,38 @@ public record Ticket(
         status,
         ticketPriority,
         createdAt,
-        updatedAt,
+        updateAt,
+        workers,
+        reportedBy,
+        ownerPartner);
+  }
+
+  public Ticket updateTicketDescription(TicketDescription newDescription, TicketUpdateAt updateAt) {
+
+    if (newDescription == null || updateAt == null) {
+      throw new IllegalTicketDescriptionUpdateException(
+          "Ticket description or update time passed cannot be null");
+    }
+    this.status.ticketUpdateDescriptionGuard();
+
+    return new Ticket(
+        id,
+        slug,
+        title,
+        newDescription,
+        status,
+        priority,
+        createdAt,
+        updateAt,
         workers,
         reportedBy,
         ownerPartner);
   }
 
   private Ticket withStatus(TicketStatus newStatus, TicketUpdateAt updateAt) {
+    if (updateAt == null) {
+      throw new IllegalTicketStatusTransitionException("Update time is required");
+    }
     return new Ticket(
         id,
         slug,
@@ -118,7 +146,7 @@ public record Ticket(
         newStatus,
         priority,
         createdAt,
-        updatedAt,
+        updateAt,
         workers,
         reportedBy,
         ownerPartner);
