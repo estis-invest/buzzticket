@@ -35,15 +35,15 @@ public record Ticket(
   }
 
   public Ticket open() {
-    return withStatus(this.status.open());
+    return withStatus(this.status.open(), updatedAt);
   }
 
   public Ticket close() {
-    return withStatus(this.status().close());
+    return withStatus(this.status().close(), updatedAt);
   }
 
   public Ticket archive() {
-    return withStatus(this.status.archive());
+    return withStatus(this.status.archive(), updatedAt);
   }
 
   public static Ticket createPending(
@@ -64,14 +64,14 @@ public record Ticket(
         TicketStatus.PENDING,
         priority,
         time,
-        TicketUpdateAt.createNow(),
+        new TicketUpdateAt(time.time()),
         TicketAssignees.empty(),
         reportedBy,
         ownerPartner);
   }
 
-  public Ticket assign(UserId staffId, UserRole actorRole) {
-    if (staffId == null || actorRole == null)
+  public Ticket assign(UserId staffId, UserRole actorRole, TicketUpdateAt updateAt) {
+    if (staffId == null || actorRole == null || updateAt == null)
       throw new IllegalTicketAssignmentException("TicketAssign method cannot pass null!");
 
     actorRole.roleGuardAssignTickets();
@@ -85,13 +85,13 @@ public record Ticket(
         status,
         priority,
         createdAt,
-        TicketUpdateAt.createNow(),
+        updatedAt,
         workers.add(staffId),
         reportedBy,
         ownerPartner);
   }
 
-  public Ticket withPriority(TicketPriority ticketPriority) {
+  public Ticket withPriority(TicketPriority ticketPriority, TicketUpdateAt updateAt) {
     if (ticketPriority == null)
       throw new IllegalTicketPriorityException("Ticket priority passed cannot be null");
     this.status().ticketChangeStatusPriorityGuard();
@@ -103,13 +103,13 @@ public record Ticket(
         status,
         ticketPriority,
         createdAt,
-        TicketUpdateAt.createNow(),
+        updatedAt,
         workers,
         reportedBy,
         ownerPartner);
   }
 
-  private Ticket withStatus(TicketStatus newStatus) {
+  private Ticket withStatus(TicketStatus newStatus, TicketUpdateAt updateAt) {
     return new Ticket(
         id,
         slug,
@@ -118,7 +118,7 @@ public record Ticket(
         newStatus,
         priority,
         createdAt,
-        TicketUpdateAt.createNow(),
+        updatedAt,
         workers,
         reportedBy,
         ownerPartner);
