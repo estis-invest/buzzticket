@@ -31,6 +31,11 @@ public record Ticket(
     Objects.requireNonNull(workers, "TicketAssignees cannot be null");
     Objects.requireNonNull(reportedBy, "UserId cannot be null");
     Objects.requireNonNull(ownerPartner, "PartnerId cannot be null");
+
+    if(createdAt.time().isAfter(updatedAt.updatedAt())){
+      throw new InvalidTicketException("Ticket updatedAt cannot be before the createdAt time");
+    }
+
   }
 
   public Ticket open(TicketUpdateAt updateAt) {
@@ -55,7 +60,7 @@ public record Ticket(
       UserId reportedBy,
       PartnerId ownerPartner) {
     if (time == null){
-      throw new InvalidTicketIdException("CreatedAt time cannot be null");
+      throw new InvalidTicketException("CreatedAt time cannot be null");
     }
 
     return new Ticket(

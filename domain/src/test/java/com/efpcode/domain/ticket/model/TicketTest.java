@@ -878,4 +878,58 @@ class TicketTest {
     assertThat(result.id()).isEqualTo(ticket.id());
     assertThat(result.status()).isEqualTo(ticket.status());
   }
+
+  @Test
+  @DisplayName("Constructor throws error if createdAt is after updatedAt")
+  void constructorThrowsErrorIfCreatedAtIsAfterUpdatedAt() {
+
+    Instant base = Instant.now();
+
+    // createdAt is AFTER updatedAt → invalid
+    TicketCreatedAt createdAt = new TicketCreatedAt(base.plusSeconds(60));
+    TicketUpdateAt updatedAt = TicketUpdateAt.of(base);
+
+    assertThatThrownBy(() ->
+            new Ticket(
+                    anyId,
+                    anySlug,
+                    anyTitle,
+                    anyDescription,
+                    TicketStatus.PENDING,
+                    TicketPriority.LOW,
+                    createdAt,
+                    updatedAt,
+                    anyWorker,
+                    anyCustomer,
+                    anyPartnerId))
+            .isInstanceOf(InvalidTicketException.class)
+            .hasMessageContaining("Ticket updatedAt cannot be before the createdAt time");
+  }
+
+  @Test
+  @DisplayName("Constructor allows createdAt equal or before updatedAt")
+  void constructorAllowsCreatedAtBeforeOrEqualUpdatedAt() {
+
+    Instant base = Instant.now();
+
+    TicketCreatedAt createdAt = new TicketCreatedAt(base);
+    TicketUpdateAt updatedAt = TicketUpdateAt.of(base.plusSeconds(60));
+
+    Ticket ticket =
+            new Ticket(
+                    anyId,
+                    anySlug,
+                    anyTitle,
+                    anyDescription,
+                    TicketStatus.PENDING,
+                    TicketPriority.LOW,
+                    createdAt,
+                    updatedAt,
+                    anyWorker,
+                    anyCustomer,
+                    anyPartnerId);
+
+    assertThat(ticket).isNotNull();
+  }
+
 }
