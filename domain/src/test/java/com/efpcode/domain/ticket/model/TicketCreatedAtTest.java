@@ -21,8 +21,8 @@ class TicketCreatedAtTest {
 
   @ParameterizedTest
   @MethodSource("providesInvalidTime")
-  @DisplayName("TicketCreateAt cannot pass null value or zero createdAt")
-  void ticketCreateAtCannotPassNullValueOrZeroCreatedAt(Instant badTime) {
+  @DisplayName("TicketCreatedAt cannot pass null value or zero createdAt")
+  void ticketCreatedAtCannotPassNullValueOrZeroCreatedAt(Instant badTime) {
 
     assertThatThrownBy(() -> new TicketCreatedAt(badTime))
         .isInstanceOf(InvalidCreatedAtException.class)

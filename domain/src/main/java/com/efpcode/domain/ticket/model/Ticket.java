@@ -1,10 +1,7 @@
 package com.efpcode.domain.ticket.model;
 
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketDescriptionUpdateException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
+import com.efpcode.domain.ticket.exceptions.*;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.util.Objects;
@@ -57,6 +54,9 @@ public record Ticket(
       TicketCreatedAt time,
       UserId reportedBy,
       PartnerId ownerPartner) {
+    if (time == null){
+      throw new InvalidTicketIdException("CreatedAt time cannot be null");
+    }
 
     return new Ticket(
         id,
@@ -66,7 +66,7 @@ public record Ticket(
         TicketStatus.PENDING,
         priority,
         time,
-        new TicketUpdateAt(time.time()),
+        TicketUpdateAt.of(time.time()),
         TicketAssignees.empty(),
         reportedBy,
         ownerPartner);
@@ -87,7 +87,7 @@ public record Ticket(
         status,
         priority,
         createdAt,
-        updatedAt,
+        updateAt,
         workers.add(staffId),
         reportedBy,
         ownerPartner);

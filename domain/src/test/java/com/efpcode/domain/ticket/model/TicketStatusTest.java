@@ -185,8 +185,8 @@ class TicketStatusTest {
   @EnumSource(
       value = TicketStatus.class,
       names = {"PENDING", "OPEN"})
-  @DisplayName("ticketUpdateDescription method throws error for statuses PENDING and OPEN")
-  void ticketUpdateDescriptionMethodThrowsErrorForStatusesPendingAndOpen(TicketStatus status) {
+  @DisplayName("ticketUpdateDescription method does not throw error for statuses PENDING and OPEN")
+  void ticketUpdateDescriptionMethodDoesNotThrowErrorForStatusesPendingAndOpen(TicketStatus status) {
 
     assertThatCode(status::ticketUpdateDescriptionGuard).doesNotThrowAnyException();
   }

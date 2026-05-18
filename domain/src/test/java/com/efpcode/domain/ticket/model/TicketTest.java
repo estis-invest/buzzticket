@@ -274,6 +274,7 @@ class TicketTest {
     assertThat(pendingTicket).isNotEqualTo(result);
     assertThat(pendingTicket.status()).isNotEqualTo(result.status());
     assertThat(result.status()).isEqualTo(TicketStatus.OPEN);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
 
     assertThat(result.id()).isEqualTo(pendingTicket.id());
     assertThat(result.title()).isEqualTo(pendingTicket.title());
@@ -304,6 +305,7 @@ class TicketTest {
 
     assertThat(openTicket.id()).isEqualTo(result.id());
     assertThat(result.status()).isEqualTo(TicketStatus.CLOSED);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
   }
 
   @Test
@@ -327,6 +329,7 @@ class TicketTest {
 
     assertThat(closedTicket).isNotEqualTo(result);
     assertThat(closedTicket.status()).isNotEqualTo(result.status());
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
 
     assertThat(closedTicket.id()).isEqualTo(result.id());
     assertThat(result.status()).isEqualTo(TicketStatus.ARCHIVED);
@@ -419,6 +422,7 @@ class TicketTest {
     assertThat(result.priority()).isNotEqualTo(pendingTicket.priority());
     assertThat(result.id()).isEqualTo(pendingTicket.id());
     assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
+    assertThat(result.updatedAt()).isEqualTo(updatedAt);
   }
 
   private static Stream<Arguments> provideNullArgumentsToPassInTicketAssignMethod() {
@@ -528,6 +532,7 @@ class TicketTest {
       names = {"PENDING", "OPEN"})
   @DisplayName("Ticket assign methods returns a new Ticket object with status PENDING and OPEN")
   void ticketAssignMethodsReturnsANewTicketObjectWithStatusPendingAndOpen(TicketStatus status) {
+    var updatedAt = TicketUpdateAt.of(Instant.now());
 
     var ticket =
         new Ticket(
@@ -544,9 +549,10 @@ class TicketTest {
             anyPartnerId);
 
     var staffId = TestUUIDIds.userId();
-    var result = ticket.assign(staffId, UserRole.SUPPORT, UPDATE_AT);
+    var result = ticket.assign(staffId, UserRole.SUPPORT, updatedAt);
     assertThat(result).isNotSameAs(ticket).isInstanceOf(Ticket.class);
     assertThat(result.workers().workers()).hasSize(1);
+    assertThat(result.updatedAt()).isEqualTo(updatedAt);
   }
 
   private static Stream<Arguments> provideStatusAndRoleCombinations() {
@@ -651,8 +657,14 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatCode(() -> ticket.withPriority(TicketPriority.HIGH, UPDATE_AT))
-        .doesNotThrowAnyException();
+    var result = ticket.withPriority(TicketPriority.HIGH, UPDATE_AT);
+
+    assertThat(result).isNotSameAs(ticket);
+    assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
+
+
+
   }
 
   @Test
