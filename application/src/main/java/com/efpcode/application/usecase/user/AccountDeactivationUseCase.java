@@ -42,7 +42,7 @@ public class AccountDeactivationUseCase {
     PlainPassword plainPassword = new PlainPassword(command.currentPassword());
 
     if (!passwordHasher.matches(plainPassword, user.password())) {
-      throw new InvalidAuthenticationException("Authentication failed");
+      throw new PasswordFailException("Authentication failed");
     }
 
     if (user.role() == UserRole.ADMIN) {
