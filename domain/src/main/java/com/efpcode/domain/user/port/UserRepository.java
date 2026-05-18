@@ -17,15 +17,13 @@ public interface UserRepository {
   List<User> findByUserCreatedAtRange(
       PartnerId partnerId, UserCreatedAt startDate, UserCreatedAt endDate);
 
-  List<User> findAll();
+  List<User> findAllCustomersAndStaffByPartnerId(PartnerId id);
 
   List<User> findByPartnerId(PartnerId id);
+
+  List<User> findAdminsForUpdate(PartnerId partnerId);
 
   boolean existsByEmail(UserEmail email);
 
   void save(User user);
-
-  void deleteByUserId(UserId id);
-
-  boolean existsAdminForPartner(PartnerId partnerId);
 }

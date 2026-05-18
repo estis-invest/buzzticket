@@ -2,6 +2,7 @@ package com.efpcode.infrastructure.config;
 
 import com.efpcode.application.policy.StaffInvitationTimeToLivePolicy;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
+import com.efpcode.application.policy.partner.PartnerAdminInvariantPolicy;
 import com.efpcode.application.policy.user.UserAuthenticationPolicy;
 import com.efpcode.application.port.out.security.PasswordHasher;
 import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
@@ -84,5 +85,46 @@ public class UserConfig {
       UserAuthenticationPolicy authenticationPolicy,
       PasswordHasher passwordHasher) {
     return new UserPasswordUpdateUseCase(userRepository, authenticationPolicy, passwordHasher);
+  }
+
+  @Bean
+  public AccountDeactivationUseCase accountDeactivationUseCase(
+      UserRepository userRepository,
+      UserAuthenticationPolicy authenticationPolicy,
+      PartnerAdminInvariantPolicy partnerAdminInvariantPolicy,
+      PasswordHasher passwordHasher) {
+
+    return new AccountDeactivationUseCase(
+        userRepository, authenticationPolicy, partnerAdminInvariantPolicy, passwordHasher);
+  }
+
+  @Bean
+  public AdminAccountDeactivationUseCase adminAccountDeactivationUseCase(
+      UserRepository userRepository,
+      AdminActionPolicy adminActionPolicy,
+      PartnerAdminInvariantPolicy partnerAdminInvariantPolicy) {
+    return new AdminAccountDeactivationUseCase(
+        userRepository, adminActionPolicy, partnerAdminInvariantPolicy);
+  }
+
+  @Bean
+  public AdminAccountActivateUseCase adminAccountActivateUseCase(
+      UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
+    return new AdminAccountActivateUseCase(userRepository, adminActionPolicy);
+  }
+
+  @Bean
+  public AdminAccountPromotionUseCase adminAccountPromotionUseCase(
+      UserRepository userRepository, AdminActionPolicy adminActionPolicy) {
+    return new AdminAccountPromotionUseCase(userRepository, adminActionPolicy);
+  }
+
+  @Bean
+  public AdminAccountDemotionUseCase adminAccountDemotionUseCase(
+      UserRepository userRepository,
+      AdminActionPolicy adminActionPolicy,
+      PartnerAdminInvariantPolicy partnerAdminInvariantPolicy) {
+    return new AdminAccountDemotionUseCase(
+        userRepository, adminActionPolicy, partnerAdminInvariantPolicy);
   }
 }

@@ -1,15 +1,18 @@
 package com.efpcode.infrastructure.web;
 
+import com.efpcode.application.port.in.user.AdminAccountCommands;
+import com.efpcode.application.port.in.user.AdminUserReads;
 import com.efpcode.application.port.in.user.StaffRegistrationCommands;
 import com.efpcode.application.port.in.user.UserAccountCommands;
 import com.efpcode.application.usecase.user.dto.*;
 import com.efpcode.domain.user.model.User;
-import com.efpcode.infrastructure.web.dto.requests.RegisterStaffRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterUserEmailChangeRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterUserNameChangeRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterUserPasswordChangeRequest;
+import com.efpcode.domain.user.model.UserId;
+import com.efpcode.infrastructure.web.dto.requests.*;
+import com.efpcode.infrastructure.web.dto.responses.UserListResponse;
 import com.efpcode.infrastructure.web.dto.responses.UserResponse;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,12 +24,18 @@ class UserController {
 
   private final StaffRegistrationCommands staffRegistrationCommands;
   private final UserAccountCommands userAccountCommands;
+  private final AdminAccountCommands adminAccountCommands;
+  private final AdminUserReads adminUserReads;
 
   public UserController(
       StaffRegistrationCommands staffRegistrationCommands,
-      UserAccountCommands userAccountCommands) {
+      UserAccountCommands userAccountCommands,
+      AdminAccountCommands adminAccountCommands,
+      AdminUserReads adminUserReads) {
     this.staffRegistrationCommands = staffRegistrationCommands;
     this.userAccountCommands = userAccountCommands;
+    this.adminAccountCommands = adminAccountCommands;
+    this.adminUserReads = adminUserReads;
   }
 
   @PreAuthorize("hasRole('ADMIN')")
@@ -63,5 +72,76 @@ class UserController {
     var command = new ChangeUserPasswordCommand(request.currentPassword(), request.newPassword());
 
     userAccountCommands.updateUserPassword(command);
+  }
+
+  @DeleteMapping("/me")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deleteAccount(@Valid @RequestBody RegisterAccountDeactivationRequest request) {
+    var command = new UserAccountDeactivationCommand(request.currentPassword());
+
+    userAccountCommands.deactivateAccount(command);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/deactivate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void deactivateAccount(@PathVariable UUID id) {
+    var command = new DeactivateCommand(id);
+    adminAccountCommands.deactivateAccount(command);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/activate")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void activateAccount(@PathVariable UUID id) {
+    var command = new ActivateUserCommand(id);
+    adminAccountCommands.activateAccount(command);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/promote")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void promoteAccount(@PathVariable UUID id) {
+    var command = new PromoteCommand(id);
+    adminAccountCommands.promoteUser(command);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @PostMapping("/{id}/demote")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void demoteAccount(@PathVariable UUID id) {
+    var command = new DemoteCommand(id);
+    adminAccountCommands.demoteUser(command);
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping
+  public ResponseEntity<UserListResponse> getAllUsers() {
+
+    List<UserResult> userResults = adminUserReads.getUsers();
+    List<UserResponse> userListResponses =
+        userResults.stream().map(UserResponse::fromResult).toList();
+
+    return ResponseEntity.ok(new UserListResponse(userListResponses, userListResponses.size()));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/staff")
+  public ResponseEntity<UserListResponse> getAllStaffUsers() {
+    List<UserResult> userResults = adminUserReads.staffUsers();
+    List<UserResponse> userResponseList =
+        userResults.stream().map(UserResponse::fromResult).toList();
+
+    return ResponseEntity.ok(new UserListResponse(userResponseList, userResponseList.size()));
+  }
+
+  @PreAuthorize("hasRole('ADMIN')")
+  @GetMapping("/{id}")
+  public ResponseEntity<UserResponse> getUser(@PathVariable UUID id) {
+    var userId = UserId.of(id);
+
+    UserResult userResult = adminUserReads.getUser(userId);
+
+    return ResponseEntity.ok(UserResponse.fromResult(userResult));
   }
 }

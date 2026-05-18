@@ -1,6 +1,7 @@
 package com.efpcode.infrastructure.web.advice;
 
 import com.efpcode.application.usecase.auth.exceptions.AuthApplicationException;
+import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
@@ -101,5 +102,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(DataIntegrityViolationException.class)
   public ProblemDetail handleDataIntegrityViolation(DataIntegrityViolationException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Resource already exists");
+  }
+
+  @ExceptionHandler(IllegalPartnerStatusException.class)
+  public ProblemDetail handleIllegalPartnerStatus(IllegalPartnerStatusException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
   }
 }

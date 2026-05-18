@@ -24,23 +24,7 @@ public class UserAuthenticationPolicy {
   }
 
   public UserContext userValidator(RequestContext requestContext) {
-
-    if (requestContext == null) {
-      throw new InvalidAuthenticationException(ERROR_MESSAGE);
-    }
-
-    User user =
-        userRepository
-            .findUserById(requestContext.userId())
-            .orElseThrow(() -> new AuthenticatedUserNotFoundException(ERROR_MESSAGE));
-
-    if (requestContext.role() != user.role()) {
-      throw new TokenValidationException(ERROR_MESSAGE);
-    }
-
-    if (!user.isActive()) {
-      throw new InvalidAuthenticationException(ERROR_MESSAGE);
-    }
+    User user = userAccountValidator(requestContext);
 
     Optional<Partner> partner = Optional.empty();
 
@@ -62,5 +46,26 @@ public class UserAuthenticationPolicy {
     }
 
     return new UserContext(user, partner);
+  }
+
+  public User userAccountValidator(RequestContext requestContext) {
+    if (requestContext == null) {
+      throw new InvalidAuthenticationException(ERROR_MESSAGE);
+    }
+
+    User user =
+        userRepository
+            .findUserById(requestContext.userId())
+            .orElseThrow(() -> new AuthenticatedUserNotFoundException(ERROR_MESSAGE));
+
+    if (requestContext.role() != user.role()) {
+      throw new TokenValidationException(ERROR_MESSAGE);
+    }
+
+    if (!user.isActive()) {
+      throw new InvalidAuthenticationException(ERROR_MESSAGE);
+    }
+
+    return user;
   }
 }

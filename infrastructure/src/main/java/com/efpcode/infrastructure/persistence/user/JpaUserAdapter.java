@@ -49,9 +49,10 @@ public class JpaUserAdapter implements UserRepository {
   }
 
   @Override
-  public List<User> findAll() {
-    Sort sort = getSort();
-    return userRepository.findAll(sort).stream().map(UserMapper::toDomain).toList();
+  public List<User> findAllCustomersAndStaffByPartnerId(PartnerId id) {
+    return userRepository.findVisibleUsersForAdmin(id.partnerId()).stream()
+        .map(UserMapper::toDomain)
+        .toList();
   }
 
   @Override
@@ -60,6 +61,13 @@ public class JpaUserAdapter implements UserRepository {
     return userRepository.findByPartner_PartnerId(id.partnerId(), sort).stream()
         .map(UserMapper::toDomain)
         .toList();
+  }
+
+  @Override
+  public List<User> findAdminsForUpdate(PartnerId partnerId) {
+    List<UserEntity> userEntities = userRepository.findAdminsForUpdate(partnerId.partnerId());
+
+    return userEntities.stream().map(UserMapper::toDomain).toList();
   }
 
   @Override
@@ -83,17 +91,6 @@ public class JpaUserAdapter implements UserRepository {
 
     UserEntity entity = UserMapper.toEntity(user, partnerEntity);
     userRepository.save(entity);
-  }
-
-  @Override
-  public void deleteByUserId(UserId id) {
-    userRepository.deleteById(id.id());
-  }
-
-  @Override
-  public boolean existsAdminForPartner(PartnerId partnerId) {
-    return userRepository.existsByPartnerPartnerIdAndUserRole(
-        partnerId.partnerId(), UserRole.ADMIN.name());
   }
 
   // Helper methods
