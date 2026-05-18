@@ -4,54 +4,60 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.ticket.exceptions.InvalidCreatedAtException;
-import com.efpcode.domain.ticket.exceptions.InvalidTicketDateException;
 import java.time.Instant;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TicketCreatedAtTest {
-  @Test
-  @DisplayName("TicketCreateAt cannot pass null value or zero createdAt")
-  void ticketCreateAtCannotPassNullValueOrZeroCreatedAt() {
 
-    assertThatThrownBy(() -> new TicketCreatedAt(null))
+  private static Stream<Arguments> providesInvalidTime() {
+
+    return Stream.of(Arguments.of((Instant) null), Arguments.of(Instant.EPOCH));
+  }
+
+  @ParameterizedTest
+  @MethodSource("providesInvalidTime")
+  @DisplayName("TicketCreatedAt cannot pass null value or zero createdAt")
+  void ticketCreatedAtCannotPassNullValueOrZeroCreatedAt(Instant badTime) {
+
+    assertThatThrownBy(() -> new TicketCreatedAt(badTime))
         .isInstanceOf(InvalidCreatedAtException.class)
         .hasMessageContaining("Time is required");
+  }
 
-    var emptyTime = Instant.ofEpochMilli(0);
+  @ParameterizedTest
+  @MethodSource("providesInvalidTime")
+  @DisplayName("Static method of cannot pass null or zero to create valid createdAt object")
+  void staticMethodOfCannotPassNullOrZeroToCreateValidCreatedAtObject(Instant badTime) {
 
-    assertThatThrownBy(() -> new TicketCreatedAt(emptyTime))
+    assertThatThrownBy(() -> TicketCreatedAt.of(badTime))
         .isInstanceOf(InvalidCreatedAtException.class)
         .hasMessageContaining("Time is required");
   }
 
   @Test
-  @DisplayName("Time cannot be created in the future")
-  void timeCannotBeCreatedInTheFuture() {
+  @DisplayName("Passing valid instant timestamp creates valid object")
+  void passingValidInstantTimestampCreatesValidObject() {
 
-    var futureTime = Instant.now().plusSeconds(90);
+    Instant now = Instant.now();
 
-    assertThatThrownBy(() -> new TicketCreatedAt(futureTime))
-        .isInstanceOf(InvalidTicketDateException.class)
-        .hasMessageContaining("the future");
+    TicketCreatedAt createdAt = new TicketCreatedAt(now);
+
+    assertThat(createdAt.time()).isEqualTo(now);
   }
 
   @Test
-  @DisplayName("Time has createNow method that returns new objects")
-  void timeHasCreateNowMethodThatReturnsNewObjects() {
+  @DisplayName("Passing valid instant timestamp to of method creates valid object")
+  void passingValidInstantTimestampToOfMethodCreatesValidObject() {
 
-    var pastTime = TicketCreatedAt.createNow();
-    var currentTime = TicketCreatedAt.createNow();
+    Instant now = Instant.now();
 
-    assertThat(pastTime).isNotSameAs(currentTime);
-  }
+    TicketCreatedAt createdAt = TicketCreatedAt.of(now);
 
-  @Test
-  @DisplayName("Time has createNow method and returns valid objects")
-  void timeHasCreateNowMethodAndReturnsValidObjects() {
-
-    var now = TicketCreatedAt.createNow();
-    assertThat(now.time()).isNotNull();
-    assertThat(now.time()).isBeforeOrEqualTo(Instant.now());
+    assertThat(createdAt.time()).isEqualTo(now);
   }
 }

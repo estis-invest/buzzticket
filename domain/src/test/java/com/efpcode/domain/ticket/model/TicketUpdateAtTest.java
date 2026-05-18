@@ -3,10 +3,13 @@ package com.efpcode.domain.ticket.model;
 import static org.assertj.core.api.Assertions.*;
 
 import com.efpcode.domain.ticket.exceptions.InvalidTicketUpdateAtException;
-import com.efpcode.domain.ticket.exceptions.TicketUpdateAtDateException;
 import java.time.Instant;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 
 class TicketUpdateAtTest {
 
@@ -21,28 +24,10 @@ class TicketUpdateAtTest {
   @Test
   @DisplayName("TicketUpdateAt cannot pass zero updatedAt as argument")
   void ticketUpdateAtCannotPassZeroUpdatedAtAsArgument() {
-    var timeZero = Instant.ofEpochMilli(0);
+    var timeZero = Instant.EPOCH;
     assertThatThrownBy(() -> new TicketUpdateAt(timeZero))
         .isInstanceOf(InvalidTicketUpdateAtException.class)
         .hasMessageContaining("Update timestamp is required");
-  }
-
-  @Test
-  @DisplayName("TicketUpdateAt cannot be in the future beyond margin of error")
-  void ticketUpdateAtCannotBeInTheFutureBeyondMarginOfError() {
-    var futureTime = Instant.now().plusSeconds(90);
-    assertThatThrownBy(() -> new TicketUpdateAt(futureTime))
-        .isInstanceOf(TicketUpdateAtDateException.class)
-        .hasMessageContaining("Update timestamp cannot be in the future");
-  }
-
-  @Test
-  @DisplayName("TicketUpdateAt within grace period returns a valid object")
-  void ticketUpdateAtWithinGracePeriodReturnsAValidObject() {
-    var slightFutureInTime = Instant.now().plusSeconds(30);
-    var result = new TicketUpdateAt(slightFutureInTime);
-    assertThat(result).isNotNull().isInstanceOf(TicketUpdateAt.class);
-    assertThat(result.updatedAt()).isEqualTo(slightFutureInTime);
   }
 
   @Test
@@ -52,25 +37,28 @@ class TicketUpdateAtTest {
     var result = new TicketUpdateAt(now);
     assertThat(result).isNotNull().isInstanceOf(TicketUpdateAt.class);
     assertThat(result.updatedAt()).isEqualTo(now);
-    assertThat(result.updatedAt()).isBeforeOrEqualTo(now.plusSeconds(5));
   }
 
   @Test
-  @DisplayName("TicketUpdateAt createNow returns a valid object")
-  void ticketUpdateAtCreateNowReturnAValidObject() {
-    var before = Instant.now();
-    var result = TicketUpdateAt.createNow();
-    var after = Instant.now();
+  @DisplayName("TicketUpdate of method creates valid object when timestamp is passed")
+  void ticketUpdateOfMethodCreatesValidObjectWhenTimestampIsPassed() {
+
+    var now = Instant.now();
+    var result = TicketUpdateAt.of(now);
     assertThat(result).isNotNull().isInstanceOf(TicketUpdateAt.class);
-    assertThat(result.updatedAt()).isAfterOrEqualTo(before);
-    assertThat(result.updatedAt()).isBeforeOrEqualTo(after);
+    assertThat(result.updatedAt()).isEqualTo(now);
   }
 
-  @Test
-  @DisplayName("TicketUpdateAt objects created from createNow are new instances each time")
-  void ticketUpdateAtObjectCreatedFromCreateNowAreNewInstanceEachTime() {
-    var time1 = TicketUpdateAt.createNow();
-    var time2 = TicketUpdateAt.createNow();
-    assertThat(time1).isNotSameAs(time2);
+  private static Stream<Arguments> providesInvalidTime() {
+    return Stream.of(Arguments.of((Instant) null), Arguments.of(Instant.EPOCH));
+  }
+
+  @ParameterizedTest
+  @MethodSource("providesInvalidTime")
+  @DisplayName("Invalid time passing of method throws error")
+  void invalidTimePassingOfMethodThrowsError(Instant badTime) {
+    assertThatThrownBy(() -> TicketUpdateAt.of(badTime))
+        .isInstanceOf(InvalidTicketUpdateAtException.class)
+        .hasMessageContaining("Update timestamp is required");
   }
 }

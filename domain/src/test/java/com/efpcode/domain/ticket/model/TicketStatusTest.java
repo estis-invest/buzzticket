@@ -2,6 +2,7 @@ package com.efpcode.domain.ticket.model;
 
 import static org.assertj.core.api.Assertions.*;
 
+import com.efpcode.domain.ticket.exceptions.IllegalTicketDescriptionUpdateException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusAssignmentException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
 import org.junit.jupiter.api.DisplayName;
@@ -145,5 +146,48 @@ class TicketStatusTest {
   void ticketStatusMethodTicketStatusAssignGuardThrowsNoErrorsForStatusPendingAndOPEN(
       TicketStatus status) {
     assertThatCode(status::ticketStatusAssignGuard).doesNotThrowAnyException();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"ARCHIVED", "CLOSED"})
+  @DisplayName("canUpdateDescription return false for statuses CLOSED and ARCHIVED")
+  void canUpdateDescriptionReturnFalseForStatusesClosedAndArchived(TicketStatus status) {
+
+    assertThat(status.canUpdateDescription()).isFalse();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"PENDING", "OPEN"})
+  @DisplayName("canUpdateDescription return true for statuses PENDING and OPEN")
+  void canUpdateDescriptionReturnTrueForStatusesPendingAndOpen(TicketStatus status) {
+
+    assertThat(status.canUpdateDescription()).isTrue();
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"ARCHIVED", "CLOSED"})
+  @DisplayName("ticketUpdateDescription method throws error for statuses CLOSED and ARCHIVED")
+  void ticketUpdateDescriptionMethodThrowsErrorForStatusesClosedAndArchived(
+      TicketStatus wrongStatus) {
+
+    assertThatThrownBy(wrongStatus::ticketUpdateDescriptionGuard)
+        .isInstanceOf(IllegalTicketDescriptionUpdateException.class)
+        .hasMessageContaining("TicketStatus: " + wrongStatus.name() + " cannot update description");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"PENDING", "OPEN"})
+  @DisplayName("ticketUpdateDescription method does not throw error for statuses PENDING and OPEN")
+  void ticketUpdateDescriptionMethodDoesNotThrowErrorForStatusesPendingAndOpen(TicketStatus status) {
+
+    assertThatCode(status::ticketUpdateDescriptionGuard).doesNotThrowAnyException();
   }
 }

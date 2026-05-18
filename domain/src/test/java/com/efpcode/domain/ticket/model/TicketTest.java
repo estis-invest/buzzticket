@@ -8,6 +8,7 @@ import com.efpcode.domain.ticket.exceptions.*;
 import com.efpcode.domain.user.exceptions.IllegalUserRolePrivilegeException;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
+import java.time.Instant;
 import java.util.Set;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
@@ -24,12 +25,13 @@ class TicketTest {
   private static final TicketTitle anyTitle = new TicketTitle("Fix broken build");
   private static final TicketDescription anyDescription =
       new TicketDescription("This ticket is broken");
-  private static final TicketCreatedAt anyTime = TicketCreatedAt.createNow();
-  private static final TicketUpdateAt anyUpdateTime = TicketUpdateAt.createNow();
+  private static final TicketCreatedAt anyTime = new TicketCreatedAt(Instant.now());
+  private static final TicketUpdateAt anyUpdateTime = TicketUpdateAt.of(Instant.now());
   private static final TicketAssignees anyWorker =
       new TicketAssignees(Set.of(TestUUIDIds.userId()));
   private static final UserId anyCustomer = TestUUIDIds.userId();
   private static final PartnerId anyPartnerId = TestUUIDIds.partnerId();
+  private static TicketUpdateAt UPDATE_AT = TicketUpdateAt.of(Instant.now());
 
   private static Stream<Arguments> providesInvalidConstructorArgs() {
 
@@ -229,6 +231,7 @@ class TicketTest {
   @Test
   @DisplayName("Opening a ticket that is not PENDING throws error")
   void openingATicketThatIsNotPendingThrowsError() {
+    Instant now = Instant.now();
 
     var closedTicket =
         new Ticket(
@@ -239,12 +242,12 @@ class TicketTest {
             TicketStatus.CLOSED,
             TicketPriority.LOW,
             anyTime,
-            TicketUpdateAt.createNow(),
+            TicketUpdateAt.of(now),
             anyWorker,
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(closedTicket::open)
+    assertThatThrownBy(() -> closedTicket.open(UPDATE_AT))
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
         .hasMessageContaining("TicketStatus cannot be transferred from " + closedTicket.status());
   }
@@ -266,11 +269,12 @@ class TicketTest {
             anyWorker,
             anyCustomer,
             anyPartnerId);
-    var result = pendingTicket.open();
+    var result = pendingTicket.open(UPDATE_AT);
 
     assertThat(pendingTicket).isNotEqualTo(result);
     assertThat(pendingTicket.status()).isNotEqualTo(result.status());
     assertThat(result.status()).isEqualTo(TicketStatus.OPEN);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
 
     assertThat(result.id()).isEqualTo(pendingTicket.id());
     assertThat(result.title()).isEqualTo(pendingTicket.title());
@@ -294,13 +298,14 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    var result = openTicket.close();
+    var result = openTicket.close(UPDATE_AT);
 
     assertThat(openTicket).isNotEqualTo(result);
     assertThat(openTicket.status()).isNotEqualTo(result.status());
 
     assertThat(openTicket.id()).isEqualTo(result.id());
     assertThat(result.status()).isEqualTo(TicketStatus.CLOSED);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
   }
 
   @Test
@@ -320,10 +325,11 @@ class TicketTest {
             anyWorker,
             anyCustomer,
             anyPartnerId);
-    var result = closedTicket.archive();
+    var result = closedTicket.archive(UPDATE_AT);
 
     assertThat(closedTicket).isNotEqualTo(result);
     assertThat(closedTicket.status()).isNotEqualTo(result.status());
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
 
     assertThat(closedTicket.id()).isEqualTo(result.id());
     assertThat(result.status()).isEqualTo(TicketStatus.ARCHIVED);
@@ -365,7 +371,7 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(pendingTicket::close)
+    assertThatThrownBy(() -> pendingTicket.close(UPDATE_AT))
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
         .hasMessageContaining("TicketStatus cannot be transferred from " + pendingTicket.status());
   }
@@ -388,7 +394,7 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(pendingTicket::archive)
+    assertThatThrownBy(() -> pendingTicket.archive(UPDATE_AT))
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
         .hasMessageContaining("TicketStatus cannot be transferred from " + pendingTicket.status());
   }
@@ -396,6 +402,7 @@ class TicketTest {
   @Test
   @DisplayName("Tickets can change priority")
   void ticketsCanChangePriority() {
+    var updatedAt = TicketUpdateAt.of(Instant.now());
     var pendingTicket =
         new Ticket(
             anyId,
@@ -410,11 +417,12 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    var result = pendingTicket.withPriority(TicketPriority.HIGH);
+    var result = pendingTicket.withPriority(TicketPriority.HIGH, updatedAt);
     assertThat(pendingTicket).isNotEqualTo(result);
     assertThat(result.priority()).isNotEqualTo(pendingTicket.priority());
     assertThat(result.id()).isEqualTo(pendingTicket.id());
     assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
+    assertThat(result.updatedAt()).isEqualTo(updatedAt);
   }
 
   private static Stream<Arguments> provideNullArgumentsToPassInTicketAssignMethod() {
@@ -446,7 +454,7 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(() -> ticket.assign(staffId, actorRole))
+    assertThatThrownBy(() -> ticket.assign(staffId, actorRole, UPDATE_AT))
         .isInstanceOf(IllegalTicketAssignmentException.class)
         .hasMessageContaining("TicketAssign method cannot pass null!");
   }
@@ -470,7 +478,7 @@ class TicketTest {
 
     var userRole = UserRole.CUSTOMER;
 
-    assertThatThrownBy(() -> ticket.assign(anyCustomer, userRole))
+    assertThatThrownBy(() -> ticket.assign(anyCustomer, userRole, UPDATE_AT))
         .isInstanceOf(IllegalUserRolePrivilegeException.class)
         .hasMessageContaining("User role: " + userRole);
   }
@@ -491,7 +499,7 @@ class TicketTest {
             TicketAssignees.empty(),
             anyCustomer,
             anyPartnerId);
-    assertThatThrownBy(() -> ticketClosed.assign(anyCustomer, UserRole.SUPPORT))
+    assertThatThrownBy(() -> ticketClosed.assign(anyCustomer, UserRole.SUPPORT, UPDATE_AT))
         .isInstanceOf(IllegalTicketStatusAssignmentException.class)
         .hasMessageContaining("TicketStatus: " + TicketStatus.CLOSED + " cannot assign users");
   }
@@ -513,7 +521,7 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(() -> ticketArchived.assign(anyCustomer, UserRole.SUPPORT))
+    assertThatThrownBy(() -> ticketArchived.assign(anyCustomer, UserRole.SUPPORT, UPDATE_AT))
         .isInstanceOf(IllegalTicketStatusAssignmentException.class)
         .hasMessageContaining("TicketStatus: " + TicketStatus.ARCHIVED + " cannot assign users");
   }
@@ -524,6 +532,7 @@ class TicketTest {
       names = {"PENDING", "OPEN"})
   @DisplayName("Ticket assign methods returns a new Ticket object with status PENDING and OPEN")
   void ticketAssignMethodsReturnsANewTicketObjectWithStatusPendingAndOpen(TicketStatus status) {
+    var updatedAt = TicketUpdateAt.of(Instant.now());
 
     var ticket =
         new Ticket(
@@ -540,9 +549,10 @@ class TicketTest {
             anyPartnerId);
 
     var staffId = TestUUIDIds.userId();
-    var result = ticket.assign(staffId, UserRole.SUPPORT);
+    var result = ticket.assign(staffId, UserRole.SUPPORT, updatedAt);
     assertThat(result).isNotSameAs(ticket).isInstanceOf(Ticket.class);
     assertThat(result.workers().workers()).hasSize(1);
+    assertThat(result.updatedAt()).isEqualTo(updatedAt);
   }
 
   private static Stream<Arguments> provideStatusAndRoleCombinations() {
@@ -572,7 +582,7 @@ class TicketTest {
             anyPartnerId);
 
     var staffId = TestUUIDIds.userId();
-    var result = ticket.assign(staffId, role);
+    var result = ticket.assign(staffId, role, UPDATE_AT);
 
     assertThat(result).isNotSameAs(ticket);
     assertThat(result.workers().workers()).hasSize(1);
@@ -595,9 +605,9 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(() -> ticket.withPriority(null))
+    assertThatThrownBy(() -> ticket.withPriority(null, UPDATE_AT))
         .isInstanceOf(IllegalTicketPriorityException.class)
-        .hasMessageContaining("Ticket priority passed cannot be null");
+        .hasMessageContaining("Ticket priority or update time passed cannot be null");
   }
 
   @ParameterizedTest
@@ -621,7 +631,7 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatThrownBy(() -> ticket.withPriority(TicketPriority.HIGH))
+    assertThatThrownBy(() -> ticket.withPriority(TicketPriority.HIGH, UPDATE_AT))
         .isInstanceOf(IllegalTicketStatusAssignmentException.class)
         .hasMessageContaining("TicketPriority cannot be altered in status: " + status);
   }
@@ -647,6 +657,225 @@ class TicketTest {
             anyCustomer,
             anyPartnerId);
 
-    assertThatCode(() -> ticket.withPriority(TicketPriority.HIGH)).doesNotThrowAnyException();
+    var result = ticket.withPriority(TicketPriority.HIGH, UPDATE_AT);
+
+    assertThat(result).isNotSameAs(ticket);
+    assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
+
+
+
+  }
+
+  @Test
+  @DisplayName("Open throws error if updateAt is null")
+  void openThrowsErrorIfUpdateAtIsNull() {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.open(null))
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("Update time is required");
+  }
+
+  @Test
+  @DisplayName("Close throws error if updateAt is null")
+  void closeThrowsErrorIfUpdateAtIsNull() {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.OPEN,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.close(null))
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("Update time is required");
+  }
+
+  @Test
+  @DisplayName("Archive throws error if updateAt is null")
+  void archiveThrowsErrorIfUpdateAtIsNull() {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.CLOSED,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.archive(null))
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining("Update time is required");
+  }
+
+  @Test
+  @DisplayName("Assign throws error when updateAt is null")
+  void assignThrowsErrorWhenUpdateAtIsNull() {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING, // valid for assignment
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            TicketAssignees.empty(),
+            anyCustomer,
+            anyPartnerId);
+
+    var staffId = TestUUIDIds.userId();
+    var role = UserRole.SUPPORT; // valid role
+
+    assertThatThrownBy(() -> ticket.assign(staffId, role, null))
+        .isInstanceOf(IllegalTicketAssignmentException.class)
+        .hasMessageContaining("TicketAssign method cannot pass null!");
+  }
+
+  @Test
+  @DisplayName("withPriority throws error when updateAt is null")
+  void withPriorityThrowsErrorWhenUpdateAtIsNull() {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING, // valid for priority change
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.withPriority(TicketPriority.HIGH, null))
+        .isInstanceOf(IllegalTicketPriorityException.class)
+        .hasMessageContaining("Ticket priority or update time passed cannot be null");
+  }
+
+  private static Stream<Arguments> provideInvalidDescriptionUpdateArgs() {
+    return Stream.of(
+        Arguments.of(null, UPDATE_AT),
+        Arguments.of(anyDescription, null),
+        Arguments.of(null, null));
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideInvalidDescriptionUpdateArgs")
+  @DisplayName("updateTicketDescription throws error if description or updateAt is null")
+  void updateTicketDescriptionThrowsErrorWhenArgumentsAreNull(
+      TicketDescription description, TicketUpdateAt updateAt) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.updateTicketDescription(description, updateAt))
+        .isInstanceOf(IllegalTicketDescriptionUpdateException.class)
+        .hasMessageContaining("Ticket description or update time passed cannot be null");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"CLOSED", "ARCHIVED"})
+  @DisplayName("updateTicketDescription throws error for CLOSED and ARCHIVED status")
+  void updateTicketDescriptionThrowsErrorForInvalidStatus(TicketStatus status) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    var newDescription = new TicketDescription("Updated description");
+
+    assertThatThrownBy(() -> ticket.updateTicketDescription(newDescription, UPDATE_AT))
+        .isInstanceOf(IllegalTicketDescriptionUpdateException.class)
+        .hasMessageContaining("TicketStatus: " + status);
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"PENDING", "OPEN"})
+  @DisplayName("updateTicketDescription updates description for valid statuses")
+  void updateTicketDescriptionUpdatesForValidStatus(TicketStatus status) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    var newDescription = new TicketDescription("Updated description");
+
+    var result = ticket.updateTicketDescription(newDescription, UPDATE_AT);
+
+    assertThat(result).isNotSameAs(ticket);
+    assertThat(result.description()).isEqualTo(newDescription);
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
+
+    // ensure immutability consistency
+    assertThat(result.id()).isEqualTo(ticket.id());
+    assertThat(result.status()).isEqualTo(ticket.status());
   }
 }

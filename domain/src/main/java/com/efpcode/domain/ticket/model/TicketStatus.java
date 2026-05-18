@@ -1,5 +1,6 @@
 package com.efpcode.domain.ticket.model;
 
+import com.efpcode.domain.ticket.exceptions.IllegalTicketDescriptionUpdateException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusAssignmentException;
 import com.efpcode.domain.ticket.exceptions.IllegalTicketStatusTransitionException;
 
@@ -47,6 +48,20 @@ public enum TicketStatus {
       case OPEN, PENDING -> true;
       default -> false;
     };
+  }
+
+  public boolean canUpdateDescription() {
+    return switch (this) {
+      case OPEN, PENDING -> true;
+      default -> false;
+    };
+  }
+
+  public void ticketUpdateDescriptionGuard() {
+    if (!canUpdateDescription()) {
+      throw new IllegalTicketDescriptionUpdateException(
+          String.format("TicketStatus: %s cannot update description", this));
+    }
   }
 
   public void ticketStatusAssignGuard() {

@@ -1,8 +1,7 @@
 package com.efpcode.domain.ticket.model;
 
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketAssignmentException;
-import com.efpcode.domain.ticket.exceptions.IllegalTicketPriorityException;
+import com.efpcode.domain.ticket.exceptions.*;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;
 import java.util.Objects;
@@ -34,16 +33,16 @@ public record Ticket(
     Objects.requireNonNull(ownerPartner, "PartnerId cannot be null");
   }
 
-  public Ticket open() {
-    return withStatus(this.status.open());
+  public Ticket open(TicketUpdateAt updateAt) {
+    return withStatus(this.status.open(), updateAt);
   }
 
-  public Ticket close() {
-    return withStatus(this.status().close());
+  public Ticket close(TicketUpdateAt updateAt) {
+    return withStatus(this.status().close(), updateAt);
   }
 
-  public Ticket archive() {
-    return withStatus(this.status.archive());
+  public Ticket archive(TicketUpdateAt updateAt) {
+    return withStatus(this.status.archive(), updateAt);
   }
 
   public static Ticket createPending(
@@ -55,6 +54,9 @@ public record Ticket(
       TicketCreatedAt time,
       UserId reportedBy,
       PartnerId ownerPartner) {
+    if (time == null){
+      throw new InvalidTicketIdException("CreatedAt time cannot be null");
+    }
 
     return new Ticket(
         id,
@@ -64,14 +66,14 @@ public record Ticket(
         TicketStatus.PENDING,
         priority,
         time,
-        TicketUpdateAt.createNow(),
+        TicketUpdateAt.of(time.time()),
         TicketAssignees.empty(),
         reportedBy,
         ownerPartner);
   }
 
-  public Ticket assign(UserId staffId, UserRole actorRole) {
-    if (staffId == null || actorRole == null)
+  public Ticket assign(UserId staffId, UserRole actorRole, TicketUpdateAt updateAt) {
+    if (staffId == null || actorRole == null || updateAt == null)
       throw new IllegalTicketAssignmentException("TicketAssign method cannot pass null!");
 
     actorRole.roleGuardAssignTickets();
@@ -85,15 +87,16 @@ public record Ticket(
         status,
         priority,
         createdAt,
-        TicketUpdateAt.createNow(),
+        updateAt,
         workers.add(staffId),
         reportedBy,
         ownerPartner);
   }
 
-  public Ticket withPriority(TicketPriority ticketPriority) {
-    if (ticketPriority == null)
-      throw new IllegalTicketPriorityException("Ticket priority passed cannot be null");
+  public Ticket withPriority(TicketPriority ticketPriority, TicketUpdateAt updateAt) {
+    if (ticketPriority == null || updateAt == null)
+      throw new IllegalTicketPriorityException(
+          "Ticket priority or update time passed cannot be null");
     this.status().ticketChangeStatusPriorityGuard();
     return new Ticket(
         id,
@@ -103,13 +106,38 @@ public record Ticket(
         status,
         ticketPriority,
         createdAt,
-        TicketUpdateAt.createNow(),
+        updateAt,
         workers,
         reportedBy,
         ownerPartner);
   }
 
-  private Ticket withStatus(TicketStatus newStatus) {
+  public Ticket updateTicketDescription(TicketDescription newDescription, TicketUpdateAt updateAt) {
+
+    if (newDescription == null || updateAt == null) {
+      throw new IllegalTicketDescriptionUpdateException(
+          "Ticket description or update time passed cannot be null");
+    }
+    this.status.ticketUpdateDescriptionGuard();
+
+    return new Ticket(
+        id,
+        slug,
+        title,
+        newDescription,
+        status,
+        priority,
+        createdAt,
+        updateAt,
+        workers,
+        reportedBy,
+        ownerPartner);
+  }
+
+  private Ticket withStatus(TicketStatus newStatus, TicketUpdateAt updateAt) {
+    if (updateAt == null) {
+      throw new IllegalTicketStatusTransitionException("Update time is required");
+    }
     return new Ticket(
         id,
         slug,
@@ -118,7 +146,7 @@ public record Ticket(
         newStatus,
         priority,
         createdAt,
-        TicketUpdateAt.createNow(),
+        updateAt,
         workers,
         reportedBy,
         ownerPartner);
