@@ -186,7 +186,8 @@ class TicketStatusTest {
       value = TicketStatus.class,
       names = {"PENDING", "OPEN"})
   @DisplayName("ticketUpdateDescription method does not throw error for statuses PENDING and OPEN")
-  void ticketUpdateDescriptionMethodDoesNotThrowErrorForStatusesPendingAndOpen(TicketStatus status) {
+  void ticketUpdateDescriptionMethodDoesNotThrowErrorForStatusesPendingAndOpen(
+      TicketStatus status) {
 
     assertThatCode(status::ticketUpdateDescriptionGuard).doesNotThrowAnyException();
   }
