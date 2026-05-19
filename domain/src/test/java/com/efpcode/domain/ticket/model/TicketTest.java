@@ -662,9 +662,6 @@ class TicketTest {
     assertThat(result).isNotSameAs(ticket);
     assertThat(result.priority()).isEqualTo(TicketPriority.HIGH);
     assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
-
-
-
   }
 
   @Test
@@ -877,5 +874,74 @@ class TicketTest {
     // ensure immutability consistency
     assertThat(result.id()).isEqualTo(ticket.id());
     assertThat(result.status()).isEqualTo(ticket.status());
+  }
+
+  @Test
+  @DisplayName("Constructor throws error if createdAt is after updatedAt")
+  void constructorThrowsErrorIfCreatedAtIsAfterUpdatedAt() {
+
+    Instant base = Instant.now();
+
+    // createdAt is AFTER updatedAt → invalid
+    TicketCreatedAt createdAt = new TicketCreatedAt(base.plusSeconds(60));
+    TicketUpdateAt updatedAt = TicketUpdateAt.of(base);
+
+    assertThatThrownBy(
+            () ->
+                new Ticket(
+                    anyId,
+                    anySlug,
+                    anyTitle,
+                    anyDescription,
+                    TicketStatus.PENDING,
+                    TicketPriority.LOW,
+                    createdAt,
+                    updatedAt,
+                    anyWorker,
+                    anyCustomer,
+                    anyPartnerId))
+        .isInstanceOf(InvalidTicketException.class)
+        .hasMessageContaining("Ticket updatedAt cannot be before the createdAt time");
+  }
+
+  @Test
+  @DisplayName("Constructor allows createdAt equal or before updatedAt")
+  void constructorAllowsCreatedAtBeforeOrEqualUpdatedAt() {
+
+    Instant base = Instant.now();
+
+    TicketCreatedAt createdAt = new TicketCreatedAt(base);
+    TicketUpdateAt updatedAt = TicketUpdateAt.of(base.plusSeconds(60));
+
+    Ticket equalTicket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            createdAt,
+            TicketUpdateAt.of(base),
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    Ticket beforeTicket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            createdAt,
+            TicketUpdateAt.of(updatedAt.updatedAt()),
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThat(equalTicket).isNotNull();
+    assertThat(beforeTicket).isNotNull();
   }
 }
