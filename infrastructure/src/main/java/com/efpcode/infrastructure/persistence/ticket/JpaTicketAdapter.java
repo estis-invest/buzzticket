@@ -8,6 +8,7 @@ import com.efpcode.domain.ticket.port.TicketRepository;
 import com.efpcode.domain.user.model.UserId;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,7 +45,8 @@ public class JpaTicketAdapter implements TicketRepository {
 
   @Override
   public List<Ticket> findByAssignee(UserId id) {
-    return ticketRepository.findByAssignees(id.id()).stream().map(TicketMapper::toDomain).toList();
+    var assignee = Set.of(id.id());
+    return ticketRepository.findByAssignees(assignee).stream().map(TicketMapper::toDomain).toList();
   }
 
   @Override
