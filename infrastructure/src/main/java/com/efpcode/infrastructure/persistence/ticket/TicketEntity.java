@@ -1,7 +1,6 @@
 package com.efpcode.infrastructure.persistence.ticket;
 
 import jakarta.persistence.*;
-
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.Objects;
@@ -9,171 +8,177 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name="ticket")
+@Table(name = "ticket")
 public class TicketEntity {
 
-    protected TicketEntity(){}
+  protected TicketEntity() {}
 
-    @Id
-    @Column(name = "ticket_id", unique = true, nullable = false)
-    private UUID id;
+  @Id
+  @Column(name = "ticket_id", unique = true, nullable = false)
+  private UUID id;
 
+  @Column(name = "ticket_slug", unique = true, nullable = false)
+  private String slug;
 
-    @Column(name = "ticket_slug", unique = true, nullable = false)
-    private String slug;
+  @Column(name = "ticket_title", unique = false, nullable = false)
+  private String title;
 
-    @Column(name = "ticket_title", unique = false, nullable = false)
-    private String title;
+  @Column(name = "ticket_description", unique = false, nullable = false)
+  private String description;
 
-    @Column(name = "ticket_description", unique = false, nullable = false)
-    private String description;
+  @Column(name = "ticket_status", unique = false, nullable = false)
+  private String status;
 
-    @Column(name = "ticket_status", unique = false, nullable = false)
-    private String status;
+  @Column(name = "ticket_priority", unique = false, nullable = false)
+  private String priority;
 
-    @Column(name = "ticket_priority", unique = false, nullable = false)
-    private String priority;
+  @Column(name = "ticket_created_at", unique = false, nullable = false)
+  private Instant createdAt;
 
-    @Column(name = "ticket_created_at", unique = false, nullable = false)
-    private Instant createdAt;
+  @Column(name = "ticket_updated_at", unique = false, nullable = false)
+  private Instant updatedAt;
 
-    @Column(name = "ticket_updated_at", unique = false, nullable = false)
-    private Instant updatedAt;
+  @ElementCollection(fetch = FetchType.LAZY)
+  @CollectionTable(name = "ticket_assignee", joinColumns = @JoinColumn(name = "ticket_id"))
+  @Column(name = "user_id", nullable = false)
+  private Set<UUID> assignees = new HashSet<>();
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(
-            name = "ticket_assignee",
-            joinColumns = @JoinColumn(name = "ticket_id")
-    )
-    @Column(name = "user_id", nullable = false)
-    private Set<UUID> assignees = new HashSet<>();
+  @Column(name = "ticket_reported_by_id", nullable = false)
+  private UUID reportedById;
 
+  @Column(name = "ticket_owner_partner_id", nullable = false)
+  private UUID ownerPartnerId;
 
-    @Column(name = "ticket_reported_by_id", nullable = false)
-    private UUID reportedById;
+  public UUID getId() {
+    return id;
+  }
 
+  public void setId(UUID id) {
+    this.id = id;
+  }
 
-    @Column(name = "ticket_owner_partner_id", nullable = false)
-    private UUID ownerPartnerId;
+  public String getSlug() {
+    return slug;
+  }
 
+  public void setSlug(String slug) {
+    this.slug = slug;
+  }
 
+  public String getTitle() {
+    return title;
+  }
 
-    public UUID getId() {
-        return id;
-    }
+  public void setTitle(String title) {
+    this.title = title;
+  }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+  public String getDescription() {
+    return description;
+  }
 
-    public String getSlug() {
-        return slug;
-    }
+  public void setDescription(String description) {
+    this.description = description;
+  }
 
-    public void setSlug(String slug) {
-        this.slug = slug;
-    }
+  public String getStatus() {
+    return status;
+  }
 
-    public String getTitle() {
-        return title;
-    }
+  public void setStatus(String status) {
+    this.status = status;
+  }
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+  public String getPriority() {
+    return priority;
+  }
 
-    public String getDescription() {
-        return description;
-    }
+  public void setPriority(String priority) {
+    this.priority = priority;
+  }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+  public Instant getCreatedAt() {
+    return createdAt;
+  }
 
-    public String getStatus() {
-        return status;
-    }
+  public void setCreatedAt(Instant createdAt) {
+    this.createdAt = createdAt;
+  }
 
-    public void setStatus(String status) {
-        this.status = status;
-    }
+  public Instant getUpdatedAt() {
+    return updatedAt;
+  }
 
-    public String getPriority() {
-        return priority;
-    }
+  public void setUpdatedAt(Instant updatedAt) {
+    this.updatedAt = updatedAt;
+  }
 
-    public void setPriority(String priority) {
-        this.priority = priority;
-    }
+  public Set<UUID> getAssignees() {
+    return assignees;
+  }
 
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
+  public void setAssignees(Set<UUID> assignees) {
+    this.assignees = assignees;
+  }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
-    }
+  public UUID getReportedById() {
+    return reportedById;
+  }
 
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
+  public void setReportedById(UUID reportedById) {
+    this.reportedById = reportedById;
+  }
 
-    public void setUpdatedAt(Instant updatedAt) {
-        this.updatedAt = updatedAt;
-    }
+  public UUID getOwnerPartnerId() {
+    return ownerPartnerId;
+  }
 
-    public Set<UUID> getAssignees() {
-        return assignees;
-    }
+  public void setOwnerPartnerId(UUID ownerPartnerId) {
+    this.ownerPartnerId = ownerPartnerId;
+  }
 
-    public void setAssignees(Set<UUID> assignees) {
-        this.assignees = assignees;
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (o == null || getClass() != o.getClass()) return false;
+    TicketEntity that = (TicketEntity) o;
+    return Objects.equals(id, that.id);
+  }
 
-    public UUID getReportedById() {
-        return reportedById;
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hashCode(id);
+  }
 
-    public void setReportedById(UUID reportedById) {
-        this.reportedById = reportedById;
-    }
-
-    public UUID getOwnerPartnerId() {
-        return ownerPartnerId;
-    }
-
-    public void setOwnerPartnerId(UUID ownerPartnerId) {
-        this.ownerPartnerId = ownerPartnerId;
-    }
-
-
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        TicketEntity that = (TicketEntity) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "TicketEntity{" +
-                "id=" + id +
-                ", slug='" + slug + '\'' +
-                ", title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", status='" + status + '\'' +
-                ", priority='" + priority + '\'' +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", assignees=" + assignees +
-                ", reportedById=" + reportedById +
-                ", ownerPartnerId=" + ownerPartnerId +
-                '}';
-    }
+  @Override
+  public String toString() {
+    return "TicketEntity{"
+        + "id="
+        + id
+        + ", slug='"
+        + slug
+        + '\''
+        + ", title='"
+        + title
+        + '\''
+        + ", description='"
+        + description
+        + '\''
+        + ", status='"
+        + status
+        + '\''
+        + ", priority='"
+        + priority
+        + '\''
+        + ", createdAt="
+        + createdAt
+        + ", updatedAt="
+        + updatedAt
+        + ", assignees="
+        + assignees
+        + ", reportedById="
+        + reportedById
+        + ", ownerPartnerId="
+        + ownerPartnerId
+        + '}';
+  }
 }
