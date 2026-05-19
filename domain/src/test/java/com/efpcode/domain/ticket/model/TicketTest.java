@@ -915,7 +915,7 @@ class TicketTest {
     TicketCreatedAt createdAt = new TicketCreatedAt(base);
     TicketUpdateAt updatedAt = TicketUpdateAt.of(base.plusSeconds(60));
 
-    Ticket ticket =
+    Ticket equalTicket =
             new Ticket(
                     anyId,
                     anySlug,
@@ -924,12 +924,28 @@ class TicketTest {
                     TicketStatus.PENDING,
                     TicketPriority.LOW,
                     createdAt,
-                    updatedAt,
+                    TicketUpdateAt.of(base),
                     anyWorker,
                     anyCustomer,
                     anyPartnerId);
 
-    assertThat(ticket).isNotNull();
+
+    Ticket beforeTicket =
+            new Ticket(
+                    anyId,
+                    anySlug,
+                    anyTitle,
+                    anyDescription,
+                    TicketStatus.PENDING,
+                    TicketPriority.LOW,
+                    createdAt,
+                    TicketUpdateAt.of(updatedAt.updatedAt()),
+                    anyWorker,
+                    anyCustomer,
+                    anyPartnerId);
+
+    assertThat(equalTicket).isNotNull();
+    assertThat(beforeTicket).isNotNull();
   }
 
 }
