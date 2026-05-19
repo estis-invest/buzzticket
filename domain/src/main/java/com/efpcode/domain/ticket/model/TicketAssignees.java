@@ -1,7 +1,7 @@
 package com.efpcode.domain.ticket.model;
 
 import com.efpcode.domain.ticket.exceptions.MissingUserAssignmentException;
-import com.efpcode.domain.ticket.exceptions.TicketAssigmentLimitException;
+import com.efpcode.domain.ticket.exceptions.TicketAssignmentLimitException;
 import com.efpcode.domain.user.model.UserId;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,7 +18,7 @@ public record TicketAssignees(Set<UserId> workers) {
     workers = Set.copyOf(workers);
 
     if (workers.size() > LIMIT) {
-      throw new TicketAssigmentLimitException(
+      throw new TicketAssignmentLimitException(
           "A ticket cannot have more than " + LIMIT + " workers");
     }
   }
