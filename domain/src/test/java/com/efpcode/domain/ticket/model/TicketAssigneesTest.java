@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.efpcode.domain.testsupport.TestUUIDIds;
 import com.efpcode.domain.ticket.exceptions.MissingUserAssignmentException;
-import com.efpcode.domain.ticket.exceptions.TicketAssigmentLimitException;
+import com.efpcode.domain.ticket.exceptions.TicketAssignmentLimitException;
 import com.efpcode.domain.user.model.UserId;
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -26,11 +26,11 @@ class TicketAssigneesTest {
     var ticketWorkers = new TicketAssignees(underLimit);
 
     assertThatThrownBy(() -> new TicketAssignees(overLimit))
-        .isInstanceOf(TicketAssigmentLimitException.class)
+        .isInstanceOf(TicketAssignmentLimitException.class)
         .hasMessageContaining("3 workers");
 
     assertThatThrownBy(() -> ticketWorkers.add(worker4))
-        .isInstanceOf(TicketAssigmentLimitException.class)
+        .isInstanceOf(TicketAssignmentLimitException.class)
         .hasMessageContaining("than 3");
   }
 
