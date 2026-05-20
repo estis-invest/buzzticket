@@ -28,8 +28,7 @@ class IdGeneratorConfiguration {
   }
 
   @Bean
-  public IdGenerator<TicketId> ticketIdIdGenerator(){
+  public IdGenerator<TicketId> ticketIdIdGenerator() {
     return new JugIdGenerator<>(TicketId::new);
   }
-
 }

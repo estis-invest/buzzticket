@@ -11,17 +11,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 class TicketTransactionalAdapter implements TicketRegisterCommands {
 
-    private final RequestContext requestContext;
-    private final TicketCreationUseCase ticketCreationUseCase;
+  private final RequestContext requestContext;
+  private final TicketCreationUseCase ticketCreationUseCase;
 
-    public TicketTransactionalAdapter(RequestContext requestContext, TicketCreationUseCase ticketCreationUseCase){
-        this.requestContext=requestContext;
-        this.ticketCreationUseCase = ticketCreationUseCase;
-    }
+  public TicketTransactionalAdapter(
+      RequestContext requestContext, TicketCreationUseCase ticketCreationUseCase) {
+    this.requestContext = requestContext;
+    this.ticketCreationUseCase = ticketCreationUseCase;
+  }
 
-    @Override
-    @Transactional
-    public TicketResult createTicket(RegisterTicketCommand command) {
-        return ticketCreationUseCase.execute(command, requestContext);
-    }
+  @Override
+  @Transactional
+  public TicketResult createTicket(RegisterTicketCommand command) {
+    return ticketCreationUseCase.execute(command, requestContext);
+  }
 }

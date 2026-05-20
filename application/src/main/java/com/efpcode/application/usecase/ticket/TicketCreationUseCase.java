@@ -14,76 +14,71 @@ import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import com.efpcode.domain.ticket.model.*;
 import com.efpcode.domain.ticket.port.TicketRepository;
-
 import java.time.Clock;
 import java.time.Instant;
 
 public class TicketCreationUseCase {
 
-    private final IdGenerator<TicketId> ticketIdGenerator;
-    private final TicketRepository ticketRepository;
-    private final TicketSlugGenerator slugGenerator;
-    private final UserAuthenticationPolicy userAuthenticationPolicy;
-    private final PartnerRepository partnerRepository;
-    private final Clock clock;
+  private final IdGenerator<TicketId> ticketIdGenerator;
+  private final TicketRepository ticketRepository;
+  private final TicketSlugGenerator slugGenerator;
+  private final UserAuthenticationPolicy userAuthenticationPolicy;
+  private final PartnerRepository partnerRepository;
+  private final Clock clock;
 
-    public TicketCreationUseCase(
-            IdGenerator<TicketId> ticketIdGenerator,
-            TicketRepository ticketRepository,
-            TicketSlugGenerator slugGenerator,
-            UserAuthenticationPolicy userAuthenticationPolicy,
-            PartnerRepository partnerRepository,
-            Clock clock
-    ){
-        this.ticketIdGenerator = ticketIdGenerator;
-        this.ticketRepository = ticketRepository;
-        this.slugGenerator = slugGenerator;
-        this.userAuthenticationPolicy = userAuthenticationPolicy;
-        this.partnerRepository = partnerRepository;
-        this.clock=clock;
+  public TicketCreationUseCase(
+      IdGenerator<TicketId> ticketIdGenerator,
+      TicketRepository ticketRepository,
+      TicketSlugGenerator slugGenerator,
+      UserAuthenticationPolicy userAuthenticationPolicy,
+      PartnerRepository partnerRepository,
+      Clock clock) {
+    this.ticketIdGenerator = ticketIdGenerator;
+    this.ticketRepository = ticketRepository;
+    this.slugGenerator = slugGenerator;
+    this.userAuthenticationPolicy = userAuthenticationPolicy;
+    this.partnerRepository = partnerRepository;
+    this.clock = clock;
+  }
+
+  public TicketResult execute(RegisterTicketCommand command, RequestContext requestContext) {
+    UserContext user = userAuthenticationPolicy.userValidator(requestContext);
+
+    PartnerId partnerId = new PartnerId(command.partnerId());
+
+    Partner partner =
+        partnerRepository
+            .findById(partnerId)
+            .orElseThrow(
+                () -> new PartnerNotFoundException("Partner not found and cannot generate ticket"));
+
+    if (!partner.isActive()) {
+      throw new IllegalPartnerStatusException(
+          "Inactive partner cannot have association with ticket");
     }
 
+    TicketId ticketId = ticketIdGenerator.generate();
+    TicketSlug ticketSlug = slugGenerator.generate();
+    Instant now = Instant.now(clock);
 
-    public TicketResult execute(RegisterTicketCommand command, RequestContext requestContext){
-        UserContext user = userAuthenticationPolicy.userValidator(requestContext);
+    TicketTitle ticketTitle = new TicketTitle(command.title());
+    TicketDescription ticketDescription = new TicketDescription(command.Description());
+    TicketPriority ticketPriority = TicketPriority.valueOf(command.priority());
+    TicketCreatedAt createdAt = new TicketCreatedAt(now);
 
-        PartnerId partnerId = new PartnerId(command.partnerId());
+    Ticket ticket =
+        Ticket.createPending(
+            ticketId,
+            ticketSlug,
+            ticketTitle,
+            ticketDescription,
+            ticketPriority,
+            createdAt,
+            user.user().id(),
+            partner.id());
 
-        Partner partner = partnerRepository.findById(partnerId).orElseThrow(() ->
-                new PartnerNotFoundException("Partner not found and cannot generate ticket"));
+    ticketRepository.save(ticket);
 
-        if(!partner.isActive()){
-            throw new IllegalPartnerStatusException("Inactive partner cannot have association with ticket");
-        }
-
-        TicketId ticketId = ticketIdGenerator.generate();
-        TicketSlug ticketSlug = slugGenerator.generate();
-        Instant now = Instant.now(clock);
-
-
-        TicketTitle ticketTitle = new TicketTitle(command.title());
-        TicketDescription ticketDescription = new TicketDescription(command.Description());
-        TicketPriority ticketPriority = TicketPriority.valueOf(command.priority());
-        TicketCreatedAt createdAt = new TicketCreatedAt(now);
-
-
-
-        Ticket ticket = Ticket.createPending(
-                ticketId,
-                ticketSlug,
-                ticketTitle,
-                ticketDescription,
-                ticketPriority,
-                createdAt,
-                user.user().id(),
-                partner.id()
-        );
-
-        ticketRepository.save(ticket);
-
-        return TicketResult.fromDomain(ticket, partner.name());
-
-    }
-
-
+    return TicketResult.fromDomain(ticket, partner.name());
+  }
 }
