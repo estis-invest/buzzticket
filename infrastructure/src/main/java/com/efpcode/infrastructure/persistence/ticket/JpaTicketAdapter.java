@@ -8,8 +8,8 @@ import com.efpcode.domain.ticket.port.TicketRepository;
 import com.efpcode.domain.user.model.UserId;
 import java.util.List;
 import java.util.Optional;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JpaTicketAdapter implements TicketRepository {
