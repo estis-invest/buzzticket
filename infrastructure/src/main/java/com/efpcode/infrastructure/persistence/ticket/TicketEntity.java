@@ -173,8 +173,6 @@ public class TicketEntity {
         + createdAt
         + ", updatedAt="
         + updatedAt
-        + ", assignees="
-        + assignees
         + ", reportedById="
         + reportedById
         + ", ownerPartnerId="

@@ -8,6 +8,7 @@ import com.efpcode.domain.ticket.port.TicketRepository;
 import com.efpcode.domain.user.model.UserId;
 import java.util.List;
 import java.util.Optional;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,6 +21,7 @@ public class JpaTicketAdapter implements TicketRepository {
   }
 
   @Override
+  @Transactional
   public void save(Ticket ticket) {
     TicketEntity entity = TicketMapper.toEntity(ticket);
     ticketRepository.save(entity);
