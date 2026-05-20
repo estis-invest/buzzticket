@@ -8,6 +8,11 @@ import com.efpcode.domain.ticket.exceptions.TicketSlugFormatException;
 import com.efpcode.domain.ticket.exceptions.TicketSlugLengthException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import java.util.stream.Stream;
 
 class TicketSlugTest {
   @Test
@@ -30,7 +35,7 @@ class TicketSlugTest {
 
     assertThatThrownBy(() -> new TicketSlug(invalidFormatSlug))
         .isInstanceOf(TicketSlugFormatException.class)
-        .hasMessageContaining("AAA-0000...000");
+        .hasMessageContaining("Slug must follow format `AAA-XXXXXXXX` where X is uppercase letter or digit");
   }
 
   @Test
@@ -57,4 +62,49 @@ class TicketSlugTest {
     assertThat(newSlug.slug()).isEqualTo(longSlug);
     assertThat(newSlug.slug()).hasSameSizeAs(longSlug);
   }
+
+  private static Stream<Arguments> invalidFormats() {
+    return Stream.of(
+            Arguments.of("AAAA-0000"),
+            Arguments.of("AA-1234"),
+            Arguments.of("aAA-1234"),
+            Arguments.of("AA1-1234"),
+            Arguments.of("A_A-1234"),
+
+            Arguments.of("AAA1234"),
+            Arguments.of("AAA--1234"),
+            Arguments.of("AAA_1234"),
+            Arguments.of("AAA 1234"),
+
+            Arguments.of("AAA-"),
+
+            Arguments.of("AAA-abc123"),
+            Arguments.of("AAA-123abc"),
+            Arguments.of("AAA-ABC_123"),
+            Arguments.of("AAA-ABC-123"),
+            Arguments.of("AAA-123!123"),
+            Arguments.of("AAA-123 123"),
+            Arguments.of("AAA-123.123")
+    );
+  }
+
+
+
+  @ParameterizedTest
+  @MethodSource("invalidFormats")
+  @DisplayName("Ticket slug that are malformatted will throw error")
+  void ticketSlugThatAreMalformattedWillThrowError(String malformatted) {
+
+    assertThatThrownBy(() -> new TicketSlug(malformatted))
+            .isInstanceOf(TicketSlugFormatException.class)
+            .hasMessageContaining("Slug must follow format `AAA-XXXXXXXX` where X is uppercase letter or digit");
+
+  }
+
+
+
+
+
+
+
 }

@@ -6,7 +6,7 @@ import com.efpcode.domain.ticket.exceptions.TicketSlugLengthException;
 import java.util.regex.Pattern;
 
 public record TicketSlug(String slug) {
-  private static final Pattern FORMAT = Pattern.compile("^[A-Z]{3}-\\d+$");
+  private static final Pattern FORMAT = Pattern.compile("^[A-Z]{3}-[A-Z0-9]+$");
 
   public TicketSlug {
 
@@ -20,7 +20,7 @@ public record TicketSlug(String slug) {
     }
 
     if (!FORMAT.matcher(slug).matches()) {
-      throw new TicketSlugFormatException("Slug must follow format `AAA-0000...000`");
+      throw new TicketSlugFormatException("Slug must follow format `AAA-XXXXXXXX` where X is uppercase letter or digit");
     }
   }
 }
