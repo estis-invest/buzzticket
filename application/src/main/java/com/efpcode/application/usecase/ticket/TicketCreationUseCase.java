@@ -62,8 +62,8 @@ public class TicketCreationUseCase {
     Instant now = Instant.now(clock);
 
     TicketTitle ticketTitle = new TicketTitle(command.title());
-    TicketDescription ticketDescription = new TicketDescription(command.Description());
-    TicketPriority ticketPriority = TicketPriority.valueOf(command.priority());
+    TicketDescription ticketDescription = new TicketDescription(command.description());
+    TicketPriority ticketPriority = TicketPriorityParser.parse(command.priority());
     TicketCreatedAt createdAt = new TicketCreatedAt(now);
 
     Ticket ticket =
