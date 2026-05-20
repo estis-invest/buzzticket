@@ -15,12 +15,13 @@ public record TicketSlug(String slug) {
     }
     slug = slug.trim();
 
-    if (slug.length() > 64) {
+    if (slug.length() > 32) {
       throw new TicketSlugLengthException("Slug length is greater than max range");
     }
 
     if (!FORMAT.matcher(slug).matches()) {
-      throw new TicketSlugFormatException("Slug must follow format `AAA-XXXXXXXX` where X is uppercase letter or digit");
+      throw new TicketSlugFormatException(
+          "Slug must follow format `AAA-XXXXXXXX` where X is uppercase letter or digit");
     }
   }
 }

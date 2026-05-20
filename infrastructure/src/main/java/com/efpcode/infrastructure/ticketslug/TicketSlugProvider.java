@@ -3,14 +3,13 @@ package com.efpcode.infrastructure.ticketslug;
 import com.efpcode.application.port.out.ticket.TicketSlugGenerator;
 import com.efpcode.domain.ticket.model.TicketSlug;
 import com.efpcode.infrastructure.config.properties.TicketSlugProperties;
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 @Component
 class ConfigurableSlugTicketGenerator implements TicketSlugGenerator {
 
   private final TicketSlugProperties properties;
-  private final AtomicLong counter = new AtomicLong(1);
 
   public ConfigurableSlugTicketGenerator(TicketSlugProperties properties) {
     this.properties = properties;
@@ -18,11 +17,19 @@ class ConfigurableSlugTicketGenerator implements TicketSlugGenerator {
 
   @Override
   public TicketSlug generate() {
-    long number = counter.getAndIncrement();
+    UUID randomString = UUID.randomUUID();
+    String hex = hexaString(randomString).toUpperCase();
 
-    String ticketSlug =
-        properties.prefix() + String.format("%0" + properties.lengthPadding() + "d", number);
+    int maxSuffixLength = 32 - 4;
+    int length = Math.min(properties.lengthPadding(), maxSuffixLength);
 
+    String hexPadding = hex.substring(0, length);
+
+    String ticketSlug = properties.prefix() + "-" + hexPadding;
     return new TicketSlug(ticketSlug);
+  }
+
+  private String hexaString(UUID value) {
+    return value.toString().replace("-", "");
   }
 }
