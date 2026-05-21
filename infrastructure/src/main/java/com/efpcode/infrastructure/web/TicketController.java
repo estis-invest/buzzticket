@@ -1,12 +1,10 @@
 package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
-import com.efpcode.application.usecase.ticket.dto.AssignTicketCommand;
-import com.efpcode.application.usecase.ticket.dto.ChangeTicketStatusCommand;
-import com.efpcode.application.usecase.ticket.dto.RegisterTicketCommand;
-import com.efpcode.application.usecase.ticket.dto.TicketResult;
+import com.efpcode.application.usecase.ticket.dto.*;
 import com.efpcode.infrastructure.web.dto.requests.AssignTicketRequest;
 import com.efpcode.infrastructure.web.dto.requests.RegisterTicketRequest;
+import com.efpcode.infrastructure.web.dto.requests.UpdateTicketPriorityRequest;
 import com.efpcode.infrastructure.web.dto.requests.UpdateTicketStatusRequest;
 import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
 import jakarta.validation.Valid;
@@ -56,6 +54,15 @@ class TicketController {
       @Valid @RequestBody UpdateTicketStatusRequest request, @PathVariable UUID id) {
     ChangeTicketStatusCommand command = new ChangeTicketStatusCommand(request.status(), id);
     ticketRegisterCommands.changeTicketStatus(command);
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @PatchMapping("/{id}/priority")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void updateTicketStatus(
+      @Valid @RequestBody UpdateTicketPriorityRequest request, @PathVariable UUID id) {
+    ChangeTicketPriorityCommand command = new ChangeTicketPriorityCommand(request.priority(), id);
+    ticketRegisterCommands.changeTicketPriority(command);
   }
 
   // TODO: Ticket API Endpoints
