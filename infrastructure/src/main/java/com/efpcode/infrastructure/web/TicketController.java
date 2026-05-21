@@ -2,10 +2,12 @@ package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
 import com.efpcode.application.usecase.ticket.dto.AssignTicketCommand;
+import com.efpcode.application.usecase.ticket.dto.ChangeTicketStatusCommand;
 import com.efpcode.application.usecase.ticket.dto.RegisterTicketCommand;
 import com.efpcode.application.usecase.ticket.dto.TicketResult;
 import com.efpcode.infrastructure.web.dto.requests.AssignTicketRequest;
 import com.efpcode.infrastructure.web.dto.requests.RegisterTicketRequest;
+import com.efpcode.infrastructure.web.dto.requests.updateTicketStatusRequest;
 import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -47,11 +49,18 @@ class TicketController {
     ticketRegisterCommands.assignTicket(assignTicketCommand);
   }
 
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @PostMapping("/{id}/status")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void updateTicketStatus(
+      @Valid @RequestBody updateTicketStatusRequest request, @PathVariable UUID id) {
+    ChangeTicketStatusCommand command = new ChangeTicketStatusCommand(request.status(), id);
+    ticketRegisterCommands.changeTicketStatus(command);
+  }
+
   // TODO: Ticket API Endpoints
 
   // --- Commands ---
-  //  TODO [Ticket] Implement POST    /api/v1/tickets                         (create ticket)
-  //  TODO [Ticket] Implement POST    /api/v1/tickets/{id}/assignments        (assign user)
   //  TODO [Ticket] Implement PATCH   /api/v1/tickets/{id}/status             (change status)
   //  TODO [Ticket] Implement PATCH   /api/v1/tickets/{id}/description        (update description)
   //
