@@ -944,4 +944,24 @@ class TicketTest {
     assertThat(equalTicket).isNotNull();
     assertThat(beforeTicket).isNotNull();
   }
+
+  @Test
+  @DisplayName("createPending throws error when createdAt time is null")
+  void createPendingThrowsWhenTimeIsNull() {
+
+    var id = TestUUIDIds.ticketId();
+    var slug = new TicketSlug("ABC-1234");
+    var title = new TicketTitle("Test title");
+    var description = new TicketDescription("Test description");
+    var priority = TicketPriority.HIGH;
+    var reportedBy = TestUUIDIds.userId();
+    var ownerPartner = TestUUIDIds.partnerId();
+
+    assertThatThrownBy(
+            () ->
+                Ticket.createPending(
+                    id, slug, title, description, priority, null, reportedBy, ownerPartner))
+        .isInstanceOf(InvalidTicketException.class)
+        .hasMessageContaining("CreatedAt time cannot be null");
+  }
 }
