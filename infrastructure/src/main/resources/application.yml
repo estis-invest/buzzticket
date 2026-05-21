@@ -39,6 +39,11 @@ app:
   staff-invite:
     ttl-days: ${APP_STAFF_INVITATION_TTL_DAYS:7}
 
+ticket:
+  slug:
+    prefix: ${TICKET_SLUG_PREFIX:BZT}
+    length-padding: ${TICKET_SLUG_LENGTH_PADDING:8}
+
 logging:
   level:
     root: INFO

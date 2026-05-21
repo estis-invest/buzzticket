@@ -5,6 +5,7 @@ import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusEx
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
+import com.efpcode.application.usecase.ticket.exceptions.TicketApplicationException;
 import com.efpcode.application.usecase.user.exceptions.*;
 import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
@@ -107,5 +108,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(IllegalPartnerStatusException.class)
   public ProblemDetail handleIllegalPartnerStatus(IllegalPartnerStatusException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+  }
+
+  @ExceptionHandler(TicketApplicationException.class)
+  public ProblemDetail handleTicketApplicationException(TicketApplicationException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
 }
