@@ -7,6 +7,7 @@ import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundExcepti
 import com.efpcode.application.usecase.ticket.dto.AssignTicketCommand;
 import com.efpcode.application.usecase.ticket.exceptions.InvalidTicketNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
+import com.efpcode.application.usecase.user.exceptions.IllegalUserStatusException;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.ticket.model.Ticket;
 import com.efpcode.domain.ticket.model.TicketId;
@@ -53,6 +54,10 @@ public class AssignTicketUseCase {
         userRepository
             .findUserById(userId)
             .orElseThrow(() -> new IllegalUserNotFoundException("User not found"));
+
+    if (!assignee.isActive()) {
+      throw new IllegalUserStatusException("Assignee account must be active");
+    }
 
     PartnerId assigneePartnerId =
         assignee

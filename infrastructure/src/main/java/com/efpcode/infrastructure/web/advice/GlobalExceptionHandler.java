@@ -10,6 +10,7 @@ import com.efpcode.application.usecase.user.exceptions.*;
 import com.efpcode.domain.common.exceptions.CommonDomainException;
 import com.efpcode.domain.partner.exceptions.PartnerDomainException;
 import com.efpcode.domain.staffinvitation.exceptions.StaffInvitationDomainException;
+import com.efpcode.domain.ticket.exceptions.TicketDomainException;
 import com.efpcode.domain.user.exceptions.UserDomainException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -66,6 +67,11 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(InvalidPartnerCommandArgumentException.class)
   public ProblemDetail handleDomainValidation(InvalidPartnerCommandArgumentException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+  }
+
+  @ExceptionHandler(TicketDomainException.class)
+  public ProblemDetail handleTicketDomainException(TicketDomainException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
   }
 
