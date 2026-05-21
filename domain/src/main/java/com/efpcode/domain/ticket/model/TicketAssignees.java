@@ -42,6 +42,13 @@ public record TicketAssignees(Set<UserId> workers) {
     return new TicketAssignees(newWorkers);
   }
 
+  public boolean contains(UserId id) {
+    if (id == null) {
+      return false;
+    }
+    return workers.contains(id);
+  }
+
   public static TicketAssignees empty() {
     return new TicketAssignees(Set.of());
   }

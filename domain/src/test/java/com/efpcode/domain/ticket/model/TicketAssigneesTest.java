@@ -123,4 +123,30 @@ class TicketAssigneesTest {
         .isInstanceOf(MissingUserAssignmentException.class)
         .hasMessageContaining("be null");
   }
+
+  @Test
+  @DisplayName("TicketAssignees contains returns true if user is assigned and false otherwise")
+  void ticketAssigneesContainsWorksCorrectly() {
+
+    var worker1 = TestUUIDIds.userId();
+    var worker2 = TestUUIDIds.userId();
+
+    var ticketWorkers = new TicketAssignees(Set.of(worker1));
+
+    // ✅ should return true for existing worker
+    assertThat(ticketWorkers.contains(worker1)).isTrue();
+
+    // ✅ should return false for non-existing worker
+    assertThat(ticketWorkers.contains(worker2)).isFalse();
+  }
+
+  @Test
+  @DisplayName("TicketAssignees contains returns false when null is passed")
+  void ticketAssigneesContainsWithNullReturnsFalse() {
+
+    var worker1 = TestUUIDIds.userId();
+    var ticketWorkers = new TicketAssignees(Set.of(worker1));
+
+    assertThat(ticketWorkers.contains(null)).isFalse();
+  }
 }
