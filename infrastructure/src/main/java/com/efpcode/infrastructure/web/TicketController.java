@@ -36,7 +36,7 @@ class TicketController {
     return ResponseEntity.status(HttpStatus.CREATED).body(TicketResponse.fromResult(ticketResult));
   }
 
-  @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_SUPPORT')")
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
   @PostMapping("/{id}/assignments")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void assignTicketToUser(
