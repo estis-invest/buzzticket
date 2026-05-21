@@ -7,7 +7,7 @@ import com.efpcode.application.usecase.ticket.dto.RegisterTicketCommand;
 import com.efpcode.application.usecase.ticket.dto.TicketResult;
 import com.efpcode.infrastructure.web.dto.requests.AssignTicketRequest;
 import com.efpcode.infrastructure.web.dto.requests.RegisterTicketRequest;
-import com.efpcode.infrastructure.web.dto.requests.updateTicketStatusRequest;
+import com.efpcode.infrastructure.web.dto.requests.UpdateTicketStatusRequest;
 import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -53,7 +53,7 @@ class TicketController {
   @PostMapping("/{id}/status")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void updateTicketStatus(
-      @Valid @RequestBody updateTicketStatusRequest request, @PathVariable UUID id) {
+      @Valid @RequestBody UpdateTicketStatusRequest request, @PathVariable UUID id) {
     ChangeTicketStatusCommand command = new ChangeTicketStatusCommand(request.status(), id);
     ticketRegisterCommands.changeTicketStatus(command);
   }
