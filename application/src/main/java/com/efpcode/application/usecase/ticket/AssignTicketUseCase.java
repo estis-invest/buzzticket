@@ -1,7 +1,7 @@
 package com.efpcode.application.usecase.ticket;
 
 import com.efpcode.application.context.RequestContext;
-import com.efpcode.application.policy.staff.dto.StaffActionPolicy;
+import com.efpcode.application.policy.staff.StaffActionPolicy;
 import com.efpcode.application.policy.staff.dto.StaffContext;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.ticket.dto.AssignTicketCommand;

@@ -1,6 +1,6 @@
 package com.efpcode.infrastructure.config;
 
-import com.efpcode.application.policy.staff.dto.StaffActionPolicy;
+import com.efpcode.application.policy.staff.StaffActionPolicy;
 import com.efpcode.application.policy.user.UserAuthenticationPolicy;
 import com.efpcode.application.port.out.ticket.TicketSlugGenerator;
 import com.efpcode.application.usecase.ticket.AssignTicketUseCase;

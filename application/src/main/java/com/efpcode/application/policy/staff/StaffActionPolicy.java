@@ -1,6 +1,7 @@
-package com.efpcode.application.policy.staff.dto;
+package com.efpcode.application.policy.staff;
 
 import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.staff.dto.StaffContext;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
