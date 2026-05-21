@@ -61,4 +61,10 @@ public class StaffActionPolicy {
       throw new IllegalPartnerStatusException("Partner mismatch against expected");
     }
   }
+
+  public void assertAccountIsActive(User source) {
+    if (!source.isActive()) {
+      throw new IllegalUserStatusException("Account must be active");
+    }
+  }
 }
