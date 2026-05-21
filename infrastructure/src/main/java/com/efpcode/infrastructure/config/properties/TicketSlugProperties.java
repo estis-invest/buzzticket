@@ -9,4 +9,4 @@ import org.springframework.validation.annotation.Validated;
 public record TicketSlugProperties(
     @NotBlank @Pattern(regexp = "^[A-Z]{3}$", message = "Expected: 3 uppercase letters.")
         String prefix,
-    @Min(8) @Max(32) int lengthPadding) {}
+    @Min(8) @Max(28) int lengthPadding) {}

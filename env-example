@@ -29,6 +29,6 @@ STAFF_INVITE_HMAC_SECRET=
 APP_FRONTEND_BASE_URL=
 APP_STAFF_INVITATION_TTL_DAYS=
 # Ticket Slug prefix must be exactly 3 uppercase letters
-# Ticket Slug Padding length must be between 8 and 64
+# Ticket Slug Padding length must be between 8 and 28
 TICKET_SLUG_PREFIX=
 TICKET_SLUG_LENGTH_PADDING=
