@@ -50,7 +50,7 @@ class TicketController {
   }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
-  @PostMapping("/{id}/status")
+  @PatchMapping("/{id}/status")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void updateTicketStatus(
       @Valid @RequestBody UpdateTicketStatusRequest request, @PathVariable UUID id) {
