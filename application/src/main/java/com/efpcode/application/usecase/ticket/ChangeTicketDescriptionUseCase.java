@@ -45,7 +45,7 @@ public class ChangeTicketDescriptionUseCase {
 
     if (!isAdmin && !isAssigned) {
       throw new InvalidTicketAuthorizationException(
-          "Only assigned staff or admin can change ticket priority");
+          "Only assigned staff or admin can change ticket description");
     }
 
     Instant now = Instant.now(clock);
@@ -55,6 +55,6 @@ public class ChangeTicketDescriptionUseCase {
 
     Ticket updatedTicketDescription = ticket.updateTicketDescription(description, updateAt);
 
-    ticketRepository.save(ticket);
+    ticketRepository.save(updatedTicketDescription);
   }
 }
