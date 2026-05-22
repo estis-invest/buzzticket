@@ -986,7 +986,7 @@ class TicketTest {
 
     assertThatThrownBy(() -> ticket.unassign(staffId, actorRole, UPDATE_AT))
         .isInstanceOf(IllegalTicketAssignmentException.class)
-        .hasMessageContaining("TicketAssign method cannot pass null!");
+        .hasMessageContaining("TicketUnassign method cannot pass null!");
   }
 
   @Test
@@ -1099,6 +1099,6 @@ class TicketTest {
 
     assertThatThrownBy(() -> ticket.unassign(userId, UserRole.SUPPORT, null))
         .isInstanceOf(IllegalTicketAssignmentException.class)
-        .hasMessageContaining("TicketAssign method cannot pass null!");
+        .hasMessageContaining("TicketUnassign method cannot pass null!");
   }
 }

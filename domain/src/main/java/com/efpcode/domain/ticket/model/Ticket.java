@@ -99,7 +99,7 @@ public record Ticket(
 
   public Ticket unassign(UserId staffId, UserRole actorRole, TicketUpdateAt updateAt) {
     if (staffId == null || actorRole == null || updateAt == null)
-      throw new IllegalTicketAssignmentException("TicketAssign method cannot pass null!");
+      throw new IllegalTicketAssignmentException("TicketUnassign method cannot pass null!");
 
     actorRole.roleGuardAssignTickets();
     this.status.ticketStatusAssignGuard();
