@@ -3,10 +3,7 @@ package com.efpcode.infrastructure.config;
 import com.efpcode.application.policy.staff.StaffActionPolicy;
 import com.efpcode.application.policy.user.UserAuthenticationPolicy;
 import com.efpcode.application.port.out.ticket.TicketSlugGenerator;
-import com.efpcode.application.usecase.ticket.AssignTicketUseCase;
-import com.efpcode.application.usecase.ticket.ChangeTicketPriorityUseCase;
-import com.efpcode.application.usecase.ticket.ChangeTicketStatusUseCase;
-import com.efpcode.application.usecase.ticket.TicketCreationUseCase;
+import com.efpcode.application.usecase.ticket.*;
 import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.partner.port.PartnerRepository;
 import com.efpcode.domain.ticket.model.TicketId;
@@ -56,5 +53,11 @@ public class TicketConfiguration {
   public ChangeTicketPriorityUseCase changeTicketPriorityUseCase(
       TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
     return new ChangeTicketPriorityUseCase(ticketRepository, staffActionPolicy, clock);
+  }
+
+  @Bean
+  public ChangeTicketDescriptionUseCase changeTicketDescriptionUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
+    return new ChangeTicketDescriptionUseCase(ticketRepository, staffActionPolicy, clock);
   }
 }

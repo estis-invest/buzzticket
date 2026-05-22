@@ -2,10 +2,7 @@ package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
 import com.efpcode.application.usecase.ticket.dto.*;
-import com.efpcode.infrastructure.web.dto.requests.AssignTicketRequest;
-import com.efpcode.infrastructure.web.dto.requests.RegisterTicketRequest;
-import com.efpcode.infrastructure.web.dto.requests.UpdateTicketPriorityRequest;
-import com.efpcode.infrastructure.web.dto.requests.UpdateTicketStatusRequest;
+import com.efpcode.infrastructure.web.dto.requests.*;
 import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
 import jakarta.validation.Valid;
 import java.util.UUID;
@@ -63,6 +60,16 @@ class TicketController {
       @Valid @RequestBody UpdateTicketPriorityRequest request, @PathVariable UUID id) {
     ChangeTicketPriorityCommand command = new ChangeTicketPriorityCommand(request.priority(), id);
     ticketRegisterCommands.changeTicketPriority(command);
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @PatchMapping("/{id}/description")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void updateTicketDescription(
+      @Valid @RequestBody UpdateTicketDescriptionRequest request, @PathVariable UUID id) {
+    ChangeTicketDescriptionCommand command =
+        new ChangeTicketDescriptionCommand(request.description(), id);
+    ticketRegisterCommands.changeTicketDescription(command);
   }
 
   // TODO: Ticket API Endpoints

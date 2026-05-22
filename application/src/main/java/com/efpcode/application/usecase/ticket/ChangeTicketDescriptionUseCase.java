@@ -1,0 +1,60 @@
+package com.efpcode.application.usecase.ticket;
+
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.staff.StaffActionPolicy;
+import com.efpcode.application.policy.staff.dto.StaffContext;
+import com.efpcode.application.usecase.ticket.dto.ChangeTicketDescriptionCommand;
+import com.efpcode.application.usecase.ticket.exceptions.InvalidTicketAuthorizationException;
+import com.efpcode.application.usecase.ticket.exceptions.InvalidTicketNotFoundException;
+import com.efpcode.domain.ticket.model.Ticket;
+import com.efpcode.domain.ticket.model.TicketDescription;
+import com.efpcode.domain.ticket.model.TicketId;
+import com.efpcode.domain.ticket.model.TicketUpdateAt;
+import com.efpcode.domain.ticket.port.TicketRepository;
+import java.time.Clock;
+import java.time.Instant;
+
+public class ChangeTicketDescriptionUseCase {
+  private final TicketRepository ticketRepository;
+  private final StaffActionPolicy staffActionPolicy;
+  private final Clock clock;
+
+  public ChangeTicketDescriptionUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
+    this.ticketRepository = ticketRepository;
+    this.staffActionPolicy = staffActionPolicy;
+    this.clock = clock;
+  }
+
+  public void execute(ChangeTicketDescriptionCommand command, RequestContext requestContext) {
+
+    StaffContext staffContext = staffActionPolicy.staffValidator(requestContext);
+
+    TicketId ticketId = TicketId.of(command.ticketId());
+
+    Ticket ticket =
+        ticketRepository
+            .findById(ticketId)
+            .orElseThrow(() -> new InvalidTicketNotFoundException("Ticket not found"));
+
+    staffActionPolicy.assertSamePartnerAsExpected(
+        staffContext.partner().id(), ticket.ownerPartner());
+
+    boolean isAdmin = staffContext.user().role().isAdmin();
+    boolean isAssigned = ticket.workers().contains(staffContext.user().id());
+
+    if (!isAdmin && !isAssigned) {
+      throw new InvalidTicketAuthorizationException(
+          "Only assigned staff or admin can change ticket priority");
+    }
+
+    Instant now = Instant.now(clock);
+    TicketUpdateAt updateAt = TicketUpdateAt.of(now);
+
+    TicketDescription description = new TicketDescription(command.description());
+
+    Ticket updatedTicketDescription = ticket.updateTicketDescription(description, updateAt);
+
+    ticketRepository.save(ticket);
+  }
+}

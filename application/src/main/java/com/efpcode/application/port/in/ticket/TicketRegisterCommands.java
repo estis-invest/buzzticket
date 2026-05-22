@@ -10,4 +10,6 @@ public interface TicketRegisterCommands {
   void changeTicketStatus(ChangeTicketStatusCommand command);
 
   void changeTicketPriority(ChangeTicketPriorityCommand command);
+
+  void changeTicketDescription(ChangeTicketDescriptionCommand command);
 }

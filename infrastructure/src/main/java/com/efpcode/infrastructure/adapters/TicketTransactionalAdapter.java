@@ -2,10 +2,7 @@ package com.efpcode.infrastructure.adapters;
 
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
-import com.efpcode.application.usecase.ticket.AssignTicketUseCase;
-import com.efpcode.application.usecase.ticket.ChangeTicketPriorityUseCase;
-import com.efpcode.application.usecase.ticket.ChangeTicketStatusUseCase;
-import com.efpcode.application.usecase.ticket.TicketCreationUseCase;
+import com.efpcode.application.usecase.ticket.*;
 import com.efpcode.application.usecase.ticket.dto.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,18 +15,21 @@ class TicketTransactionalAdapter implements TicketRegisterCommands {
   private final AssignTicketUseCase assignTicketUseCase;
   private final ChangeTicketStatusUseCase changeTicketStatusUseCase;
   private final ChangeTicketPriorityUseCase changeTicketPriorityUseCase;
+  private final ChangeTicketDescriptionUseCase changeTicketDescriptionUseCase;
 
   public TicketTransactionalAdapter(
       RequestContext requestContext,
       TicketCreationUseCase ticketCreationUseCase,
       AssignTicketUseCase assignTicketUseCase,
       ChangeTicketStatusUseCase changeTicketStatusUseCase,
-      ChangeTicketPriorityUseCase changeTicketPriorityUseCase) {
+      ChangeTicketPriorityUseCase changeTicketPriorityUseCase,
+      ChangeTicketDescriptionUseCase changeTicketDescriptionUseCase) {
     this.requestContext = requestContext;
     this.ticketCreationUseCase = ticketCreationUseCase;
     this.assignTicketUseCase = assignTicketUseCase;
     this.changeTicketStatusUseCase = changeTicketStatusUseCase;
     this.changeTicketPriorityUseCase = changeTicketPriorityUseCase;
+    this.changeTicketDescriptionUseCase = changeTicketDescriptionUseCase;
   }
 
   @Override
@@ -54,5 +54,11 @@ class TicketTransactionalAdapter implements TicketRegisterCommands {
   @Transactional
   public void changeTicketPriority(ChangeTicketPriorityCommand command) {
     changeTicketPriorityUseCase.execute(command, requestContext);
+  }
+
+  @Override
+  @Transactional
+  public void changeTicketDescription(ChangeTicketDescriptionCommand command) {
+    changeTicketDescriptionUseCase.execute(command, requestContext);
   }
 }
