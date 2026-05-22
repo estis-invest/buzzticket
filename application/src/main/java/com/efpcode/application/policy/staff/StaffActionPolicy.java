@@ -4,6 +4,7 @@ import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.staff.dto.StaffContext;
 import com.efpcode.application.usecase.auth.exceptions.TokenValidationException;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
+import com.efpcode.application.usecase.partner.exceptions.PartnerContextMismatchException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserStatusException;
@@ -60,7 +61,7 @@ public class StaffActionPolicy {
 
   public void assertSamePartnerAsExpected(PartnerId sourcePartnerId, PartnerId expectedPartnerId) {
     if (!expectedPartnerId.equals(sourcePartnerId)) {
-      throw new IllegalPartnerStatusException("Partner mismatch against expected");
+      throw new PartnerContextMismatchException("Partner mismatch against expected");
     }
   }
 
