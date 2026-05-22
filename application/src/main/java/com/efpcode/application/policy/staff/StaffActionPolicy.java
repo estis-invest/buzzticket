@@ -1,9 +1,10 @@
-package com.efpcode.application.policy.admin;
+package com.efpcode.application.policy.staff;
 
 import com.efpcode.application.context.RequestContext;
-import com.efpcode.application.policy.admin.dto.AdminContext;
+import com.efpcode.application.policy.staff.dto.StaffContext;
 import com.efpcode.application.usecase.auth.exceptions.TokenValidationException;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
+import com.efpcode.application.usecase.partner.exceptions.PartnerContextMismatchException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserStatusException;
@@ -13,34 +14,35 @@ import com.efpcode.domain.partner.port.PartnerRepository;
 import com.efpcode.domain.user.model.User;
 import com.efpcode.domain.user.port.UserRepository;
 
-public class AdminActionPolicy {
+public class StaffActionPolicy {
+
   private final UserRepository userRepository;
   private final PartnerRepository partnerRepository;
 
-  public AdminActionPolicy(UserRepository userRepository, PartnerRepository partnerRepository) {
+  public StaffActionPolicy(UserRepository userRepository, PartnerRepository partnerRepository) {
     this.userRepository = userRepository;
     this.partnerRepository = partnerRepository;
   }
 
-  public AdminContext adminValidator(RequestContext requestContext) {
+  public StaffContext staffValidator(RequestContext requestContext) {
 
-    requestContext.role().roleGuardIsAdmin();
+    requestContext.role().roleGuardIsStaff();
 
-    User adminHandler =
+    User staffHandler =
         userRepository
             .findUserById(requestContext.userId())
-            .orElseThrow(() -> new IllegalUserNotFoundException("Request handler is not found"));
+            .orElseThrow(() -> new IllegalUserNotFoundException("Staff handler not found"));
 
-    if (adminHandler.role() != requestContext.role()) {
+    if (staffHandler.role() != requestContext.role()) {
       throw new TokenValidationException("Token role mismatch");
     }
 
-    if (!adminHandler.status().isActive()) {
+    if (!staffHandler.status().isActive()) {
       throw new IllegalUserStatusException("Request handler status other than activated");
     }
 
     PartnerId partnerId =
-        adminHandler
+        staffHandler
             .partnerId()
             .orElseThrow(() -> new PartnerNotFoundException("Request handler has no partner"));
 
@@ -54,26 +56,18 @@ public class AdminActionPolicy {
       throw new IllegalPartnerStatusException("Partner status is not active");
     }
 
-    return new AdminContext(adminHandler, partner);
+    return new StaffContext(staffHandler, partner);
   }
 
-  public void assertSamePartnerIfStaff(AdminContext adminContext, User targetUser) {
-
-    if (targetUser.role().isStaff()) {
-      PartnerId targetPartnerId =
-          targetUser
-              .partnerId()
-              .orElseThrow(() -> new IllegalUserNotFoundException("Staff must have partner id"));
-
-      if (!targetPartnerId.equals(adminContext.partner().id())) {
-        throw new IllegalPartnerStatusException("Target user belongs to another partner");
-      }
+  public void assertSamePartnerAsExpected(PartnerId sourcePartnerId, PartnerId expectedPartnerId) {
+    if (!expectedPartnerId.equals(sourcePartnerId)) {
+      throw new PartnerContextMismatchException("Partner mismatch against expected");
     }
   }
 
-  public void assertThatTargetIsActive(User targetUser) {
-    if (!targetUser.isActive()) {
-      throw new IllegalUserStatusException("User already deactivated");
+  public void assertAccountIsActive(User source) {
+    if (!source.isActive()) {
+      throw new IllegalUserStatusException("Account must be active");
     }
   }
 }
