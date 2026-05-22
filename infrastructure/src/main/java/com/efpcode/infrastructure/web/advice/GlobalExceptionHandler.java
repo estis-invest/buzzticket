@@ -1,10 +1,7 @@
 package com.efpcode.infrastructure.web.advice;
 
 import com.efpcode.application.usecase.auth.exceptions.AuthApplicationException;
-import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
-import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
-import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
-import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
+import com.efpcode.application.usecase.partner.exceptions.*;
 import com.efpcode.application.usecase.ticket.exceptions.TicketApplicationException;
 import com.efpcode.application.usecase.user.exceptions.*;
 import com.efpcode.domain.common.exceptions.CommonDomainException;
@@ -119,5 +116,10 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(TicketApplicationException.class)
   public ProblemDetail handleTicketApplicationException(TicketApplicationException ex) {
     return ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+  }
+
+  @ExceptionHandler(PartnerContextMismatchException.class)
+  public ProblemDetail handlePartnerContextMismatch(PartnerContextMismatchException ex) {
+    return ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
   }
 }
