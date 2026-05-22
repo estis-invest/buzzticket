@@ -13,6 +13,7 @@ class TicketTransactionalAdapter implements TicketRegisterCommands {
   private final RequestContext requestContext;
   private final TicketCreationUseCase ticketCreationUseCase;
   private final AssignTicketUseCase assignTicketUseCase;
+  private final UnassignTicketUseCase unassignTicketUseCase;
   private final ChangeTicketStatusUseCase changeTicketStatusUseCase;
   private final ChangeTicketPriorityUseCase changeTicketPriorityUseCase;
   private final ChangeTicketDescriptionUseCase changeTicketDescriptionUseCase;
@@ -21,12 +22,14 @@ class TicketTransactionalAdapter implements TicketRegisterCommands {
       RequestContext requestContext,
       TicketCreationUseCase ticketCreationUseCase,
       AssignTicketUseCase assignTicketUseCase,
+      UnassignTicketUseCase unassignTicketUseCase,
       ChangeTicketStatusUseCase changeTicketStatusUseCase,
       ChangeTicketPriorityUseCase changeTicketPriorityUseCase,
       ChangeTicketDescriptionUseCase changeTicketDescriptionUseCase) {
     this.requestContext = requestContext;
     this.ticketCreationUseCase = ticketCreationUseCase;
     this.assignTicketUseCase = assignTicketUseCase;
+    this.unassignTicketUseCase = unassignTicketUseCase;
     this.changeTicketStatusUseCase = changeTicketStatusUseCase;
     this.changeTicketPriorityUseCase = changeTicketPriorityUseCase;
     this.changeTicketDescriptionUseCase = changeTicketDescriptionUseCase;
@@ -42,6 +45,12 @@ class TicketTransactionalAdapter implements TicketRegisterCommands {
   @Transactional
   public void assignTicket(AssignTicketCommand command) {
     assignTicketUseCase.execute(command, requestContext);
+  }
+
+  @Override
+  @Transactional
+  public void unassignTicket(UnassignTicketCommand command) {
+    unassignTicketUseCase.execute(command, requestContext);
   }
 
   @Override

@@ -44,6 +44,12 @@ public class TicketConfiguration {
   }
 
   @Bean
+  public UnassignTicketUseCase unassignTicketUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
+    return new UnassignTicketUseCase(ticketRepository, staffActionPolicy, clock);
+  }
+
+  @Bean
   public ChangeTicketStatusUseCase changeTicketStatusUseCase(
       TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
     return new ChangeTicketStatusUseCase(ticketRepository, staffActionPolicy, clock);

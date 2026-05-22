@@ -7,6 +7,8 @@ public interface TicketRegisterCommands {
 
   void assignTicket(AssignTicketCommand command);
 
+  void unassignTicket(UnassignTicketCommand command);
+
   void changeTicketStatus(ChangeTicketStatusCommand command);
 
   void changeTicketPriority(ChangeTicketPriorityCommand command);
