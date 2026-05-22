@@ -7,6 +7,7 @@ import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.admin.AdminActionPolicy;
 import com.efpcode.application.policy.admin.dto.AdminContext;
 import com.efpcode.application.testsupport.TestUUIDIds;
+import com.efpcode.application.usecase.auth.exceptions.TokenValidationException;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
@@ -132,7 +133,7 @@ class AdminActionPolicyTest {
     when(userRepository.findUserById(supportId)).thenReturn(Optional.of(support));
 
     assertThatThrownBy(() -> adminActionPolicy.adminValidator(requestContext))
-        .isInstanceOf(SecurityException.class)
+        .isInstanceOf(TokenValidationException.class)
         .hasMessageContaining("Token role mismatch");
 
     verifyNoInteractions(partnerRepository);

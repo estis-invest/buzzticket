@@ -2,6 +2,7 @@ package com.efpcode.application.policy.admin;
 
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.admin.dto.AdminContext;
+import com.efpcode.application.usecase.auth.exceptions.TokenValidationException;
 import com.efpcode.application.usecase.partner.exceptions.IllegalPartnerStatusException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.application.usecase.user.exceptions.IllegalUserNotFoundException;
@@ -31,7 +32,7 @@ public class AdminActionPolicy {
             .orElseThrow(() -> new IllegalUserNotFoundException("Request handler is not found"));
 
     if (adminHandler.role() != requestContext.role()) {
-      throw new SecurityException("Token role mismatch");
+      throw new TokenValidationException("Token role mismatch");
     }
 
     if (!adminHandler.status().isActive()) {
