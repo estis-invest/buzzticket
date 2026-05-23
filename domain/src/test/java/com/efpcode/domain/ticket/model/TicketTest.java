@@ -964,4 +964,141 @@ class TicketTest {
         .isInstanceOf(InvalidTicketException.class)
         .hasMessageContaining("CreatedAt time cannot be null");
   }
+
+  @ParameterizedTest
+  @MethodSource("provideNullArgumentsToPassInTicketAssignMethod")
+  @DisplayName("Ticket unassign throws error if staffId or actorRole is null")
+  void ticketUnassignThrowsErrorIfStaffIdOrActorRoleIsNull(UserId staffId, UserRole actorRole) {
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            anyWorker,
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.unassign(staffId, actorRole, UPDATE_AT))
+        .isInstanceOf(IllegalTicketAssignmentException.class)
+        .hasMessageContaining("TicketUnassign method cannot pass null!");
+  }
+
+  @Test
+  @DisplayName("Ticket unassign throws error if role is CUSTOMER")
+  void ticketUnassignThrowsErrorIfRoleIsCustomer() {
+
+    var userId = TestUUIDIds.userId();
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            new TicketAssignees(Set.of(userId)),
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.unassign(userId, UserRole.CUSTOMER, UPDATE_AT))
+        .isInstanceOf(IllegalUserRolePrivilegeException.class)
+        .hasMessageContaining("User role");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"CLOSED", "ARCHIVED"})
+  @DisplayName("Ticket unassign throws error for CLOSED and ARCHIVED status")
+  void ticketUnassignThrowsErrorForInvalidStatus(TicketStatus status) {
+
+    var userId = TestUUIDIds.userId();
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            status,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            new TicketAssignees(Set.of(userId)),
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.unassign(userId, UserRole.SUPPORT, UPDATE_AT))
+        .isInstanceOf(IllegalTicketStatusAssignmentException.class)
+        .hasMessageContaining("cannot assign users");
+  }
+
+  @Test
+  @DisplayName("Ticket unassign removes worker and returns new Ticket")
+  void ticketUnassignRemovesWorkerAndReturnsNewTicket() {
+
+    var worker1 = TestUUIDIds.userId();
+    var worker2 = TestUUIDIds.userId();
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            new TicketAssignees(Set.of(worker1, worker2)),
+            anyCustomer,
+            anyPartnerId);
+
+    var result = ticket.unassign(worker1, UserRole.SUPPORT, UPDATE_AT);
+
+    assertThat(result).isNotSameAs(ticket);
+
+    assertThat(result.workers().workers()).doesNotContain(worker1);
+    assertThat(result.workers().workers()).contains(worker2);
+    assertThat(result.workers().workers()).hasSize(1);
+
+    assertThat(result.updatedAt()).isEqualTo(UPDATE_AT);
+
+    assertThat(result.id()).isEqualTo(ticket.id());
+    assertThat(result.status()).isEqualTo(ticket.status());
+  }
+
+  @Test
+  @DisplayName("Ticket unassign throws error when updateAt is null")
+  void ticketUnassignThrowsErrorWhenUpdateAtIsNull() {
+
+    var userId = TestUUIDIds.userId();
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.PENDING,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            new TicketAssignees(Set.of(userId)),
+            anyCustomer,
+            anyPartnerId);
+
+    assertThatThrownBy(() -> ticket.unassign(userId, UserRole.SUPPORT, null))
+        .isInstanceOf(IllegalTicketAssignmentException.class)
+        .hasMessageContaining("TicketUnassign method cannot pass null!");
+  }
 }

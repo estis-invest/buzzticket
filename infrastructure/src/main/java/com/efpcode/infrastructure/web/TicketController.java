@@ -45,6 +45,14 @@ class TicketController {
   }
 
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @DeleteMapping("/{id}/assignments/{assigneeId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void unassignTicketToUser(@PathVariable UUID id, @PathVariable UUID assigneeId) {
+    UnassignTicketCommand command = new UnassignTicketCommand(id, assigneeId);
+    ticketRegisterCommands.unassignTicket(command);
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
   @PatchMapping("/{id}/status")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void updateTicketStatus(
@@ -74,9 +82,6 @@ class TicketController {
 
   // TODO: Ticket API Endpoints
 
-  // --- Commands ---
-  //  TODO [Ticket] Implement PATCH   /api/v1/tickets/{id}/status             (change status)
-  //  TODO [Ticket] Implement PATCH   /api/v1/tickets/{id}/description        (update description)
   //
   // --- Customer (Reporter) ---
   //  TODO [Ticket] Implement GET     /api/v1/tickets                         (list user tickets)
@@ -84,12 +89,9 @@ class TicketController {
   // ownership check)
   //
   // --- Staff limited to partnerId ---
-  //  TODO [Ticket] Implement GET     /api/v1/staff/tickets/assigned          (tickets assigned to
-  // user)
-  //  TODO [Ticket] Implement GET     /api/v1/staff/tickets/partner           (tickets for staff
-  // partner)
-  //  TODO [Ticket] Implement GET     /api/v1/staff/tickets/{id}              (get ticket by id,
-  // staff view)
-  //  TODO [Ticket] Implement GET     /api/v1/staff/tickets/slug/{slug}       (get ticket by slug)
-  //
+  // GET /api/v1/tickets/staff/assigned
+  // GET /api/v1/tickets/staff/partner
+  // GET /api/v1/tickets/staff/{id}
+  // GET /api/v1/tickets/staff/slug/{slug}
+
 }

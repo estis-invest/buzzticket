@@ -97,6 +97,27 @@ public record Ticket(
         ownerPartner);
   }
 
+  public Ticket unassign(UserId staffId, UserRole actorRole, TicketUpdateAt updateAt) {
+    if (staffId == null || actorRole == null || updateAt == null)
+      throw new IllegalTicketAssignmentException("TicketUnassign method cannot pass null!");
+
+    actorRole.roleGuardAssignTickets();
+    this.status.ticketStatusAssignGuard();
+
+    return new Ticket(
+        id,
+        slug,
+        title,
+        description,
+        status,
+        priority,
+        createdAt,
+        updateAt,
+        workers.remove(staffId),
+        reportedBy,
+        ownerPartner);
+  }
+
   public Ticket withPriority(TicketPriority ticketPriority, TicketUpdateAt updateAt) {
     if (ticketPriority == null || updateAt == null)
       throw new IllegalTicketPriorityException(
