@@ -53,6 +53,7 @@ class TicketAssigneesTest {
     assertThat(result.workers()).hasSize(2);
     assertThat(result.workers()).contains(newWorker);
     assertThat(result).isNotEqualTo(ticketWorkers);
+    assertThat(result.isEmpty()).isFalse();
   }
 
   @Test
@@ -148,5 +149,18 @@ class TicketAssigneesTest {
     var ticketWorkers = new TicketAssignees(Set.of(worker1));
 
     assertThat(ticketWorkers.contains(null)).isFalse();
+  }
+
+  @Test
+  @DisplayName("Static empty methods returns a empty set")
+  void staticEmptyMethodsReturnsAEmptySet() {
+
+    var expected = Set.of();
+
+    TicketAssignees empty = TicketAssignees.empty();
+
+    assertThat(empty.workers()).isEqualTo(expected);
+    assertThat(empty.workers()).isNotNull();
+    assertThat(empty.isEmpty()).isTrue();
   }
 }

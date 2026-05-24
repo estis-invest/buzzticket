@@ -49,6 +49,10 @@ public record TicketAssignees(Set<UserId> workers) {
     return workers.contains(id);
   }
 
+  public boolean isEmpty() {
+    return workers.isEmpty();
+  }
+
   public static TicketAssignees empty() {
     return new TicketAssignees(Set.of());
   }

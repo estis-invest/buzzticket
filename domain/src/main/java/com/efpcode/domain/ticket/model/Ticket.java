@@ -35,6 +35,11 @@ public record Ticket(
     if (createdAt.time().isAfter(updatedAt.updatedAt())) {
       throw new InvalidTicketException("Ticket updatedAt cannot be before the createdAt time");
     }
+
+    if (status != TicketStatus.PENDING && workers.isEmpty()) {
+      throw new IllegalTicketStatusTransitionException(
+          "Ticket must have at least one worker status is: " + status.name());
+    }
   }
 
   public Ticket open(TicketUpdateAt updateAt) {
