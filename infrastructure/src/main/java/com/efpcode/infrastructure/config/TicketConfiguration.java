@@ -72,4 +72,13 @@ public class TicketConfiguration {
       TicketRepository ticketRepository, UserAuthenticationPolicy userAuthenticationPolicy) {
     return new GetReportedTicketsUseCase(ticketRepository, userAuthenticationPolicy);
   }
+
+  @Bean
+  public GetReportedTicketUseCase getReportedTicketUseCase(
+      TicketRepository ticketRepository,
+      PartnerRepository partnerRepository,
+      UserAuthenticationPolicy userAuthenticationPolicy) {
+    return new GetReportedTicketUseCase(
+        ticketRepository, partnerRepository, userAuthenticationPolicy);
+  }
 }

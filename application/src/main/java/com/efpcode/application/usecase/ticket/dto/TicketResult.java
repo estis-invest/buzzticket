@@ -1,5 +1,6 @@
 package com.efpcode.application.usecase.ticket.dto;
 
+import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.partner.model.PartnerName;
 import com.efpcode.domain.ticket.model.Ticket;
 import java.time.Instant;
@@ -13,10 +14,12 @@ public record TicketResult(
     String status,
     String priority,
     String partnerName,
+    UUID partnerId,
     Instant createdAt,
     Instant updatedAt) {
 
-  public static TicketResult fromDomain(Ticket ticket, PartnerName partnerName) {
+  public static TicketResult fromDomain(
+      Ticket ticket, PartnerName partnerName, PartnerId partnerId) {
     return new TicketResult(
         ticket.id().ticketId(),
         ticket.slug().slug(),
@@ -25,6 +28,7 @@ public record TicketResult(
         ticket.status().name(),
         ticket.priority().name(),
         partnerName.partnerName(),
+        partnerId.partnerId(),
         ticket.createdAt().time(),
         ticket.updatedAt().updatedAt());
   }

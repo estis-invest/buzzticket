@@ -98,6 +98,15 @@ class TicketController {
         new TicketsViewListResponse(ticketViewResponses, ticketViewResponses.size()));
   }
 
+  @GetMapping("/{id}")
+  public ResponseEntity<TicketResponse> getReportedTicket(@PathVariable UUID id) {
+    var viewer = new TicketViewer(id);
+
+    TicketResult ticketResult = ticketViews.getReportedTicket(viewer);
+
+    return ResponseEntity.ok(TicketResponse.fromResult(ticketResult));
+  }
+
   // TODO: Ticket API Endpoints
 
   //

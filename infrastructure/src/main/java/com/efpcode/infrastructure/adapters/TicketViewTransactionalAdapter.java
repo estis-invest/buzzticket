@@ -2,6 +2,7 @@ package com.efpcode.infrastructure.adapters;
 
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.ticket.TicketViews;
+import com.efpcode.application.usecase.ticket.GetReportedTicketUseCase;
 import com.efpcode.application.usecase.ticket.GetReportedTicketsUseCase;
 import com.efpcode.application.usecase.ticket.dto.TicketResult;
 import com.efpcode.application.usecase.ticket.dto.TicketSlugViewer;
@@ -15,11 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 public class TicketViewTransactionalAdapter implements TicketViews {
   private final RequestContext requestContext;
   private final GetReportedTicketsUseCase getReportedTicketsUseCase;
+  private final GetReportedTicketUseCase getReportedTicketUseCase;
 
   public TicketViewTransactionalAdapter(
-      RequestContext requestContext, GetReportedTicketsUseCase getReportedTicketsUseCase) {
+      RequestContext requestContext,
+      GetReportedTicketsUseCase getReportedTicketsUseCase,
+      GetReportedTicketUseCase getReportedTicketUseCase) {
     this.requestContext = requestContext;
     this.getReportedTicketsUseCase = getReportedTicketsUseCase;
+    this.getReportedTicketUseCase = getReportedTicketUseCase;
   }
 
   @Override
@@ -30,7 +35,7 @@ public class TicketViewTransactionalAdapter implements TicketViews {
 
   @Override
   public TicketResult getReportedTicket(TicketViewer ticketViewer) {
-    return null;
+    return getReportedTicketUseCase.execute(ticketViewer, requestContext);
   }
 
   @Override

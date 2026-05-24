@@ -12,6 +12,7 @@ public record TicketResponse(
     String status,
     String priority,
     String partnerName,
+    UUID partnerId,
     Instant createdAt,
     Instant updatedAt) {
 
@@ -24,6 +25,7 @@ public record TicketResponse(
         ticketResult.status(),
         ticketResult.priority(),
         ticketResult.partnerName(),
+        ticketResult.partnerId(),
         ticketResult.createdAt(),
         ticketResult.updatedAt());
   }
