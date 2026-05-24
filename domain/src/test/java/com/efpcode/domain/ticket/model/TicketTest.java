@@ -496,7 +496,7 @@ class TicketTest {
             TicketPriority.LOW,
             anyTime,
             anyUpdateTime,
-            TicketAssignees.empty(),
+            anyWorker,
             anyCustomer,
             anyPartnerId);
     assertThatThrownBy(() -> ticketClosed.assign(anyCustomer, UserRole.SUPPORT, UPDATE_AT))
@@ -517,7 +517,7 @@ class TicketTest {
             TicketPriority.LOW,
             anyTime,
             anyUpdateTime,
-            TicketAssignees.empty(),
+            anyWorker,
             anyCustomer,
             anyPartnerId);
 
@@ -544,14 +544,14 @@ class TicketTest {
             TicketPriority.LOW,
             anyTime,
             anyUpdateTime,
-            TicketAssignees.empty(),
+            anyWorker,
             anyCustomer,
             anyPartnerId);
 
     var staffId = TestUUIDIds.userId();
     var result = ticket.assign(staffId, UserRole.SUPPORT, updatedAt);
     assertThat(result).isNotSameAs(ticket).isInstanceOf(Ticket.class);
-    assertThat(result.workers().workers()).hasSize(1);
+    assertThat(result.workers().workers()).hasSize(2);
     assertThat(result.updatedAt()).isEqualTo(updatedAt);
   }
 
@@ -577,7 +577,7 @@ class TicketTest {
             TicketPriority.LOW,
             anyTime,
             anyUpdateTime,
-            TicketAssignees.empty(),
+            anyWorker,
             anyCustomer,
             anyPartnerId);
 
@@ -585,7 +585,7 @@ class TicketTest {
     var result = ticket.assign(staffId, role, UPDATE_AT);
 
     assertThat(result).isNotSameAs(ticket);
-    assertThat(result.workers().workers()).hasSize(1);
+    assertThat(result.workers().workers()).hasSize(2);
   }
 
   @Test
@@ -627,7 +627,7 @@ class TicketTest {
             TicketPriority.LOW,
             anyTime,
             anyUpdateTime,
-            TicketAssignees.empty(),
+            anyWorker,
             anyCustomer,
             anyPartnerId);
 
@@ -653,7 +653,7 @@ class TicketTest {
             TicketPriority.LOW,
             anyTime,
             anyUpdateTime,
-            TicketAssignees.empty(),
+            anyWorker,
             anyCustomer,
             anyPartnerId);
 
@@ -1100,5 +1100,56 @@ class TicketTest {
     assertThatThrownBy(() -> ticket.unassign(userId, UserRole.SUPPORT, null))
         .isInstanceOf(IllegalTicketAssignmentException.class)
         .hasMessageContaining("TicketUnassign method cannot pass null!");
+  }
+
+  @ParameterizedTest
+  @EnumSource(
+      value = TicketStatus.class,
+      names = {"OPEN", "CLOSED", "ARCHIVED"})
+  @DisplayName("Ticket throws error when status is not PENDING and has no workers")
+  void ticketThrowsWhenNonPendingStatusHasNoWorkers(TicketStatus status) {
+
+    var emptyWorkers = TicketAssignees.empty();
+
+    assertThatThrownBy(
+            () ->
+                new Ticket(
+                    anyId,
+                    anySlug,
+                    anyTitle,
+                    anyDescription,
+                    status,
+                    TicketPriority.LOW,
+                    anyTime,
+                    anyUpdateTime,
+                    emptyWorkers,
+                    anyCustomer,
+                    anyPartnerId))
+        .isInstanceOf(IllegalTicketStatusTransitionException.class)
+        .hasMessageContaining(
+            "Ticket must have at least one worker when status is: " + status.name());
+  }
+
+  @Test
+  @DisplayName("Ticket allows non-pending status when workers are present")
+  void ticketAllowsNonPendingWhenWorkersNotEmpty() {
+
+    var worker = TestUUIDIds.userId();
+
+    var ticket =
+        new Ticket(
+            anyId,
+            anySlug,
+            anyTitle,
+            anyDescription,
+            TicketStatus.OPEN,
+            TicketPriority.LOW,
+            anyTime,
+            anyUpdateTime,
+            new TicketAssignees(Set.of(worker)),
+            anyCustomer,
+            anyPartnerId);
+
+    assertThat(ticket).isNotNull();
   }
 }
