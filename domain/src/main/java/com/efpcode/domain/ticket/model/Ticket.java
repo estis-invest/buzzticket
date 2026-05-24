@@ -38,7 +38,7 @@ public record Ticket(
 
     if (status != TicketStatus.PENDING && workers.isEmpty()) {
       throw new IllegalTicketStatusTransitionException(
-          "Ticket must have at least one worker status is: " + status.name());
+          "Ticket must have at least one worker when status is: " + status.name());
     }
   }
 

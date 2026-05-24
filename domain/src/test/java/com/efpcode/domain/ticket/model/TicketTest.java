@@ -1126,7 +1126,8 @@ class TicketTest {
                     anyCustomer,
                     anyPartnerId))
         .isInstanceOf(IllegalTicketStatusTransitionException.class)
-        .hasMessageContaining("Ticket must have at least one worker status is: " + status.name());
+        .hasMessageContaining(
+            "Ticket must have at least one worker when status is: " + status.name());
   }
 
   @Test
