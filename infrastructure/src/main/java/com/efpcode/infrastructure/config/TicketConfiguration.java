@@ -66,4 +66,10 @@ public class TicketConfiguration {
       TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
     return new ChangeTicketDescriptionUseCase(ticketRepository, staffActionPolicy, clock);
   }
+
+  @Bean
+  public GetReportedTicketsUseCase getReportedTicketsUseCase(
+      TicketRepository ticketRepository, UserAuthenticationPolicy userAuthenticationPolicy) {
+    return new GetReportedTicketsUseCase(ticketRepository, userAuthenticationPolicy);
+  }
 }

@@ -1,10 +1,14 @@
 package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
+import com.efpcode.application.port.in.ticket.TicketViews;
 import com.efpcode.application.usecase.ticket.dto.*;
 import com.efpcode.infrastructure.web.dto.requests.*;
 import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
+import com.efpcode.infrastructure.web.dto.responses.TicketViewResponse;
+import com.efpcode.infrastructure.web.dto.responses.TicketsViewListResponse;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +20,11 @@ import org.springframework.web.bind.annotation.*;
 class TicketController {
 
   private final TicketRegisterCommands ticketRegisterCommands;
+  private final TicketViews ticketViews;
 
-  public TicketController(TicketRegisterCommands ticketRegisterCommands) {
+  public TicketController(TicketRegisterCommands ticketRegisterCommands, TicketViews ticketViews) {
     this.ticketRegisterCommands = ticketRegisterCommands;
+    this.ticketViews = ticketViews;
   }
 
   @PostMapping
@@ -78,6 +84,18 @@ class TicketController {
     ChangeTicketDescriptionCommand command =
         new ChangeTicketDescriptionCommand(request.description(), id);
     ticketRegisterCommands.changeTicketDescription(command);
+  }
+
+  @GetMapping
+  public ResponseEntity<TicketsViewListResponse> getReportedTickets() {
+
+    List<TicketsResultsView> reportedTickets = ticketViews.getReportedTickets();
+
+    List<TicketViewResponse> ticketViewResponses =
+        reportedTickets.stream().map(TicketViewResponse::fromResult).toList();
+
+    return ResponseEntity.ok(
+        new TicketsViewListResponse(ticketViewResponses, ticketViewResponses.size()));
   }
 
   // TODO: Ticket API Endpoints
