@@ -34,6 +34,7 @@ public class TicketViewTransactionalAdapter implements TicketViews {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public TicketResult getReportedTicket(TicketViewer ticketViewer) {
     return getReportedTicketUseCase.execute(ticketViewer, requestContext);
   }
