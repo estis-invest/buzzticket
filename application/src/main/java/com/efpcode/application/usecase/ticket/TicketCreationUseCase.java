@@ -79,6 +79,6 @@ public class TicketCreationUseCase {
 
     ticketRepository.save(ticket);
 
-    return TicketResult.fromDomain(ticket, partner.name());
+    return TicketResult.fromDomain(ticket, partner.name(), partnerId);
   }
 }

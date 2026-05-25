@@ -9,8 +9,10 @@ public record TicketResponse(
     String slug,
     String title,
     String description,
+    String status,
     String priority,
     String partnerName,
+    UUID partnerId,
     Instant createdAt,
     Instant updatedAt) {
 
@@ -20,8 +22,10 @@ public record TicketResponse(
         ticketResult.slug(),
         ticketResult.title(),
         ticketResult.description(),
+        ticketResult.status(),
         ticketResult.priority(),
         ticketResult.partnerName(),
+        ticketResult.partnerId(),
         ticketResult.createdAt(),
         ticketResult.updatedAt());
   }

@@ -1,10 +1,12 @@
 package com.efpcode.infrastructure.web;
 
 import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
+import com.efpcode.application.port.in.ticket.TicketViews;
 import com.efpcode.application.usecase.ticket.dto.*;
 import com.efpcode.infrastructure.web.dto.requests.*;
-import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
+import com.efpcode.infrastructure.web.dto.responses.*;
 import jakarta.validation.Valid;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,9 +18,11 @@ import org.springframework.web.bind.annotation.*;
 class TicketController {
 
   private final TicketRegisterCommands ticketRegisterCommands;
+  private final TicketViews ticketViews;
 
-  public TicketController(TicketRegisterCommands ticketRegisterCommands) {
+  public TicketController(TicketRegisterCommands ticketRegisterCommands, TicketViews ticketViews) {
     this.ticketRegisterCommands = ticketRegisterCommands;
+    this.ticketViews = ticketViews;
   }
 
   @PostMapping
@@ -80,18 +84,63 @@ class TicketController {
     ticketRegisterCommands.changeTicketDescription(command);
   }
 
-  // TODO: Ticket API Endpoints
+  @GetMapping
+  public ResponseEntity<TicketsViewListResponse> getReportedTickets() {
 
-  //
-  // --- Customer (Reporter) ---
-  //  TODO [Ticket] Implement GET     /api/v1/tickets                         (list user tickets)
-  //  TODO [Ticket] Implement GET     /api/v1/tickets/{id}                    (get ticket by id,
-  // ownership check)
-  //
-  // --- Staff limited to partnerId ---
-  // GET /api/v1/tickets/staff/assigned
-  // GET /api/v1/tickets/staff/partner
-  // GET /api/v1/tickets/staff/{id}
-  // GET /api/v1/tickets/staff/slug/{slug}
+    List<TicketsResultsView> reportedTickets = ticketViews.getReportedTickets();
 
+    List<TicketViewResponse> ticketViewResponses =
+        reportedTickets.stream().map(TicketViewResponse::fromResult).toList();
+
+    return ResponseEntity.ok(
+        new TicketsViewListResponse(ticketViewResponses, ticketViewResponses.size()));
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity<TicketResponse> getReportedTicket(@PathVariable UUID id) {
+    var viewer = new GetStaffTicketQuery(id);
+
+    TicketResult ticketResult = ticketViews.getReportedTicket(viewer);
+
+    return ResponseEntity.ok(TicketResponse.fromResult(ticketResult));
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @GetMapping("staff/assigned")
+  public ResponseEntity<TicketStaffResponseList> getAssignedTickets() {
+    List<TicketStaffResult> ticketStaffResults = ticketViews.getAssignedStaffTickets();
+    List<TicketStaffResponse> ticketStaffResponses =
+        ticketStaffResults.stream().map(TicketStaffResponse::fromResult).toList();
+    return ResponseEntity.ok(
+        new TicketStaffResponseList(ticketStaffResponses, ticketStaffResponses.size()));
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @GetMapping("staff/partner")
+  public ResponseEntity<TicketStaffResponseList> getPartnerTicketsStaff() {
+    List<TicketStaffResult> ticketStaffResults = ticketViews.getPartnerTickets();
+    List<TicketStaffResponse> ticketStaffResponses =
+        ticketStaffResults.stream().map(TicketStaffResponse::fromResult).toList();
+    return ResponseEntity.ok(
+        new TicketStaffResponseList(ticketStaffResponses, ticketStaffResponses.size()));
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @GetMapping("staff/{id}")
+  public ResponseEntity<TicketStaffResponse> getStaffTicket(@PathVariable UUID id) {
+    var viewer = new GetStaffTicketQuery(id);
+
+    TicketStaffResult ticketStaffResult = ticketViews.getStaffTicket(viewer);
+
+    return ResponseEntity.ok(TicketStaffResponse.fromResult(ticketStaffResult));
+  }
+
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @GetMapping("staff/slug/{slug}")
+  public ResponseEntity<TicketStaffResponse> getStaffTicketBySlug(@PathVariable String slug) {
+    var slugViewer = new GetStaffTicketsBySlugQuery(slug);
+
+    TicketStaffResult ticketStaffResult = ticketViews.getStaffTicketBySlug(slugViewer);
+    return ResponseEntity.ok(TicketStaffResponse.fromResult(ticketStaffResult));
+  }
 }

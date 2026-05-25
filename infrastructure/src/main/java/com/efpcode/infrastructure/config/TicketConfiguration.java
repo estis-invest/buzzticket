@@ -66,4 +66,43 @@ public class TicketConfiguration {
       TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy, Clock clock) {
     return new ChangeTicketDescriptionUseCase(ticketRepository, staffActionPolicy, clock);
   }
+
+  @Bean
+  public GetReportedTicketsUseCase getReportedTicketsUseCase(
+      TicketRepository ticketRepository, UserAuthenticationPolicy userAuthenticationPolicy) {
+    return new GetReportedTicketsUseCase(ticketRepository, userAuthenticationPolicy);
+  }
+
+  @Bean
+  public GetReportedTicketUseCase getReportedTicketUseCase(
+      TicketRepository ticketRepository,
+      PartnerRepository partnerRepository,
+      UserAuthenticationPolicy userAuthenticationPolicy) {
+    return new GetReportedTicketUseCase(
+        ticketRepository, partnerRepository, userAuthenticationPolicy);
+  }
+
+  @Bean
+  public GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy) {
+    return new GetAssignedStaffTicketsUseCase(ticketRepository, staffActionPolicy);
+  }
+
+  @Bean
+  GetPartnerTicketsForStaffUseCase getAllStaffTicketsForPartnerUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy) {
+    return new GetPartnerTicketsForStaffUseCase(ticketRepository, staffActionPolicy);
+  }
+
+  @Bean
+  GetStaffTicketUseCase getStaffTicketUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy) {
+    return new GetStaffTicketUseCase(ticketRepository, staffActionPolicy);
+  }
+
+  @Bean
+  GetStaffTicketSlugUseCase getStaffTicketSlugUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy) {
+    return new GetStaffTicketSlugUseCase(ticketRepository, staffActionPolicy);
+  }
 }
