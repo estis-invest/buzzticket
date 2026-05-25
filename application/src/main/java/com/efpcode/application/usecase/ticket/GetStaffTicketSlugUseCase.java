@@ -3,7 +3,7 @@ package com.efpcode.application.usecase.ticket;
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.staff.StaffActionPolicy;
 import com.efpcode.application.policy.staff.dto.StaffContext;
-import com.efpcode.application.usecase.ticket.dto.TicketSlugViewer;
+import com.efpcode.application.usecase.ticket.dto.GetStaffTicketsBySlugQuery;
 import com.efpcode.application.usecase.ticket.dto.TicketStaffResult;
 import com.efpcode.application.usecase.ticket.exceptions.InvalidTicketSlugException;
 import com.efpcode.domain.ticket.model.Ticket;
@@ -21,7 +21,8 @@ public class GetStaffTicketSlugUseCase {
     this.staffActionPolicy = staffActionPolicy;
   }
 
-  public TicketStaffResult execute(TicketSlugViewer slugViewer, RequestContext requestContext) {
+  public TicketStaffResult execute(
+      GetStaffTicketsBySlugQuery slugViewer, RequestContext requestContext) {
     StaffContext context = staffActionPolicy.staffValidator(requestContext);
 
     TicketSlug slug = new TicketSlug(slugViewer.slug());

@@ -7,13 +7,13 @@ public interface TicketViews {
 
   List<TicketsResultsView> getReportedTickets();
 
-  TicketResult getReportedTicket(TicketViewer ticketViewer);
+  TicketResult getReportedTicket(GetStaffTicketQuery getStaffTicketQuery);
 
   List<TicketStaffResult> getAssignedStaffTickets();
 
   List<TicketStaffResult> getPartnerTickets();
 
-  TicketStaffResult getStaffTicket(TicketViewer ticketViewer);
+  TicketStaffResult getStaffTicket(GetStaffTicketQuery getStaffTicketQuery);
 
-  TicketStaffResult getStaffTicketBySlug(TicketSlugViewer ticketSlugViewer);
+  TicketStaffResult getStaffTicketBySlug(GetStaffTicketsBySlugQuery getStaffTicketsBySlugQuery);
 }

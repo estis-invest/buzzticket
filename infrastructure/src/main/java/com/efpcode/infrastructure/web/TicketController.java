@@ -98,7 +98,7 @@ class TicketController {
 
   @GetMapping("/{id}")
   public ResponseEntity<TicketResponse> getReportedTicket(@PathVariable UUID id) {
-    var viewer = new TicketViewer(id);
+    var viewer = new GetStaffTicketQuery(id);
 
     TicketResult ticketResult = ticketViews.getReportedTicket(viewer);
 
@@ -128,7 +128,7 @@ class TicketController {
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
   @GetMapping("staff/{id}")
   public ResponseEntity<TicketStaffResponse> getStaffTicket(@PathVariable UUID id) {
-    var viewer = new TicketViewer(id);
+    var viewer = new GetStaffTicketQuery(id);
 
     TicketStaffResult ticketStaffResult = ticketViews.getStaffTicket(viewer);
 
@@ -138,7 +138,7 @@ class TicketController {
   @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
   @GetMapping("staff/slug/{slug}")
   public ResponseEntity<TicketStaffResponse> getStaffTicketBySlug(@PathVariable String slug) {
-    var slugViewer = new TicketSlugViewer(slug);
+    var slugViewer = new GetStaffTicketsBySlugQuery(slug);
 
     TicketStaffResult ticketStaffResult = ticketViews.getStaffTicketBySlug(slugViewer);
     return ResponseEntity.ok(TicketStaffResponse.fromResult(ticketStaffResult));

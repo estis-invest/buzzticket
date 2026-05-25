@@ -43,8 +43,8 @@ public class TicketViewTransactionalAdapter implements TicketViews {
 
   @Override
   @Transactional(readOnly = true)
-  public TicketResult getReportedTicket(TicketViewer ticketViewer) {
-    return getReportedTicketUseCase.execute(ticketViewer, requestContext);
+  public TicketResult getReportedTicket(GetStaffTicketQuery getStaffTicketQuery) {
+    return getReportedTicketUseCase.execute(getStaffTicketQuery, requestContext);
   }
 
   @Override
@@ -61,13 +61,14 @@ public class TicketViewTransactionalAdapter implements TicketViews {
 
   @Override
   @Transactional(readOnly = true)
-  public TicketStaffResult getStaffTicket(TicketViewer ticketViewer) {
-    return getStaffTicketUseCase.execute(ticketViewer, requestContext);
+  public TicketStaffResult getStaffTicket(GetStaffTicketQuery getStaffTicketQuery) {
+    return getStaffTicketUseCase.execute(getStaffTicketQuery, requestContext);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public TicketStaffResult getStaffTicketBySlug(TicketSlugViewer ticketSlugViewer) {
-    return getStaffTicketSlugUseCase.execute(ticketSlugViewer, requestContext);
+  public TicketStaffResult getStaffTicketBySlug(
+      GetStaffTicketsBySlugQuery getStaffTicketsBySlugQuery) {
+    return getStaffTicketSlugUseCase.execute(getStaffTicketsBySlugQuery, requestContext);
   }
 }

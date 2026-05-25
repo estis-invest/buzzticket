@@ -4,8 +4,8 @@ import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.policy.user.UserAuthenticationPolicy;
 import com.efpcode.application.policy.user.dto.UserContext;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
+import com.efpcode.application.usecase.ticket.dto.GetStaffTicketQuery;
 import com.efpcode.application.usecase.ticket.dto.TicketResult;
-import com.efpcode.application.usecase.ticket.dto.TicketViewer;
 import com.efpcode.application.usecase.ticket.exceptions.InvalidTicketAuthorizationException;
 import com.efpcode.application.usecase.ticket.exceptions.InvalidTicketNotFoundException;
 import com.efpcode.domain.partner.model.Partner;
@@ -29,7 +29,7 @@ public class GetReportedTicketUseCase {
     this.userAuthenticationPolicy = userAuthenticationPolicy;
   }
 
-  public TicketResult execute(TicketViewer viewer, RequestContext requestContext) {
+  public TicketResult execute(GetStaffTicketQuery viewer, RequestContext requestContext) {
     UserContext userContext = userAuthenticationPolicy.userValidator(requestContext);
     TicketId ticketId = TicketId.of(viewer.ticketId());
 
