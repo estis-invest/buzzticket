@@ -38,6 +38,7 @@ class PartnerController {
     this.partnerLifeCycleCommands = partnerLifeCycleCommands;
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PostMapping
   public ResponseEntity<PartnerResponse> registerPartner(
       @Valid @RequestBody RegisterPartnerRequest request) {
@@ -51,13 +52,14 @@ class PartnerController {
     return ResponseEntity.status(HttpStatus.CREATED).body(PartnerResponse.fromDomain(partner));
   }
 
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT', 'CUSTOMER')")
   @GetMapping("/{id}")
   public ResponseEntity<PartnerResponse> getPartner(@PathVariable UUID id) {
     Partner partner = getPartnerUseCase.execute(new PartnerId(id));
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
   }
 
-  @PreAuthorize("hasRole('ADMIN')")
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT', 'CUSTOMER')")
   @GetMapping
   public ResponseEntity<PartnerListResponse> getAllPartners() {
     List<Partner> partners = getAllPartnersUseCase.execute();
@@ -66,6 +68,7 @@ class PartnerController {
     return ResponseEntity.ok(new PartnerListResponse(partnerResponses, partnerResponses.size()));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deletePartner(@PathVariable UUID id) {
     log.info("REST: Deleting request for partner with id: {}", id);
@@ -74,6 +77,7 @@ class PartnerController {
     return ResponseEntity.noContent().build();
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{id}/deactivate")
   public ResponseEntity<PartnerResponse> deactivatePartner(@PathVariable UUID id) {
     log.info("REST: Deactivation request for partner: {}", id);
@@ -84,6 +88,7 @@ class PartnerController {
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{id}/activate")
   public ResponseEntity<PartnerResponse> activatePartner(@PathVariable UUID id) {
     log.info("REST: Activation request for partner: {}", id);
@@ -92,6 +97,7 @@ class PartnerController {
     return ResponseEntity.ok(PartnerResponse.fromDomain(partner));
   }
 
+  @PreAuthorize("hasRole('ADMIN')")
   @PatchMapping("/{id}")
   public ResponseEntity<PartnerResponse> editPartner(
       @RequestBody UpdatePartnerRequest request, @PathVariable UUID id) {
