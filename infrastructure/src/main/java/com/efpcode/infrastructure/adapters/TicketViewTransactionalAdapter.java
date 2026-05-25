@@ -16,6 +16,7 @@ public class TicketViewTransactionalAdapter implements TicketViews {
   private final GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase;
   private final GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase;
   private final GetStaffTicketUseCase getStaffTicketUseCase;
+  private final GetStaffTicketSlugUseCase getStaffTicketSlugUseCase;
 
   public TicketViewTransactionalAdapter(
       RequestContext requestContext,
@@ -23,13 +24,15 @@ public class TicketViewTransactionalAdapter implements TicketViews {
       GetReportedTicketUseCase getReportedTicketUseCase,
       GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase,
       GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase,
-      GetStaffTicketUseCase getStaffTicketUseCase) {
+      GetStaffTicketUseCase getStaffTicketUseCase,
+      GetStaffTicketSlugUseCase getStaffTicketSlugUseCase) {
     this.requestContext = requestContext;
     this.getReportedTicketsUseCase = getReportedTicketsUseCase;
     this.getReportedTicketUseCase = getReportedTicketUseCase;
     this.getAssignedStaffTicketsUseCase = getAssignedStaffTicketsUseCase;
     this.getPartnerTicketsForStaffUseCase = getPartnerTicketsForStaffUseCase;
     this.getStaffTicketUseCase = getStaffTicketUseCase;
+    this.getStaffTicketSlugUseCase = getStaffTicketSlugUseCase;
   }
 
   @Override
@@ -63,7 +66,8 @@ public class TicketViewTransactionalAdapter implements TicketViews {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public TicketStaffResult getStaffTicketBySlug(TicketSlugViewer ticketSlugViewer) {
-    return null;
+    return getStaffTicketSlugUseCase.execute(ticketSlugViewer, requestContext);
   }
 }

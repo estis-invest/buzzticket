@@ -135,10 +135,12 @@ class TicketController {
     return ResponseEntity.ok(TicketStaffResponse.fromResult(ticketStaffResult));
   }
 
-  // TODO: Ticket API Endpoints
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @GetMapping("staff/slug/{slug}")
+  public ResponseEntity<TicketStaffResponse> getStaffTicketBySlug(@PathVariable String slug) {
+    var slugViewer = new TicketSlugViewer(slug);
 
-  // --- Staff limited to partnerId ---
-  // GET /api/v1/tickets/staff/{id}
-  // GET /api/v1/tickets/staff/slug/{slug}
-
+    TicketStaffResult ticketStaffResult = ticketViews.getStaffTicketBySlug(slugViewer);
+    return ResponseEntity.ok(TicketStaffResponse.fromResult(ticketStaffResult));
+  }
 }
