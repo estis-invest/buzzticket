@@ -1,5 +1,8 @@
 package com.efpcode.application.usecase.partner;
 
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.admin.dto.AdminContext;
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
@@ -8,12 +11,19 @@ import com.efpcode.domain.partner.port.PartnerRepository;
 
 public class EditPartnerUseCase {
   private final PartnerRepository partnerRepository;
+  private final PartnerAdminActionPolicy partnerAdminActionPolicy;
 
-  public EditPartnerUseCase(PartnerRepository partnerRepository) {
+  public EditPartnerUseCase(
+      PartnerRepository partnerRepository, PartnerAdminActionPolicy partnerAdminActionPolicy) {
     this.partnerRepository = partnerRepository;
+    this.partnerAdminActionPolicy = partnerAdminActionPolicy;
   }
 
-  public Partner execute(PartnerId partnerId, UpdatePartnerCommand command) {
+  public Partner execute(
+      PartnerId partnerId, UpdatePartnerCommand command, RequestContext requestContext) {
+    AdminContext adminContext = partnerAdminActionPolicy.partnerAdminValidator(requestContext);
+
+    partnerAdminActionPolicy.assertAdminHasSamePartnerAs(adminContext, partnerId);
 
     Partner partner =
         partnerRepository
@@ -23,12 +33,12 @@ public class EditPartnerUseCase {
                     new InvalidPartnerCommandArgumentException(
                         "Partner not found with id:" + partnerId.partnerId()));
 
-    UpdatePartnerCommand fullcommand = UpdatePartnerCommand.merge(command, partner);
+    UpdatePartnerCommand fullCommand = UpdatePartnerCommand.merge(command, partner);
 
-    PartnerName newName = new PartnerName(fullcommand.name());
-    PartnerCity newCity = new PartnerCity(fullcommand.city());
-    PartnerCountry newCountry = new PartnerCountry(fullcommand.country());
-    PartnerIsoCode newIsoCode = new PartnerIsoCode(fullcommand.isoCode());
+    PartnerName newName = new PartnerName(fullCommand.name());
+    PartnerCity newCity = new PartnerCity(fullCommand.city());
+    PartnerCountry newCountry = new PartnerCountry(fullCommand.country());
+    PartnerIsoCode newIsoCode = new PartnerIsoCode(fullCommand.isoCode());
 
     if (!partner.name().partnerName().equals(newName.partnerName())) {
       if (partnerRepository.existsByName(newName))

@@ -3,6 +3,8 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
@@ -22,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DeactivatePartnerUseCaseTest {
 
   @Mock PartnerRepository partnerRepository;
+  @Mock RequestContext requestContext;
+  @Mock PartnerAdminActionPolicy partnerAdminActionPolicy;
 
   private DeactivatePartnerUseCase deactivatePartnerUseCase;
   private PartnerId id;
@@ -30,7 +34,8 @@ class DeactivatePartnerUseCaseTest {
   @BeforeEach
   void setUp() {
     id = TestUUIDIds.partnerId();
-    deactivatePartnerUseCase = new DeactivatePartnerUseCase(partnerRepository);
+    deactivatePartnerUseCase =
+        new DeactivatePartnerUseCase(partnerRepository, partnerAdminActionPolicy);
     testPartner = Partner.createDraftPartner(id, "Test", "Test", "TEST", "TST");
   }
 
@@ -40,7 +45,7 @@ class DeactivatePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    assertThatThrownBy(() -> deactivatePartnerUseCase.execute(id))
+    assertThatThrownBy(() -> deactivatePartnerUseCase.execute(id, requestContext))
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
         .hasMessageContaining(
             "PartnerStatus EDIT cannot be deactivated. Only ACTIVE PartnerStatus can transition to DEACTIVATED");
@@ -53,7 +58,7 @@ class DeactivatePartnerUseCaseTest {
   void notfoundPartnerByPartnerIdThrowsNotFoundError() {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.empty());
-    assertThatThrownBy(() -> deactivatePartnerUseCase.execute(id))
+    assertThatThrownBy(() -> deactivatePartnerUseCase.execute(id, requestContext))
         .isInstanceOf(PartnerNotFoundException.class)
         .hasMessageContaining("Partner not found with id:" + id.partnerId());
 
@@ -68,7 +73,7 @@ class DeactivatePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    var result = deactivatePartnerUseCase.execute(id);
+    var result = deactivatePartnerUseCase.execute(id, requestContext);
 
     assertThat(result.status()).isEqualTo(PartnerStatus.DEACTIVATED);
 

@@ -3,6 +3,8 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
@@ -21,6 +23,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class DeletePartnerUseCaseTest {
 
   @Mock private PartnerRepository partnerRepository;
+  @Mock private PartnerAdminActionPolicy partnerAdminActionPolicy;
+  @Mock private RequestContext requestContext;
 
   private DeletePartnerUseCase deletePartnerUseCase;
 
@@ -30,7 +34,7 @@ class DeletePartnerUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    deletePartnerUseCase = new DeletePartnerUseCase(partnerRepository);
+    deletePartnerUseCase = new DeletePartnerUseCase(partnerRepository, partnerAdminActionPolicy);
     id = TestUUIDIds.partnerId();
     testPartner = Partner.createDraftPartner(id, "TEST", "TEST", "TEST", "TST");
   }
@@ -41,12 +45,13 @@ class DeletePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    assertThatThrownBy(() -> deletePartnerUseCase.execute(id))
+    assertThatThrownBy(() -> deletePartnerUseCase.execute(id, requestContext))
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
         .hasMessageContaining(
             "PartnerStatus EDIT cannot be deleted. Only DEACTIVATED PartnerStatus can transition to DELETED");
 
     verify(partnerRepository, never()).save(any());
+    verify(partnerAdminActionPolicy).partnerAdminValidator(requestContext);
   }
 
   @Test
@@ -54,11 +59,12 @@ class DeletePartnerUseCaseTest {
   void partnerNotFoundByIdWillThrowError() {
     when(partnerRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> deletePartnerUseCase.execute(id))
+    assertThatThrownBy(() -> deletePartnerUseCase.execute(id, requestContext))
         .isInstanceOf(PartnerNotFoundException.class)
         .hasMessageContaining("Partner not found with id: " + id.partnerId());
 
     verify(partnerRepository, never()).save(any());
+    verify(partnerAdminActionPolicy).partnerAdminValidator(requestContext);
   }
 
   @Test
@@ -68,8 +74,9 @@ class DeletePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    deletePartnerUseCase.execute(id);
+    deletePartnerUseCase.execute(id, requestContext);
 
     verify(partnerRepository, times(1)).save(any());
+    verify(partnerAdminActionPolicy).partnerAdminValidator(requestContext);
   }
 }
