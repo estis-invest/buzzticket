@@ -1,20 +1,29 @@
 # Seed Data
 
-## Run seeds files
+## Run Seeds Files
 
 
 ### Step 1
+
 ```shell
 cat seed/v1_initial_setup.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
+
 ```
 ### Step 2
 ```shell
 cat seed/v2_adds_customers.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
+
 ```
 ### Step 3
 ```shell
 cat seed/v3_adds_staff_members.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
 ```
+
+### Step 4
+```shell
+cat seed/v4_adds_tickets_pending_status.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
+```
+
 -----
 
 ## Admin Login

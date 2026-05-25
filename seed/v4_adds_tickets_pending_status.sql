@@ -1,0 +1,96 @@
+INSERT INTO ticket (
+    ticket_id,
+    slug,
+    title,
+    description,
+    status,
+    priority,
+    created_at,
+    updated_at,
+    reported_by_user_id,
+    partner_id
+) VALUES
+      (
+          '019e60e1-d52b-7429-bbc6-60dd54e0c81a',
+          'BZT-4392B878',
+          'Cannot access dashboard',
+          'Getting 403 when trying to load dashboard',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:44:33.453987',
+          '2026-05-25 20:44:33.453987',
+          '019e5f4f-fc21-7f72-a2c9-18bc231dbd84',
+          '019e5f15-1021-783b-b123-1901331999a7'
+      ),
+      (
+          '019e60e2-4c3b-7544-a4de-71f7dce82102',
+          'BZT-AB375A2C',
+          'Cannot access dashboard',
+          'Cannot logout',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:45:03.931098',
+          '2026-05-25 20:45:03.931098',
+          '019e5f4f-fc21-7f72-a2c9-18bc231dbd84',
+          '019e5f15-1021-783b-b123-1901331999a7'
+      ),
+      (
+          '019e60e3-96dd-7dfc-9aae-37cdb023c0d1',
+          'BZT-DD256B88',
+          'Logout problems',
+          'Cannot logout',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:46:28.573551',
+          '2026-05-25 20:46:28.573551',
+          '019e5f4f-fc21-7f72-a2c9-18bc231dbd84',
+          '019e5f15-1021-783b-b123-1901331999a7'
+      ),
+      (
+          '019e60e6-5efa-75a2-ab8e-fa34a9a2bfa8',
+          'BZT-E3B75815',
+          'I cannot update my profile',
+          'jlkj;j',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:49:30.874567',
+          '2026-05-25 20:49:30.874567',
+          '019e5f51-f3c4-7a44-bc05-a3ade4a15c77',
+          '019e5f16-b180-70fe-8d2d-ed7fc292b031'
+      ),
+      (
+          '019e60e6-e839-7770-87b9-05b5b4533861',
+          'BZT-480F5730',
+          'Cannot reset password',
+          'why!!',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:50:06.009816',
+          '2026-05-25 20:50:06.009816',
+          '019e5f51-f3c4-7a44-bc05-a3ade4a15c77',
+          '019e5f16-b180-70fe-8d2d-ed7fc292b031'
+      ),
+      (
+          '019e60e9-911a-73fe-ac57-5195508d9400',
+          'BZT-0D669615',
+          'Cannot find partner',
+          'why!!',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:53:00.314398',
+          '2026-05-25 20:53:00.314398',
+          '019e5f53-17e7-7945-989a-2a7a6e573efc',
+          '019e5f18-16a1-7e90-8b9d-171de06b31af'
+      ),
+      (
+          '019e60ea-01ea-727d-8b55-c79247d379ef',
+          'BZT-997ADB9E',
+          'I need a new password',
+          'why!!',
+          'PENDING',
+          'HIGH',
+          '2026-05-25 20:53:29.194451',
+          '2026-05-25 20:53:29.194451',
+          '019e5f53-17e7-7945-989a-2a7a6e573efc',
+          '019e5f18-16a1-7e90-8b9d-171de06b31af'
+      );
