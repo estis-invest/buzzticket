@@ -2,10 +2,7 @@ package com.efpcode.infrastructure.adapters;
 
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.ticket.TicketViews;
-import com.efpcode.application.usecase.ticket.GetAssignedStaffTicketsUseCase;
-import com.efpcode.application.usecase.ticket.GetPartnerTicketsForStaffUseCase;
-import com.efpcode.application.usecase.ticket.GetReportedTicketUseCase;
-import com.efpcode.application.usecase.ticket.GetReportedTicketsUseCase;
+import com.efpcode.application.usecase.ticket.*;
 import com.efpcode.application.usecase.ticket.dto.*;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -18,18 +15,21 @@ public class TicketViewTransactionalAdapter implements TicketViews {
   private final GetReportedTicketUseCase getReportedTicketUseCase;
   private final GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase;
   private final GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase;
+  private final GetStaffTicketUseCase getStaffTicketUseCase;
 
   public TicketViewTransactionalAdapter(
       RequestContext requestContext,
       GetReportedTicketsUseCase getReportedTicketsUseCase,
       GetReportedTicketUseCase getReportedTicketUseCase,
       GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase,
-      GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase) {
+      GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase,
+      GetStaffTicketUseCase getStaffTicketUseCase) {
     this.requestContext = requestContext;
     this.getReportedTicketsUseCase = getReportedTicketsUseCase;
     this.getReportedTicketUseCase = getReportedTicketUseCase;
     this.getAssignedStaffTicketsUseCase = getAssignedStaffTicketsUseCase;
     this.getPartnerTicketsForStaffUseCase = getPartnerTicketsForStaffUseCase;
+    this.getStaffTicketUseCase = getStaffTicketUseCase;
   }
 
   @Override
@@ -58,7 +58,7 @@ public class TicketViewTransactionalAdapter implements TicketViews {
 
   @Override
   public TicketStaffResult getStaffTicket(TicketViewer ticketViewer) {
-    return null;
+    return getStaffTicketUseCase.execute(ticketViewer, requestContext);
   }
 
   @Override

@@ -93,4 +93,10 @@ public class TicketConfiguration {
       TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy) {
     return new GetPartnerTicketsForStaffUseCase(ticketRepository, staffActionPolicy);
   }
+
+  @Bean
+  GetStaffTicketUseCase getStaffTicketUseCase(
+      TicketRepository ticketRepository, StaffActionPolicy staffActionPolicy) {
+    return new GetStaffTicketUseCase(ticketRepository, staffActionPolicy);
+  }
 }
