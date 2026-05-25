@@ -51,6 +51,7 @@ public class TicketViewTransactionalAdapter implements TicketViews {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<TicketStaffResult> getPartnerTickets() {
     return getPartnerTicketsForStaffUseCase.execute(requestContext);
   }
