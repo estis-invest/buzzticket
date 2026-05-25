@@ -115,10 +115,19 @@ class TicketController {
         new TicketStaffResponseList(ticketStaffResponses, ticketStaffResponses.size()));
   }
 
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
+  @GetMapping("staff/partner")
+  public ResponseEntity<TicketStaffResponseList> getPartnerTicketsStaff() {
+    List<TicketStaffResult> ticketStaffResults = ticketViews.getPartnerTickets();
+    List<TicketStaffResponse> ticketStaffResponses =
+        ticketStaffResults.stream().map(TicketStaffResponse::fromResult).toList();
+    return ResponseEntity.ok(
+        new TicketStaffResponseList(ticketStaffResponses, ticketStaffResponses.size()));
+  }
+
   // TODO: Ticket API Endpoints
 
   // --- Staff limited to partnerId ---
-  // GET /api/v1/tickets/staff/assigned
   // GET /api/v1/tickets/staff/partner
   // GET /api/v1/tickets/staff/{id}
   // GET /api/v1/tickets/staff/slug/{slug}

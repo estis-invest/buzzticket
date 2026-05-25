@@ -3,6 +3,7 @@ package com.efpcode.infrastructure.adapters;
 import com.efpcode.application.context.RequestContext;
 import com.efpcode.application.port.in.ticket.TicketViews;
 import com.efpcode.application.usecase.ticket.GetAssignedStaffTicketsUseCase;
+import com.efpcode.application.usecase.ticket.GetPartnerTicketsForStaffUseCase;
 import com.efpcode.application.usecase.ticket.GetReportedTicketUseCase;
 import com.efpcode.application.usecase.ticket.GetReportedTicketsUseCase;
 import com.efpcode.application.usecase.ticket.dto.*;
@@ -16,16 +17,19 @@ public class TicketViewTransactionalAdapter implements TicketViews {
   private final GetReportedTicketsUseCase getReportedTicketsUseCase;
   private final GetReportedTicketUseCase getReportedTicketUseCase;
   private final GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase;
+  private final GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase;
 
   public TicketViewTransactionalAdapter(
       RequestContext requestContext,
       GetReportedTicketsUseCase getReportedTicketsUseCase,
       GetReportedTicketUseCase getReportedTicketUseCase,
-      GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase) {
+      GetAssignedStaffTicketsUseCase getAssignedStaffTicketsUseCase,
+      GetPartnerTicketsForStaffUseCase getPartnerTicketsForStaffUseCase) {
     this.requestContext = requestContext;
     this.getReportedTicketsUseCase = getReportedTicketsUseCase;
     this.getReportedTicketUseCase = getReportedTicketUseCase;
     this.getAssignedStaffTicketsUseCase = getAssignedStaffTicketsUseCase;
+    this.getPartnerTicketsForStaffUseCase = getPartnerTicketsForStaffUseCase;
   }
 
   @Override
@@ -48,7 +52,7 @@ public class TicketViewTransactionalAdapter implements TicketViews {
 
   @Override
   public List<TicketStaffResult> getPartnerTickets() {
-    return List.of();
+    return getPartnerTicketsForStaffUseCase.execute(requestContext);
   }
 
   @Override
