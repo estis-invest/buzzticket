@@ -1,14 +1,14 @@
 INSERT INTO ticket (
     ticket_id,
-    slug,
-    title,
-    description,
-    status,
-    priority,
-    created_at,
-    updated_at,
-    reported_by_user_id,
-    partner_id
+   ticket_slug,
+   ticket_title,
+   ticket_description,
+   ticket_status,
+   ticket_priority,
+   ticket_created_at,
+   ticket_updated_at,
+   ticket_reported_by_id,
+   ticket_owner_partner_id
 ) VALUES
       (
           '019e60e1-d52b-7429-bbc6-60dd54e0c81a',
