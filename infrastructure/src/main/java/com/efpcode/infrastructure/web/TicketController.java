@@ -4,9 +4,7 @@ import com.efpcode.application.port.in.ticket.TicketRegisterCommands;
 import com.efpcode.application.port.in.ticket.TicketViews;
 import com.efpcode.application.usecase.ticket.dto.*;
 import com.efpcode.infrastructure.web.dto.requests.*;
-import com.efpcode.infrastructure.web.dto.responses.TicketResponse;
-import com.efpcode.infrastructure.web.dto.responses.TicketViewResponse;
-import com.efpcode.infrastructure.web.dto.responses.TicketsViewListResponse;
+import com.efpcode.infrastructure.web.dto.responses.*;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -107,14 +105,17 @@ class TicketController {
     return ResponseEntity.ok(TicketResponse.fromResult(ticketResult));
   }
 
+  @GetMapping("staff/assigned")
+  public ResponseEntity<TicketStaffResponseList> getAssignedTickets() {
+    List<TicketStaffResult> ticketStaffResults = ticketViews.getAssignedStaffTickets();
+    List<TicketStaffResponse> ticketStaffResponses =
+        ticketStaffResults.stream().map(TicketStaffResponse::fromResult).toList();
+    return ResponseEntity.ok(
+        new TicketStaffResponseList(ticketStaffResponses, ticketStaffResponses.size()));
+  }
+
   // TODO: Ticket API Endpoints
 
-  //
-  // --- Customer (Reporter) ---
-  //  TODO [Ticket] Implement GET     /api/v1/tickets                         (list user tickets)
-  //  TODO [Ticket] Implement GET     /api/v1/tickets/{id}                    (get ticket by id,
-  // ownership check)
-  //
   // --- Staff limited to partnerId ---
   // GET /api/v1/tickets/staff/assigned
   // GET /api/v1/tickets/staff/partner

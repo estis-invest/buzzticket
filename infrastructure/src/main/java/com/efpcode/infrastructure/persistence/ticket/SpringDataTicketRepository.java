@@ -20,6 +20,8 @@ public interface SpringDataTicketRepository extends JpaRepository<TicketEntity, 
     SELECT t FROM TicketEntity t
     JOIN t.assignees a
     WHERE a = :assigneeId
+    AND t.ownerPartnerId = :partnerId
 """)
-  List<TicketEntity> findByAssignee(@Param("assigneeId") UUID assigneeId);
+  List<TicketEntity> findByAssignee(
+      @Param("assigneeId") UUID assigneeId, @Param("partnerId") UUID partnerId);
 }

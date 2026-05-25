@@ -1,9 +1,6 @@
 package com.efpcode.application.port.in.ticket;
 
-import com.efpcode.application.usecase.ticket.dto.TicketResult;
-import com.efpcode.application.usecase.ticket.dto.TicketSlugViewer;
-import com.efpcode.application.usecase.ticket.dto.TicketViewer;
-import com.efpcode.application.usecase.ticket.dto.TicketsResultsView;
+import com.efpcode.application.usecase.ticket.dto.*;
 import java.util.List;
 
 public interface TicketViews {
@@ -12,11 +9,11 @@ public interface TicketViews {
 
   TicketResult getReportedTicket(TicketViewer ticketViewer);
 
-  List<TicketResult> getAssignedStaffTickets();
+  List<TicketStaffResult> getAssignedStaffTickets();
 
-  List<TicketResult> getPartnerTickets();
+  List<TicketStaffResult> getPartnerTickets();
 
-  TicketResult getStaffTicket(TicketViewer ticketViewer);
+  TicketStaffResult getStaffTicket(TicketViewer ticketViewer);
 
-  TicketResult getStaffTicketBySlug(TicketSlugViewer ticketSlugViewer);
+  TicketStaffResult getStaffTicketBySlug(TicketSlugViewer ticketSlugViewer);
 }

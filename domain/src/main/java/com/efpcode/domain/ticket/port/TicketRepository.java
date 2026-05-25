@@ -18,7 +18,7 @@ public interface TicketRepository {
 
   List<Ticket> findByReportedBy(UserId id);
 
-  List<Ticket> findByAssignee(UserId id);
+  List<Ticket> findByAssigneeAndPartner(UserId id, PartnerId partnerId);
 
   List<Ticket> findByOwnerPartner(PartnerId id);
 }

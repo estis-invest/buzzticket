@@ -45,8 +45,10 @@ public class JpaTicketAdapter implements TicketRepository {
   }
 
   @Override
-  public List<Ticket> findByAssignee(UserId id) {
-    return ticketRepository.findByAssignee(id.id()).stream().map(TicketMapper::toDomain).toList();
+  public List<Ticket> findByAssigneeAndPartner(UserId id, PartnerId partnerId) {
+    return ticketRepository.findByAssignee(id.id(), partnerId.partnerId()).stream()
+        .map(TicketMapper::toDomain)
+        .toList();
   }
 
   @Override
