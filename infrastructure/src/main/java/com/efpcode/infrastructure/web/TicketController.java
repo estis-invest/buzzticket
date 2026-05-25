@@ -105,6 +105,7 @@ class TicketController {
     return ResponseEntity.ok(TicketResponse.fromResult(ticketResult));
   }
 
+  @PreAuthorize("hasAnyRole('ADMIN', 'SUPPORT')")
   @GetMapping("staff/assigned")
   public ResponseEntity<TicketStaffResponseList> getAssignedTickets() {
     List<TicketStaffResult> ticketStaffResults = ticketViews.getAssignedStaffTickets();

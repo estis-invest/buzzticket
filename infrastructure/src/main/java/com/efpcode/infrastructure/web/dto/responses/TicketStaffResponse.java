@@ -22,7 +22,7 @@ public record TicketStaffResponse(
         staffResult.ticketId(),
         staffResult.slug(),
         staffResult.title(),
-        staffResult.title(),
+        staffResult.description(),
         staffResult.status(),
         staffResult.priority(),
         staffResult.createdAt(),
