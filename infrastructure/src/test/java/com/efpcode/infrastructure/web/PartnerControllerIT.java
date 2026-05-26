@@ -278,7 +278,8 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .expectBody()
           .jsonPath("$.status")
           .isEqualTo("ACTIVE")
-          .jsonPath("$.updatedAt");
+          .jsonPath("$.updatedAt")
+          .isNotEmpty();
 
       webTestClient
           .patch()
