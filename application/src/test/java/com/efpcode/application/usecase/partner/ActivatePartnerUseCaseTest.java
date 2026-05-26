@@ -3,6 +3,8 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.exceptions.PartnerNotFoundException;
 import com.efpcode.domain.partner.exceptions.IllegalPartnerStatusTransitionException;
@@ -20,12 +22,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ActivatePartnerUseCaseTest {
   @Mock private PartnerRepository partnerRepository;
+  @Mock private PartnerAdminActionPolicy partnerAdminActionPolicy;
+  @Mock private RequestContext requestContext;
 
   private ActivatePartnerUseCase activatePartnerUseCase;
 
   @BeforeEach
   void setUp() {
-    activatePartnerUseCase = new ActivatePartnerUseCase(partnerRepository);
+    activatePartnerUseCase =
+        new ActivatePartnerUseCase(partnerRepository, partnerAdminActionPolicy);
   }
 
   @Test
@@ -36,7 +41,7 @@ class ActivatePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    Partner result = activatePartnerUseCase.execute(id);
+    Partner result = activatePartnerUseCase.execute(id, requestContext);
     assertThat(result.status()).isEqualTo(PartnerStatus.ACTIVE);
 
     verify(partnerRepository, times(1)).save(result);
@@ -50,7 +55,7 @@ class ActivatePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> activatePartnerUseCase.execute(id))
+    assertThatThrownBy(() -> activatePartnerUseCase.execute(id, requestContext))
         .isInstanceOf(PartnerNotFoundException.class)
         .hasMessageContaining("Partner not found with id:" + id.partnerId());
 
@@ -67,7 +72,7 @@ class ActivatePartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    assertThatThrownBy(() -> activatePartnerUseCase.execute(id))
+    assertThatThrownBy(() -> activatePartnerUseCase.execute(id, requestContext))
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
         .hasMessageContaining(
             "PartnerStatus DELETED cannot be activated. Only DEACTIVATED and EDIT PartnerStatus can transition to ACTIVE");

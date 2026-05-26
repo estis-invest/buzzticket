@@ -3,6 +3,8 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.testsupport.TestUUIDIds;
 import com.efpcode.application.usecase.partner.dto.UpdatePartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.InvalidPartnerCommandArgumentException;
@@ -24,6 +26,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class EditPartnerUseCaseTest {
 
   @Mock private PartnerRepository partnerRepository;
+  @Mock private PartnerAdminActionPolicy partnerAdminActionPolicy;
+  @Mock private RequestContext requestContext;
 
   private PartnerId id;
 
@@ -33,7 +37,7 @@ class EditPartnerUseCaseTest {
 
   @BeforeEach
   void setUp() {
-    editPartnerUseCase = new EditPartnerUseCase(partnerRepository);
+    editPartnerUseCase = new EditPartnerUseCase(partnerRepository, partnerAdminActionPolicy);
     id = TestUUIDIds.partnerId();
     testPartner = Partner.createDraftPartner(id, "TEST", "TEST", "TEST", "TST");
   }
@@ -48,7 +52,7 @@ class EditPartnerUseCaseTest {
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
     when(partnerRepository.existsByName(newName)).thenReturn(false);
 
-    var result = editPartnerUseCase.execute(id, command);
+    var result = editPartnerUseCase.execute(id, command, requestContext);
 
     assertThat(result.name().partnerName()).doesNotContain(testPartner.name().partnerName());
     assertThat(result.city().partnerCity()).contains(testPartner.city().partnerCity());
@@ -66,7 +70,7 @@ class EditPartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    assertThatThrownBy(() -> editPartnerUseCase.execute(id, command))
+    assertThatThrownBy(() -> editPartnerUseCase.execute(id, command, requestContext))
         .isInstanceOf(IllegalPartnerStatusTransitionException.class)
         .hasMessageContaining("PartnerStatus: DEACTIVATED cannot be edited.");
 
@@ -81,7 +85,7 @@ class EditPartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.empty());
 
-    assertThatThrownBy(() -> editPartnerUseCase.execute(id, command))
+    assertThatThrownBy(() -> editPartnerUseCase.execute(id, command, requestContext))
         .isInstanceOf(InvalidPartnerCommandArgumentException.class)
         .hasMessageContaining("Partner not found with id:" + id.partnerId());
 
@@ -98,7 +102,7 @@ class EditPartnerUseCaseTest {
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
     when(partnerRepository.existsByName(duplicatedName)).thenReturn(true);
 
-    assertThatThrownBy(() -> editPartnerUseCase.execute(id, command))
+    assertThatThrownBy(() -> editPartnerUseCase.execute(id, command, requestContext))
         .isInstanceOf(PartnerAlreadyExistsException.class)
         .hasMessageContaining("Partner name already exists: " + expectedName);
 
@@ -114,7 +118,7 @@ class EditPartnerUseCaseTest {
 
     when(partnerRepository.findById(id)).thenReturn(Optional.of(testPartner));
 
-    var result = editPartnerUseCase.execute(id, command);
+    var result = editPartnerUseCase.execute(id, command, requestContext);
 
     assertThat(result.name().partnerName()).isEqualTo(testPartner.name().partnerName());
     verify(partnerRepository, times(1)).save(any());

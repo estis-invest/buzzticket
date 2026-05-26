@@ -4,13 +4,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.efpcode.BaseIntegrationTest;
+import com.efpcode.domain.partner.model.PartnerId;
+import com.efpcode.domain.user.model.*;
+import com.efpcode.domain.user.port.UserRepository;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
+import com.efpcode.infrastructure.persistence.user.SpringDataUserRepository;
 import com.efpcode.infrastructure.security.TestSecurityConfiguration;
+import com.efpcode.infrastructure.web.dto.requests.RegisterCompanyRequest;
 import com.efpcode.infrastructure.web.dto.requests.RegisterPartnerRequest;
 import com.efpcode.infrastructure.web.dto.requests.UpdatePartnerRequest;
-import com.efpcode.infrastructure.web.dto.responses.PartnerResponse;
+import com.efpcode.infrastructure.web.dto.responses.CompanyResponse;
 import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,6 +35,8 @@ class PartnerControllerIT extends BaseIntegrationTest {
   @Autowired private WebTestClient webTestClient;
 
   @Autowired private SpringDataPartnerRepository partnerRepository;
+  @Autowired private SpringDataUserRepository userDataRepository;
+  @Autowired private UserRepository userRepository;
 
   @Nested
   @DisplayName("When connection to database is established")
@@ -41,6 +49,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
 
   @BeforeEach
   void clearDatabase() {
+    userDataRepository.deleteAllInBatch();
     partnerRepository.deleteAllInBatch();
   }
 
@@ -73,20 +82,42 @@ class PartnerControllerIT extends BaseIntegrationTest {
 
     @BeforeEach
     void setUp() {
-      var seedRequest =
-          new RegisterPartnerRequest("Initial Partner", "Gothenburg", "SWEDEN", "SWE");
+      var companyRequest =
+          new RegisterCompanyRequest(
+              "Initial Partner",
+              "Gothenburg",
+              "SWEDEN",
+              "SWE",
+              "TestAdmin",
+              "P@ssword123",
+              "testadmin@test.com");
+
       partnerId =
           webTestClient
               .post()
-              .uri("/api/v1/partners")
-              .bodyValue(seedRequest)
+              .uri("/public/v1/company-registration")
+              .bodyValue(companyRequest)
               .exchange()
               .expectStatus()
               .isCreated()
-              .expectBody(PartnerResponse.class)
+              .expectBody(CompanyResponse.class)
               .returnResult()
               .getResponseBody()
-              .id();
+              .partnerId();
+
+      User admin =
+          new User(
+              new UserId(UUID.fromString("00000000-0000-0000-0000-000000000001")),
+              new UserName("TestAdmin"),
+              new UserEmail("testadmin2@test.com"),
+              UserPassword.fromHash("$2a$12$ybtImSJ.2l3C4kv4045EBOYHSfmj5MmGEdGbQVt.eEpBTGIZIgRF6"),
+              UserRole.ADMIN,
+              UserAccountStatus.ACTIVATED,
+              UserCreatedAt.createNow(),
+              UserUpdateAt.createNow(),
+              Optional.of(new PartnerId(partnerId)));
+
+      userRepository.save(admin);
     }
 
     @Test
@@ -188,6 +219,11 @@ class PartnerControllerIT extends BaseIntegrationTest {
     @Test
     @DisplayName("PATCH /activate should transition partner from EDIT to ACTIVE")
     void shouldTransitionFromEditToActive() {
+
+      var seededPartner = partnerRepository.findById(partnerId).orElseThrow();
+      seededPartner.setPartnerStatus("EDIT");
+      partnerRepository.save(seededPartner);
+
       webTestClient
           .patch()
           .uri("/api/v1/partners/{id}/activate", partnerId)
@@ -226,18 +262,13 @@ class PartnerControllerIT extends BaseIntegrationTest {
     }
 
     @Test
-    @DisplayName("Full Lifecycle: EDIT -> ACTIVE -> DEACTIVATED -> DELETED")
+    @DisplayName("Full Lifecycle: ACTIVE -> DEACTIVATED -> DELETED")
     void shouldFollowFullStatusLifecycle() {
-      // Ensure that when partner is DELETED, does not throw error PartnerNotFoundException
-      var request = new RegisterPartnerRequest("Partner 100", "New York", "USA", "USA");
-      webTestClient
-          .post()
-          .uri("/api/v1/partners")
-          .bodyValue(request)
-          .exchange()
-          .expectStatus()
-          .isCreated();
-      // Test that partner is ACTIVE
+
+      var seededPartner = partnerRepository.findById(partnerId).orElseThrow();
+      seededPartner.setPartnerStatus("EDIT");
+      partnerRepository.save(seededPartner);
+
       webTestClient
           .patch()
           .uri("/api/v1/partners/{id}/activate", partnerId)
@@ -246,7 +277,9 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .isOk()
           .expectBody()
           .jsonPath("$.status")
-          .isEqualTo("ACTIVE");
+          .isEqualTo("ACTIVE")
+          .jsonPath("$.updatedAt")
+          .isNotEmpty();
 
       webTestClient
           .patch()
@@ -272,12 +305,6 @@ class PartnerControllerIT extends BaseIntegrationTest {
     @Test
     @DisplayName("DELETE /id should return 422 if partner is still ACTIVE")
     void shouldReturn422WhenDeletingActivePartner() {
-      webTestClient
-          .patch()
-          .uri("/api/v1/partners/{id}/activate", partnerId)
-          .exchange()
-          .expectStatus()
-          .isOk();
 
       webTestClient
           .delete()
@@ -296,27 +323,13 @@ class PartnerControllerIT extends BaseIntegrationTest {
     @Test
     @DisplayName("Update Partner: Should change name and city successfully")
     void shouldUpdatePartnerDetails() {
-      var registerRequest = new RegisterPartnerRequest("Old Name", "Old City", "SWEDEN", "SWE");
-      var partnerResponse =
-          webTestClient
-              .post()
-              .uri("/api/v1/partners")
-              .bodyValue(registerRequest)
-              .exchange()
-              .expectStatus()
-              .isCreated()
-              .expectBody(PartnerResponse.class)
-              .returnResult()
-              .getResponseBody();
-
-      UUID partnerIdLookUp = partnerResponse.id();
 
       var updateRequest =
           new UpdatePartnerRequest("New Amazing Name", "Stockholm", "SWEDEN", "SWE");
 
       webTestClient
           .patch()
-          .uri("/api/v1/partners/{id}", partnerIdLookUp)
+          .uri("/api/v1/partners/{id}", partnerId)
           .bodyValue(updateRequest)
           .exchange()
           .expectStatus()
@@ -327,13 +340,13 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .jsonPath("$.city")
           .isEqualTo("Stockholm");
 
-      var updatedEntity = partnerRepository.findById(partnerIdLookUp).orElseThrow();
+      var updatedEntity = partnerRepository.findById(partnerId).orElseThrow();
       assertThat(updatedEntity.getPartnerName()).isEqualTo("New Amazing Name");
       assertThat(updatedEntity.getPartnerCity()).isEqualTo("Stockholm");
     }
 
     @Test
-    @DisplayName("Update Partner: Should fail if id is not found")
+    @DisplayName("Update Partner: Should fail if partner id does not belong to admin")
     void updatePartnerShouldFailIfIdIsNotFound() {
       UUID someId = UUID.randomUUID();
       var invalidRequest = new UpdatePartnerRequest("", "Stockholm", "SWEDEN", "SWE");
@@ -344,8 +357,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .bodyValue(invalidRequest)
           .exchange()
           .expectStatus()
-          .isEqualTo(
-              HttpStatus.UNPROCESSABLE_CONTENT); // This triggers your Exception Handling advice!
+          .isEqualTo(HttpStatus.FORBIDDEN); // This triggers your Exception Handling advice!
     }
 
     @Test

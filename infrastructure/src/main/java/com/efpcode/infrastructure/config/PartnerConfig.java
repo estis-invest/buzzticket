@@ -1,5 +1,6 @@
 package com.efpcode.infrastructure.config;
 
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.usecase.partner.*;
 import com.efpcode.domain.common.port.IdGenerator;
 import com.efpcode.domain.partner.model.PartnerId;
@@ -12,8 +13,10 @@ class PartnerConfig {
 
   @Bean
   public RegisterPartnerUseCase registerPartnerUseCase(
-      PartnerRepository partnerRepository, IdGenerator<PartnerId> idGenerator) {
-    return new RegisterPartnerUseCase(partnerRepository, idGenerator);
+      PartnerRepository partnerRepository,
+      IdGenerator<PartnerId> idGenerator,
+      PartnerAdminActionPolicy partnerAdminActionPolicy) {
+    return new RegisterPartnerUseCase(partnerRepository, idGenerator, partnerAdminActionPolicy);
   }
 
   @Bean
@@ -27,22 +30,26 @@ class PartnerConfig {
   }
 
   @Bean
-  public DeletePartnerUseCase deletePartnerUseCase(PartnerRepository partnerRepository) {
-    return new DeletePartnerUseCase(partnerRepository);
+  public DeletePartnerUseCase deletePartnerUseCase(
+      PartnerRepository partnerRepository, PartnerAdminActionPolicy partnerAdminActionPolicy) {
+    return new DeletePartnerUseCase(partnerRepository, partnerAdminActionPolicy);
   }
 
   @Bean
-  public DeactivatePartnerUseCase deactivatePartnerUseCase(PartnerRepository partnerRepository) {
-    return new DeactivatePartnerUseCase(partnerRepository);
+  public DeactivatePartnerUseCase deactivatePartnerUseCase(
+      PartnerRepository partnerRepository, PartnerAdminActionPolicy partnerAdminActionPolicy) {
+    return new DeactivatePartnerUseCase(partnerRepository, partnerAdminActionPolicy);
   }
 
   @Bean
-  public ActivatePartnerUseCase activatePartnerUseCase(PartnerRepository partnerRepository) {
-    return new ActivatePartnerUseCase(partnerRepository);
+  public ActivatePartnerUseCase activatePartnerUseCase(
+      PartnerRepository partnerRepository, PartnerAdminActionPolicy partnerAdminActionPolicy) {
+    return new ActivatePartnerUseCase(partnerRepository, partnerAdminActionPolicy);
   }
 
   @Bean
-  public EditPartnerUseCase editPartnerUseCase(PartnerRepository partnerRepository) {
-    return new EditPartnerUseCase(partnerRepository);
+  public EditPartnerUseCase editPartnerUseCase(
+      PartnerRepository partnerRepository, PartnerAdminActionPolicy partnerAdminActionPolicy) {
+    return new EditPartnerUseCase(partnerRepository, partnerAdminActionPolicy);
   }
 }

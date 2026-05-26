@@ -3,6 +3,8 @@ package com.efpcode.application.usecase.partner;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+import com.efpcode.application.context.RequestContext;
+import com.efpcode.application.policy.partner.PartnerAdminActionPolicy;
 import com.efpcode.application.usecase.partner.dto.RegisterPartnerCommand;
 import com.efpcode.application.usecase.partner.exceptions.PartnerAlreadyExistsException;
 import com.efpcode.domain.common.port.IdGenerator;
@@ -22,12 +24,15 @@ class RegisterPartnerUseCaseTest {
 
   @Mock private PartnerRepository partnerRepository;
   @Mock private IdGenerator<PartnerId> idGenerator;
+  @Mock private PartnerAdminActionPolicy partnerAdminActionPolicy;
+  @Mock private RequestContext requestContext;
 
   private RegisterPartnerUseCase registerPartnerUseCase;
 
   @BeforeEach
   void setUp() {
-    registerPartnerUseCase = new RegisterPartnerUseCase(partnerRepository, idGenerator);
+    registerPartnerUseCase =
+        new RegisterPartnerUseCase(partnerRepository, idGenerator, partnerAdminActionPolicy);
     lenient().when(idGenerator.generate()).thenReturn(new PartnerId(UUID.randomUUID()));
   }
 
@@ -36,8 +41,9 @@ class RegisterPartnerUseCaseTest {
   void partnerRegisterSuccessfullyForUniquePartnerName() {
     var command = new RegisterPartnerCommand("Test", "Test", "TEST", "TST");
     when(partnerRepository.existsByName(any(PartnerName.class))).thenReturn(false);
-    var partner = registerPartnerUseCase.execute(command);
+    var partner = registerPartnerUseCase.execute(command, requestContext);
     assertThat(partner).isNotNull();
+    verify(partnerAdminActionPolicy).partnerAdminValidator(requestContext);
     verify(partnerRepository).save(any());
   }
 
@@ -47,10 +53,12 @@ class RegisterPartnerUseCaseTest {
     var command = new RegisterPartnerCommand("Test", "Test", "TEST", "TST");
     when(partnerRepository.existsByName(any(PartnerName.class))).thenReturn(true);
 
-    assertThatThrownBy(() -> registerPartnerUseCase.execute(command))
+    assertThatThrownBy(() -> registerPartnerUseCase.execute(command, requestContext))
         .isInstanceOf(PartnerAlreadyExistsException.class)
         .hasMessageContaining("Partner is already registered with that name: Test");
 
+    verify(partnerRepository, never()).save(any());
+    verify(partnerAdminActionPolicy).partnerAdminValidator(requestContext);
     verify(partnerRepository, never()).save(any());
   }
 }
