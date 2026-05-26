@@ -4,11 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.efpcode.BaseIntegrationTest;
-import com.efpcode.domain.partner.model.Partner;
 import com.efpcode.domain.partner.model.PartnerId;
 import com.efpcode.domain.user.model.*;
 import com.efpcode.domain.user.port.UserRepository;
-import com.efpcode.infrastructure.persistence.partner.PartnerMapper;
 import com.efpcode.infrastructure.persistence.partner.SpringDataPartnerRepository;
 import com.efpcode.infrastructure.persistence.user.SpringDataUserRepository;
 import com.efpcode.infrastructure.security.TestSecurityConfiguration;
@@ -222,17 +220,13 @@ class PartnerControllerIT extends BaseIntegrationTest {
     @DisplayName("PATCH /activate should transition partner from EDIT to ACTIVE")
     void shouldTransitionFromEditToActive() {
 
-      var draftPartner =
-          Partner.createDraftPartner(
-              new PartnerId(UUID.randomUUID()), "Draft Partner", "Gothenburg", "SWEDEN", "SWE");
-
-      partnerRepository.save(PartnerMapper.toEntity(draftPartner));
-
-      UUID draftPartnerId = draftPartner.id().partnerId();
+      var seededPartner = partnerRepository.findById(partnerId).orElseThrow();
+      seededPartner.setPartnerStatus("EDIT");
+      partnerRepository.save(seededPartner);
 
       webTestClient
           .patch()
-          .uri("/api/v1/partners/{id}/activate", draftPartnerId)
+          .uri("/api/v1/partners/{id}/activate", partnerId)
           .exchange()
           .expectStatus()
           .isOk()
@@ -242,7 +236,7 @@ class PartnerControllerIT extends BaseIntegrationTest {
           .jsonPath("$.updatedAt")
           .isNotEmpty();
 
-      var updatedPartner = partnerRepository.findById(draftPartnerId).orElseThrow();
+      var updatedPartner = partnerRepository.findById(partnerId).orElseThrow();
       assertThat(updatedPartner.getPartnerStatus()).isEqualTo("ACTIVE");
     }
 
@@ -270,15 +264,21 @@ class PartnerControllerIT extends BaseIntegrationTest {
     @Test
     @DisplayName("Full Lifecycle: ACTIVE -> DEACTIVATED -> DELETED")
     void shouldFollowFullStatusLifecycle() {
-      // Ensure that when partner is DELETED, does not throw error PartnerNotFoundException
-      var request = new RegisterPartnerRequest("Partner 100", "New York", "USA", "USA");
+
+      var seededPartner = partnerRepository.findById(partnerId).orElseThrow();
+      seededPartner.setPartnerStatus("EDIT");
+      partnerRepository.save(seededPartner);
+
       webTestClient
-          .post()
-          .uri("/api/v1/partners")
-          .bodyValue(request)
+          .patch()
+          .uri("/api/v1/partners/{id}/activate", partnerId)
           .exchange()
           .expectStatus()
-          .isCreated();
+          .isOk()
+          .expectBody()
+          .jsonPath("$.status")
+          .isEqualTo("ACTIVE")
+          .jsonPath("$.updatedAt");
 
       webTestClient
           .patch()

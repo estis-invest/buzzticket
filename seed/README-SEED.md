@@ -3,23 +3,40 @@
 ## Run Seeds Files
 
 
-### Step 1
+### Recommended Seeding of Database (Safe & Atomic)
+
+#### Step 1
+```shell
+docker cp seed buzzticket-db:/seed
+```
+
+#### Step 2
+```shell
+docker exec -it buzzticket-db \
+psql -U BUZZTICKET -d buzzticket -f /seed/run_seed.sql
+```
+
+
+
+### Unsafe Manual Seeding of Database (Not Recommended!)
+
+#### Step 1
 
 ```shell
 cat seed/v1_initial_setup.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
 
 ```
-### Step 2
+#### Step 2
 ```shell
 cat seed/v2_adds_customers.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
 
 ```
-### Step 3
+#### Step 3
 ```shell
 cat seed/v3_adds_staff_members.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
 ```
 
-### Step 4
+#### Step 4
 ```shell
 cat seed/v4_adds_tickets_pending_status.sql | docker exec -i buzzticket-db psql -U BUZZTICKET -d buzzticket
 ```
