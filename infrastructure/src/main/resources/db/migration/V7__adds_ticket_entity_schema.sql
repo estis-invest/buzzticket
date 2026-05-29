@@ -1,7 +1,7 @@
 CREATE TABLE ticket
 (
     ticket_id               UUID                        NOT NULL,
-    ticket_slug             VARCHAR(64)                 NOT NULL,
+    ticket_slug             VARCHAR(32)                 NOT NULL,
     ticket_title            VARCHAR(50)                 NOT NULL,
     ticket_description      VARCHAR(1800)               NOT NULL,
     ticket_status           VARCHAR(255)                NOT NULL,
