@@ -9,7 +9,7 @@ import com.efpcode.application.port.out.security.StaffInvitationTokenGenerator;
 import com.efpcode.application.port.out.security.StaffInvitationTokenHasher;
 import com.efpcode.application.usecase.user.*;
 import com.efpcode.domain.common.port.IdGenerator;
-import com.efpcode.domain.staffinvitation.StaffInvitationId;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationId;
 import com.efpcode.domain.staffinvitation.port.StaffInvitationRepository;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.port.UserRepository;

@@ -1,4 +1,4 @@
-package com.efpcode.domain.staffinvitation;
+package com.efpcode.domain.staffinvitation.model;
 
 import static org.assertj.core.api.Assertions.*;
 

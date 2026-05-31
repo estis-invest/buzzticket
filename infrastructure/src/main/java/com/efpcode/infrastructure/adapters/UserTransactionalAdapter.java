@@ -6,7 +6,7 @@ import com.efpcode.application.usecase.user.CancelStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.CreateStaffInvitationUseCase;
 import com.efpcode.application.usecase.user.RegisterStaffUseCase;
 import com.efpcode.application.usecase.user.dto.*;
-import com.efpcode.domain.staffinvitation.StaffInvitationId;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationId;
 import com.efpcode.domain.user.model.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

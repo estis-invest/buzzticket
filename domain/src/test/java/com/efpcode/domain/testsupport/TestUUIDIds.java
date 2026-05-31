@@ -1,7 +1,7 @@
 package com.efpcode.domain.testsupport;
 
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.staffinvitation.StaffInvitationId;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationId;
 import com.efpcode.domain.ticket.model.TicketId;
 import com.efpcode.domain.user.model.UserId;
 import java.util.UUID;
