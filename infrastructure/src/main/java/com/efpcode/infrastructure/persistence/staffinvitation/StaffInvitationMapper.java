@@ -1,7 +1,7 @@
 package com.efpcode.infrastructure.persistence.staffinvitation;
 
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.staffinvitation.*;
+import com.efpcode.domain.staffinvitation.model.*;
 import com.efpcode.domain.user.model.UserEmail;
 import com.efpcode.domain.user.model.UserId;
 import com.efpcode.domain.user.model.UserRole;

@@ -1,10 +1,10 @@
 package com.efpcode.domain.staffinvitation.port;
 
 import com.efpcode.domain.partner.model.PartnerId;
-import com.efpcode.domain.staffinvitation.StaffInvitation;
-import com.efpcode.domain.staffinvitation.StaffInvitationId;
-import com.efpcode.domain.staffinvitation.StaffInvitationStatus;
-import com.efpcode.domain.staffinvitation.StaffInvitationTokenHash;
+import com.efpcode.domain.staffinvitation.model.StaffInvitation;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationId;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationStatus;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationTokenHash;
 import com.efpcode.domain.user.model.UserEmail;
 import java.util.List;
 import java.util.Optional;

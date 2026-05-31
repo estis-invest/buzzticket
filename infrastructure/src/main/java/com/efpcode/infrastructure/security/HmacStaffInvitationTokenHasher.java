@@ -2,7 +2,7 @@ package com.efpcode.infrastructure.security;
 
 import com.efpcode.application.port.out.security.StaffInvitationTokenHasher;
 import com.efpcode.domain.common.model.PlainStaffInvitationToken;
-import com.efpcode.domain.staffinvitation.StaffInvitationTokenHash;
+import com.efpcode.domain.staffinvitation.model.StaffInvitationTokenHash;
 import com.efpcode.infrastructure.config.properties.StaffInvitationTokenProperties;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
