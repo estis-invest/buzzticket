@@ -5,11 +5,13 @@
 
 ### Recommended Seeding of Database (Safe & Atomic)
 
+> Please note that the `buzzticket-db` is the container name from docker compose file. 
 #### Step 1
 ```shell
 docker cp seed buzzticket-db:/seed
 ```
 
+> Please note that the names `BUZZTICKET` is the .env field `DB_USERNAME` and `buzzticket` is the .env field called `DB_NAME`. 
 #### Step 2
 ```shell
 docker exec -it buzzticket-db \
@@ -73,3 +75,15 @@ cat seed/v4_adds_tickets_pending_status.sql | docker exec -i buzzticket-db psql 
 | Beta Corp   | support@beta.com           | Support@1    | SUPPORT  |
 | Zeta Corp   | support@zeta.com           | Support@1    | SUPPORT  |
 
+
+## Login with example user
+```shell
+# Authenticate and obtain access token
+curl -X POST http://localhost:8080/auth/login \
+-H "Content-Type: application/json" \
+-d '{
+"email": "admin@acme.com",
+"password": "Secret@1"
+}'
+
+```
