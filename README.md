@@ -106,7 +106,7 @@ jwt-private.pem jwt-public.pem
 Run docker-compose to create containerized env:
 
 ```shell
-docker-compose up -d
+docker compose up -d
 ```
 
 > Note that all fields in the .env must be populated to work

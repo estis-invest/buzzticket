@@ -1,17 +1,18 @@
 # Seed Data
 
-## Run Seeds Files
+## Database Seeding
 
 
 ### Recommended Seeding of Database (Safe & Atomic)
 
-> Please note that the `buzzticket-db` is the container name from docker compose file. 
+> Please note that `buzzticket-db` is the container name defined in the *Docker Compose* file. 
+> See `docker-compose.yml` for further details or configuration. 
 #### Step 1
 ```shell
 docker cp seed buzzticket-db:/seed
 ```
 
-> Please note that the names `BUZZTICKET` is the .env field `DB_USERNAME` and `buzzticket` is the .env field called `DB_NAME`. 
+> Please note that `BUZZTICKET` is the value provided in the `.env` field `DB_USERNAME` and `buzzticket` is the value provided in the `.env` field `DB_NAME`.
 #### Step 2
 ```shell
 docker exec -it buzzticket-db \
@@ -45,6 +46,8 @@ cat seed/v4_adds_tickets_pending_status.sql | docker exec -i buzzticket-db psql 
 
 -----
 
+> Please note: **CREDENTIALS ARE ONLY INTENDED FOR DEMONSTRATION PURPOSES. DO NOT USE IN PRODUCTION ENVIRONMENT** 
+
 ## Admin Login
 
 | Partner     | Email             | Password   | Role   |
@@ -75,8 +78,24 @@ cat seed/v4_adds_tickets_pending_status.sql | docker exec -i buzzticket-db psql 
 | Beta Corp   | support@beta.com           | Support@1    | SUPPORT  |
 | Zeta Corp   | support@zeta.com           | Support@1    | SUPPORT  |
 
+---
 
-## Login with example user
+## Login with a Demo User
+
+### Step 1: Initialize Buzzticket
+Run command below to start application
+
+```shell
+./run.sh
+```
+
+> Please note that Docker container must be created and must be running for the command to work. 
+
+
+### Step 2: Login with Demo User
+
+Open another terminal window and cd to `buzzticket` run the command below:
+
 ```shell
 # Authenticate and obtain access token
 curl -X POST http://localhost:8080/auth/login \
@@ -87,3 +106,5 @@ curl -X POST http://localhost:8080/auth/login \
 }'
 
 ```
+
+
